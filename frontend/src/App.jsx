@@ -6,15 +6,14 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import BackToTop from "./components/layout/BackToTop";
 import Booking from "./pages/Booking";
-
+import Services from "./pages/Services";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Team from "./pages/Team";
+import Testimonial from "./pages/Testimonial";
+import Rooms from "./pages/Rooms";
+import RoomDetail from "./pages/RoomDetail";
 import Home from "./pages/Home";
-
-// TODO: Import other pages when they are created
-// import Rooms from "./pages/Rooms";
-// import RoomDetail from "./pages/RoomDetail";
-// import About from "./pages/About";
-// import Services from "./pages/Services";
-// import Contact from "./pages/Contact";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -48,7 +47,6 @@ function App() {
 
                 {/* TODO: Add routes when pages are created */}
 
-                {/*
                 <Route
                     path="/rooms"
                     element={<Rooms />}
@@ -57,14 +55,18 @@ function App() {
                 <Route
                     path="/rooms/:id"
                     element={<RoomDetail />}
-                />*/}
+                />
 
                 <Route
                     path="/booking"
                     element={<Booking />}
                 />
 
-                {/*
+                <Route
+                    path="/booking/:roomId"
+                    element={<Booking />}
+                />
+
                 <Route
                     path="/about"
                     element={<About />}
@@ -76,10 +78,19 @@ function App() {
                 />
 
                 <Route
+                    path="/team"
+                    element={<Team />}
+                />
+
+                <Route
+                    path="/testimonial"
+                    element={<Testimonial />}
+                />
+
+                <Route
                     path="/contact"
                     element={<Contact />}
                 />
-                */}
 
             </Routes>
 
