@@ -134,26 +134,26 @@ function Navbar() {
 
                                     <div className="dropdown-menu rounded-0 m-0">
 
-                                        <Link
+                                        <NavLink
                                             to="/booking"
                                             className="dropdown-item"
                                         >
                                             Booking
-                                        </Link>
+                                        </NavLink>
 
-                                        <Link
+                                        <NavLink
                                             to="/team"
                                             className="dropdown-item"
                                         >
                                             Our Team
-                                        </Link>
+                                        </NavLink>
 
-                                        <Link
+                                        <NavLink
                                             to="/testimonial"
                                             className="dropdown-item"
                                         >
                                             Testimonial
-                                        </Link>
+                                        </NavLink>
 
                                     </div>
                                 </div>
@@ -168,12 +168,12 @@ function Navbar() {
                             </div>
 
                             {/* TODO: Booking page will use room.id to load room data from Spring Boot API */}
-                            <Link
+                            <NavLink
                                 to={`/booking`}
                                 className="btn btn-sm btn-dark rounded py-2 px-4"
                             >
                                 Book Now
-                            </Link>
+                            </NavLink>
 
                         </div>
                     </nav>
