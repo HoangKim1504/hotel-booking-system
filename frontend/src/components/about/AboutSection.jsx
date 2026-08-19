@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 import about1 from "../../assets/images/about-1.jpg";
 import about2 from "../../assets/images/about-2.jpg";
 import about3 from "../../assets/images/about-3.jpg";
@@ -7,7 +5,8 @@ import about4 from "../../assets/images/about-4.jpg";
 
 function AboutSection() {
 
-    // TODO: Replace mock statistics with Spring Boot API if needed
+    // TODO: Replace mock hotel statistics with Spring Boot API if needed
+    // Example: GET /api/statistics/overview
     const statistics = [
         {
             id: 1,
@@ -32,8 +31,10 @@ function AboutSection() {
     return (
         <div className="container-xxl py-5">
             <div className="container">
+
                 <div className="row g-5 align-items-center">
 
+                    {/* About Content */}
                     <div className="col-lg-6">
 
                         <h6 className="section-title text-start text-primary text-uppercase">
@@ -47,12 +48,18 @@ function AboutSection() {
                             </span>
                         </h1>
 
+                        {/* TODO: Replace mock hotel description with real data
+                            or Spring Boot API if hotel information becomes dynamic */}
                         <p className="mb-4">
                             Tempor erat elitr rebum at clita.
                             Diam dolor diam ipsum sit.
                             Aliqu diam amet diam et eos.
+                            Clita erat ipsum et lorem et sit,
+                            sed stet lorem sit clita duo justo
+                            magna dolore erat amet.
                         </p>
 
+                        {/* Statistics */}
                         <div className="row g-3 pb-4">
 
                             {statistics.map((item) => (
@@ -61,6 +68,7 @@ function AboutSection() {
                                     className="col-sm-4"
                                 >
                                     <div className="border rounded p-1">
+
                                         <div className="border rounded text-center p-4">
 
                                             <i
@@ -82,24 +90,21 @@ function AboutSection() {
 
                         </div>
 
-                        <Link
-                            to="/about"
-                            className="btn btn-primary py-3 px-5 mt-2"
-                        >
-                            Explore More
-                        </Link>
-
                     </div>
 
+                    {/* About Images */}
                     <div className="col-lg-6">
+
                         <div className="row g-3">
 
                             <div className="col-6 text-end">
                                 <img
                                     className="img-fluid rounded w-75"
                                     src={about1}
-                                    alt="Hotel"
-                                    style={{ marginTop: "25%" }}
+                                    alt="Hotel view"
+                                    style={{
+                                        marginTop: "25%",
+                                    }}
                                 />
                             </div>
 
@@ -107,7 +112,7 @@ function AboutSection() {
                                 <img
                                     className="img-fluid rounded w-100"
                                     src={about2}
-                                    alt="Hotel"
+                                    alt="Hotel room"
                                 />
                             </div>
 
@@ -115,7 +120,7 @@ function AboutSection() {
                                 <img
                                     className="img-fluid rounded w-50"
                                     src={about3}
-                                    alt="Hotel"
+                                    alt="Hotel interior"
                                 />
                             </div>
 
@@ -123,14 +128,16 @@ function AboutSection() {
                                 <img
                                     className="img-fluid rounded w-75"
                                     src={about4}
-                                    alt="Hotel"
+                                    alt="Hotel service"
                                 />
                             </div>
 
                         </div>
+
                     </div>
 
                 </div>
+
             </div>
         </div>
     );
