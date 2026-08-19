@@ -1,12 +1,14 @@
 import HeroCarousel from "../components/home/HeroCarousel";
-import BookingSearch from "../components/booking/BookingSearch";
-import AboutSection from "../components/home/AboutSection";
-import RoomList from "../components/room/RoomList";
 import VideoSection from "../components/home/VideoSection";
-import ServiceSection from "../components/home/ServiceSection";
-import Testimonial from "../components/home/Testimonial";
-import TeamSection from "../components/home/TeamSection";
-import Newsletter from "../components/home/Newsletter";
+
+import BookingSearch from "../components/booking/BookingSearch";
+import AboutSection from "../components/about/AboutSection";
+import RoomList from "../components/room/RoomList";
+import ServiceSection from "../components/service/ServiceSection";
+import TeamSection from "../components/team/TeamSection";
+
+import TestimonialSection from "../components/common/TestimonialSection";
+import Newsletter from "../components/common/Newsletter";
 
 function Home() {
     return (
@@ -23,7 +25,7 @@ function Home() {
 
             <ServiceSection />
 
-            <Testimonial />
+            <TestimonialSection />
 
             <TeamSection />
 

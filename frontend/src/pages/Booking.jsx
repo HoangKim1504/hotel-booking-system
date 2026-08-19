@@ -1,7 +1,7 @@
 import PageHeader from "../components/layout/PageHeader";
 import BookingSearch from "../components/booking/BookingSearch";
 import BookingForm from "../components/booking/BookingForm";
-import Newsletter from "../components/home/Newsletter";
+import Newsletter from "../components/common/Newsletter";
 
 function Booking() {
     return (
