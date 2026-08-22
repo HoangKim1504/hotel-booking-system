@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @SuperBuilder
@@ -28,6 +30,9 @@ public class User extends BaseModel {
     @Field("user_name")
     private String userName;
 
+    /**
+     * BCrypt hash — không lưu plain text.
+     */
     private String password;
 
     @Field("full_name")
@@ -51,4 +56,10 @@ public class User extends BaseModel {
 
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
+
+    /**
+     * Reference → {@code roles._id}.
+     */
+    private List<String> roleIds = new ArrayList<>();
+
 }
