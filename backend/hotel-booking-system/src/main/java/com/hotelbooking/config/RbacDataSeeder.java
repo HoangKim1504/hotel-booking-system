@@ -32,7 +32,7 @@ public class RbacDataSeeder implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         // --- Đã seed rồi → bỏ qua (idempotent) ---
-        if (userRepository.existsByUserName("admin")) {
+        if (userRepository.existsByUsername("admin")) {
             log.info("RbacDataSeeder: data already present — skip");
             return;
         }
@@ -92,7 +92,7 @@ public class RbacDataSeeder implements ApplicationRunner {
 
     private void saveUser(String username, String email, String rawPassword, List<String> roleIds) {
         User u = new User();
-        u.setUserName(username);
+        u.setUsername(username);
         u.setEmail(email);
         // --- Chỉ encode một lần; login dùng matches(raw, hashTrongDb) ---
         u.setPassword(passwordEncoder.encode(rawPassword));

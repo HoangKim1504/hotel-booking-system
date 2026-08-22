@@ -28,7 +28,7 @@ public class User extends BaseModel {
 
     @Indexed(unique = true)
     @Field("user_name")
-    private String userName;
+    private String username;
 
     /**
      * BCrypt hash — không lưu plain text.
@@ -57,6 +57,8 @@ public class User extends BaseModel {
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
+    private boolean enabled = true;
+    
     /**
      * Reference → {@code roles._id}.
      */
