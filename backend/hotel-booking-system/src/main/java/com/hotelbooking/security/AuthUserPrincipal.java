@@ -38,7 +38,7 @@ public class AuthUserPrincipal implements UserDetails {
         this.enabled = enabled;
         this.roleCodes = List.copyOf(roleCodes);
         this.permissionCodes = List.copyOf(permissionCodes);
-        // --- Map permission.code → GrantedAuthority (không thêm tiền tố ROLE_) ---
+        // Map permission.code → GrantedAuthority (không thêm tiền tố ROLE_)
         this.authorities = permissionCodes.stream()
                 .map(SimpleGrantedAuthority::new)
                 .toList();

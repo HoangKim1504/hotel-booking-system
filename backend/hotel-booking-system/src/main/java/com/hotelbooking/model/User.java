@@ -1,7 +1,9 @@
 package com.hotelbooking.model;
 
-import com.hotelbooking.enums.UserStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -54,11 +56,8 @@ public class User extends BaseModel {
     @Field("profile_url_link")
     private String profileUrlLink;
 
-    @Builder.Default
-    private UserStatus status = UserStatus.ACTIVE;
-
     private boolean enabled = true;
-    
+
     /**
      * Reference → {@code roles._id}.
      */
