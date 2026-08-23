@@ -67,7 +67,7 @@ public class RbacDataSeeder implements ApplicationRunner {
         saveUser(
                 "admin",
                 "admin@demo.local",
-                "admin123",
+                "@Admin123",
                 "System Admin",
                 Gender.MALE,
                 LocalDate.of(1995, 1, 15),
@@ -80,7 +80,7 @@ public class RbacDataSeeder implements ApplicationRunner {
         saveUser(
                 "editor",
                 "editor@demo.local",
-                "editor123",
+                "@Editor123",
                 "Hotel Editor",
                 Gender.FEMALE,
                 LocalDate.of(1998, 5, 20),
@@ -93,7 +93,7 @@ public class RbacDataSeeder implements ApplicationRunner {
         saveUser(
                 "alice",
                 "alice@demo.local",
-                "user123",
+                "@User123",
                 "Alice Nguyen",
                 Gender.FEMALE,
                 LocalDate.of(2000, 10, 10),
@@ -103,7 +103,7 @@ public class RbacDataSeeder implements ApplicationRunner {
                 List.of(roleUser.getId())
         );
 
-        log.info("RbacDataSeeder: done. Logins: admin/admin123, editor/editor123, alice/user123");
+        log.info("RbacDataSeeder: done. Logins: admin/@Admin123, editor/@Editor123, alice/@User123");
     }
 
     private Permission savePermission(String code, String name) {
