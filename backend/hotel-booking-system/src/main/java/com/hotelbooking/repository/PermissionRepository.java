@@ -13,6 +13,4 @@ public interface PermissionRepository extends MongoRepository<Permission, String
 
     List<Permission> findByIdIn(Collection<String> ids);
 
-    Permission save(Permission p);
-
 }
