@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface RoleRepository extends MongoRepository<Role, String> {
 
-    Optional<Role> findByCode(String code);
+    List<Role> findByIdInAndDeleteFlagFalse(Collection<String> ids);
 
-    List<Role> findByIdIn(Collection<String> ids);
+    Optional<Role> findByCodeAndDeleteFlagFalse(String code);
 
 }

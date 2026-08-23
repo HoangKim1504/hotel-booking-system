@@ -34,7 +34,8 @@ public class UserService {
 
     public List<UserResponse> findAll() {
         // Map toàn bộ user → DTO (kèm role codes)
-        return userRepository.findAll().stream()
+        return userRepository.findAllByDeleteFlagFalse()
+                .stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -70,16 +71,19 @@ public class UserService {
         user.setAddress(request.address());
         user.setProfileUrlLink(request.profileUrlLink());
         user.setEnabled(true);
+        user.setDeleteFlag(false);
         user.setRoleIds(roleIds);
         Instant now = Instant.now();
         user.setCreatedBy(request.username());
         user.setCreatedAt(now);
         user.setUpdatedBy(null);
         user.setUpdatedAt(null);
+
         return toResponse(userRepository.save(user));
     }
 
     public UserResponse update(String id, UpdateUserRequest request) {
+        // Không tồn tại hoặc đã soft delete → 404
         User user = requireUser(id);
 
         // Cập nhật từng field nếu client gửi
@@ -97,28 +101,38 @@ public class UserService {
         if (request.password() != null && !request.password().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.password()));
         }
+        user.setUpdatedBy(user.getUsername());
         user.setUpdatedAt(Instant.now());
+
         return toResponse(userRepository.save(user));
     }
 
     public void delete(String id) {
-        // Xóa; không thấy → 404
-        if (!userRepository.existsById(id)) {
-            throw new NotFoundException("User not found: " + id);
-        }
-        userRepository.deleteById(id);
+        // Không tồn tại hoặc đã soft delete → 404
+        User user = requireUser(id);
+
+        // Soft delete
+        user.setEnabled(false);
+        user.setDeleteFlag(true);
+        user.setUpdatedBy(user.getUsername());
+        user.setUpdatedAt(Instant.now());
+
+        userRepository.save(user);
     }
 
     public UserResponse assignRole(String userId, String roleCode) {
+        // User không tồn tại hoặc đã soft delete → 404
         User user = requireUser(userId);
-        Role role = roleRepository.findByCode(roleCode.toUpperCase())
-                .orElseThrow(() -> new NotFoundException("Role not found: " + roleCode));
 
-        // Idempotent: đã có role thì giữ nguyên
+        // Role không tồn tại hoặc đã soft delete → 404
+        Role role = requireRole(roleCode);
+
+        // Đã có role thì không thêm lại
         List<String> roleIds = new ArrayList<>(user.getRoleIds());
         if (!roleIds.contains(role.getId())) {
             roleIds.add(role.getId());
             user.setRoleIds(roleIds);
+            user.setUpdatedBy(user.getUsername());
             user.setUpdatedAt(Instant.now());
             user = userRepository.save(user);
         }
@@ -126,13 +140,16 @@ public class UserService {
     }
 
     public UserResponse removeRole(String userId, String roleCode) {
+        // User không tồn tại hoặc đã soft delete → 404
         User user = requireUser(userId);
-        Role role = roleRepository.findByCode(roleCode.toUpperCase())
-                .orElseThrow(() -> new NotFoundException("Role not found: " + roleCode));
+
+        // Role không tồn tại hoặc đã soft delete → 404
+        Role role = requireRole(roleCode);
 
         List<String> roleIds = new ArrayList<>(user.getRoleIds());
         if (roleIds.remove(role.getId())) {
             user.setRoleIds(roleIds);
+            user.setUpdatedBy(user.getUsername());
             user.setUpdatedAt(Instant.now());
             user = userRepository.save(user);
         }
@@ -140,15 +157,25 @@ public class UserService {
     }
 
     private User requireUser(String id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found: " + id));
+        return userRepository.findByIdAndDeleteFlagFalse(id)
+                .orElseThrow(() ->
+                        new NotFoundException("User not found: " + id)
+                );
+    }
+
+    private Role requireRole(String roleCode) {
+        String code = roleCode.trim().toUpperCase();
+
+        return roleRepository.findByCodeAndDeleteFlagFalse(code)
+                .orElseThrow(() ->
+                        new NotFoundException("Role not found: " + roleCode)
+                );
     }
 
     private List<String> resolveRoleIds(List<String> roleCodes) {
         List<String> ids = new ArrayList<>();
         for (String code : roleCodes) {
-            Role role = roleRepository.findByCode(code.toUpperCase())
-                    .orElseThrow(() -> new NotFoundException("Role not found: " + code));
+            Role role = requireRole(code);
             ids.add(role.getId());
         }
         return ids;

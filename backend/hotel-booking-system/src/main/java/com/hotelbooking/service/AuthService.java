@@ -25,7 +25,7 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request) {
         // Tìm user theo username
-        User user = userRepository.findByUsername(request.username())
+        User user = userRepository.findByUsernameAndDeleteFlagFalse(request.username())
                 .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
 
         // Tài khoản bị khóa

@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface PermissionRepository extends MongoRepository<Permission, String> {
 
-    Optional<Permission> findByCode(String code);
+    List<Permission> findByIdInAndDeleteFlagFalse(Collection<String> ids);
 
-    List<Permission> findByIdIn(Collection<String> ids);
+    Optional<Permission> findByCodeAndDeleteFlagFalse(String code);
 
 }

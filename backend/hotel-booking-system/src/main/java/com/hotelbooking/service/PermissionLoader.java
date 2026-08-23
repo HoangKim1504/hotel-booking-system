@@ -28,7 +28,7 @@ public class PermissionLoader {
         }
 
         // Load roles theo id
-        List<Role> roles = roleRepository.findByIdIn(roleIds);
+        List<Role> roles = roleRepository.findByIdInAndDeleteFlagFalse(roleIds);
         Set<String> permissionIds = new LinkedHashSet<>();
         for (Role role : roles) {
             if (role.getPermissionIds() != null) {
@@ -40,7 +40,7 @@ public class PermissionLoader {
         }
 
         // Load permissions → lấy code
-        for (Permission p : permissionRepository.findByIdIn(permissionIds)) {
+        for (Permission p : permissionRepository.findByIdInAndDeleteFlagFalse(permissionIds)) {
             codes.add(p.getCode());
         }
         return codes;
@@ -53,7 +53,7 @@ public class PermissionLoader {
         if (roleIds == null || roleIds.isEmpty()) {
             return List.of();
         }
-        return roleRepository.findByIdIn(roleIds).stream()
+        return roleRepository.findByIdInAndDeleteFlagFalse(roleIds).stream()
                 .map(Role::getCode)
                 .toList();
     }
