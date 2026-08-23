@@ -1,5 +1,6 @@
 package com.hotelbooking.model;
 
+import com.hotelbooking.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,9 +26,6 @@ public class User extends BaseModel {
     @Id
     private String id;
 
-    @Field("role_id")
-    private String roleId;
-
     @Indexed(unique = true)
     @Field("user_name")
     private String username;
@@ -40,7 +38,7 @@ public class User extends BaseModel {
     @Field("full_name")
     private String fullName;
 
-    private String gender;
+    private Gender gender;
 
     @Field("date_of_birth")
     private LocalDate dateOfBirth;
