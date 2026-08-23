@@ -46,7 +46,19 @@ public class SecurityConfig {
 
                 // URL: login + Swagger/OpenAPI public; còn lại cần JWT (@PreAuthorize)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                        // Public
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/login",
+                                "/api/auth/register"
+                        ).permitAll()
+
+                        // User management
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/users"
+                        ).hasAuthority("USER_CREATE")
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",
