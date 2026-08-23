@@ -61,13 +61,21 @@ public class UserService {
         // Lưu user (BCrypt)
         User user = new User();
         user.setUsername(request.username());
-        user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
+        user.setFullName(request.fullName());
+        user.setGender(request.gender());
+        user.setDateOfBirth(request.dateOfBirth());
+        user.setEmail(request.email());
+        user.setPhoneNumber(request.phoneNumber());
+        user.setAddress(request.address());
+        user.setProfileUrlLink(request.profileUrlLink());
         user.setEnabled(true);
         user.setRoleIds(roleIds);
         Instant now = Instant.now();
+        user.setCreatedBy(request.username());
         user.setCreatedAt(now);
-        user.setUpdatedAt(now);
+        user.setUpdatedBy(null);
+        user.setUpdatedAt(null);
         return toResponse(userRepository.save(user));
     }
 
@@ -151,7 +159,12 @@ public class UserService {
         return new UserResponse(
                 user.getId(),
                 user.getUsername(),
+                user.getFullName(),
+                user.getGender(),
+                user.getDateOfBirth(),
                 user.getEmail(),
+                user.getPhoneNumber(),
+                user.getAddress(),
                 user.isEnabled(),
                 roles,
                 user.getCreatedAt(),
