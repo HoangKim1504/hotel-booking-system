@@ -129,7 +129,9 @@ public class UserService {
 
         // Đã có role thì không thêm lại
         List<String> roleIds = new ArrayList<>(user.getRoleIds());
-        if (!roleIds.contains(role.getId())) {
+        if (roleIds.contains(role.getId())) {
+            throw new ConflictException("Role already exists");
+        } else {
             roleIds.add(role.getId());
             user.setRoleIds(roleIds);
             user.setUpdatedBy(user.getUsername());
