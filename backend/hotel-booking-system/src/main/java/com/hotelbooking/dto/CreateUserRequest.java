@@ -57,7 +57,7 @@ public record CreateUserRequest(
         @NotBlank(message = "Phone number is required")
         @Pattern(
                 regexp = "^(0|\\+84)[0-9]{9}$",
-                message = "Phone number format is invalid"
+                message = "Phone number must be 10 digits or start with +84 followed by 9 digits"
         )
         String phoneNumber,
 
