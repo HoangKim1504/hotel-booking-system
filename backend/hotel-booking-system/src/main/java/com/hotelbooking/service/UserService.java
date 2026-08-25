@@ -87,6 +87,18 @@ public class UserService {
         User user = requireUser(id);
 
         // Cập nhật từng field nếu client gửi
+        if (request.fullName() != null) {
+            user.setFullName(request.fullName());
+        }
+
+        if (request.gender() != null) {
+            user.setGender(request.gender());
+        }
+
+        if (request.dateOfBirth() != null) {
+            user.setDateOfBirth(request.dateOfBirth());
+        }
+
         if (request.email() != null && !request.email().isBlank()) {
             userRepository.findByEmail(request.email())
                     .filter(u -> !u.getId().equals(id))
@@ -95,12 +107,28 @@ public class UserService {
                     });
             user.setEmail(request.email());
         }
+
+        if (request.phoneNumber() != null) {
+            user.setPhoneNumber(request.phoneNumber());
+        }
+
+        if (request.address() != null) {
+            user.setAddress(request.address());
+        }
+
+        if (request.profileUrlLink() != null) {
+            user.setProfileUrlLink(request.profileUrlLink());
+        }
+
         if (request.enabled() != null) {
             user.setEnabled(request.enabled());
+            user.setDeleteFlag(!request.enabled());
         }
-        if (request.password() != null && !request.password().isBlank()) {
+
+        if (request.password() != null) {
             user.setPassword(passwordEncoder.encode(request.password()));
         }
+
         user.setUpdatedBy(user.getUsername());
         user.setUpdatedAt(Instant.now());
 
