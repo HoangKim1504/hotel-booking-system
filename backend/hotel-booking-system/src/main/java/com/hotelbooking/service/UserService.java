@@ -99,12 +99,10 @@ public class UserService {
             user.setDateOfBirth(request.dateOfBirth());
         }
 
-        if (request.email() != null && !request.email().isBlank()) {
-            userRepository.findByEmail(request.email())
-                    .filter(u -> !u.getId().equals(id))
-                    .ifPresent(u -> {
-                        throw new ConflictException("Email already exists");
-                    });
+        if (request.email() != null) {
+            if (userRepository.existsByEmail(request.email())) {
+                throw new ConflictException("Email already exists");
+            }
             user.setEmail(request.email());
         }
 
