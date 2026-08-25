@@ -127,17 +127,23 @@ public class UserService {
         // Role không tồn tại hoặc đã soft delete → 404
         Role role = requireRole(roleCode);
 
+        // Tránh NullPointerException
+        List<String> roleIds = user.getRoleIds() == null
+                ? new ArrayList<>()
+                : new ArrayList<>(user.getRoleIds());
+
         // Đã có role thì không thêm lại
-        List<String> roleIds = new ArrayList<>(user.getRoleIds());
         if (roleIds.contains(role.getId())) {
             throw new ConflictException("Role already exists");
         } else {
+            // Add role
             roleIds.add(role.getId());
             user.setRoleIds(roleIds);
             user.setUpdatedBy(user.getUsername());
             user.setUpdatedAt(Instant.now());
             user = userRepository.save(user);
         }
+
         return toResponse(user);
     }
 
@@ -148,13 +154,23 @@ public class UserService {
         // Role không tồn tại hoặc đã soft delete → 404
         Role role = requireRole(roleCode);
 
-        List<String> roleIds = new ArrayList<>(user.getRoleIds());
-        if (roleIds.remove(role.getId())) {
-            user.setRoleIds(roleIds);
-            user.setUpdatedBy(user.getUsername());
-            user.setUpdatedAt(Instant.now());
-            user = userRepository.save(user);
+        // Tránh NullPointerException
+        List<String> roleIds = user.getRoleIds() == null
+                ? new ArrayList<>()
+                : new ArrayList<>(user.getRoleIds());
+
+        // Role tồn tại nhưng user không có role này → 409
+        if (!roleIds.contains(role.getId())) {
+            throw new ConflictException("User does not have role: " + roleCode);
         }
+
+        // Remove role
+        roleIds.remove(role.getId());
+        user.setRoleIds(roleIds);
+        user.setUpdatedBy(user.getUsername());
+        user.setUpdatedAt(Instant.now());
+        user = userRepository.save(user);
+
         return toResponse(user);
     }
 
