@@ -1,11 +1,10 @@
 package com.hotelbooking.controller;
 
-import com.hotelbooking.dto.LoginRequest;
-import com.hotelbooking.dto.LoginResponse;
-import com.hotelbooking.dto.MeResponse;
+import com.hotelbooking.dto.*;
 import com.hotelbooking.security.AuthUserPrincipal;
 import com.hotelbooking.service.AuthService;
 import com.hotelbooking.service.SecurityUtils;
+import com.hotelbooking.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -27,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
     private final SecurityUtils securityUtils;
 
     /**
@@ -49,6 +49,12 @@ public class AuthController {
                 user.getEmail(),
                 user.getRoleCodes(),
                 user.getPermissionCodes());
+    }
+
+    @PostMapping("/register")
+    @SecurityRequirements // empty = không bắt Authorize khi Try it out login
+    public UserResponse register(@Valid @RequestBody CreateUserRequest request) {
+        return userService.create(request);
     }
 
 }
