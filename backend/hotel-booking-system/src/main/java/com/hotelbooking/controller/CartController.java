@@ -4,9 +4,8 @@ import com.hotelbooking.dto.CartResponse;
 import com.hotelbooking.service.CartService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,10 +17,10 @@ public class CartController {
 
     private final CartService cartService;
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_VIEW')")
-    public CartResponse get(@PathVariable String userId) {
-        return cartService.findById(userId);
+    @GetMapping
+    public CartResponse get(Authentication authentication) {
+        String username = authentication.getName();
+        return cartService.findByUsername(username);
     }
 
 }

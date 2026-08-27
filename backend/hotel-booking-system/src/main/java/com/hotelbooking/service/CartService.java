@@ -6,9 +6,11 @@ import com.hotelbooking.exception.NotFoundException;
 import com.hotelbooking.model.Cart;
 import com.hotelbooking.model.CartItem;
 import com.hotelbooking.model.RoomType;
+import com.hotelbooking.model.User;
 import com.hotelbooking.repository.CartItemRepository;
 import com.hotelbooking.repository.CartRepository;
 import com.hotelbooking.repository.RoomTypeRepository;
+import com.hotelbooking.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,16 +23,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartService {
 
+    private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final RoomTypeRepository roomTypeRepository;
 
-    public CartResponse findById(String userId) {
+    public CartResponse findByUsername(String username) {
 
         BigDecimal subTotal;
         BigDecimal totalAmount = BigDecimal.ZERO;
         CartItemResponse cartItemResponse;
         List<CartItemResponse> cartItemList = new ArrayList<>();
+
+        User user = requireUser(username);
+        String userId = user.getId();
 
         Cart cart = getOrCreateCart(userId);
         List<CartItem> cartItems = cartItemRepository.findAllByDeleteFlagFalse();
@@ -62,6 +68,13 @@ public class CartService {
                     cart.setCreatedAt(Instant.now());
                     return cartRepository.save(cart);
                 });
+    }
+
+    private User requireUser(String username) {
+        return userRepository.findByUsernameAndDeleteFlagFalse(username)
+                .orElseThrow(() ->
+                        new NotFoundException("User not found: " + username)
+                );
     }
 
     private RoomType requireRomeType(String id) {
