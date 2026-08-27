@@ -1,5 +1,6 @@
 package com.hotelbooking.service;
 
+import com.hotelbooking.dto.AddCartItemRequest;
 import com.hotelbooking.dto.CartItemResponse;
 import com.hotelbooking.dto.CartResponse;
 import com.hotelbooking.exception.NotFoundException;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -58,13 +60,62 @@ public class CartService {
         return toCartResponse(cart, cartItemList, totalAmount);
     }
 
-    private Cart getOrCreateCart(String userId) {
+    public CartResponse addCartItem(AddCartItemRequest request, String username) {
+        BigDecimal subTotal;
+        CartItemResponse cartItemResponse;
+        CartItem item;
+        List<CartItemResponse> cartItemList = new ArrayList<>();
+
+        String userId = getUserId(username);
+        Cart cart = getOrCreateCart(userId, username);
+        RoomType roomType = requireRomeType(request.roomTypeId());
+
+        Optional<CartItem> existItem = cartItemRepository.findByCartIdAndRoomTypeIdAndDeleteFlagFalse(
+                cart.getId(),
+                request.roomTypeId());
+
+        if (existItem.isPresent()) {
+            item = existItem.get();
+            item.setQuantity(item.getQuantity() + request.quantity()); // Đã có → cộng quantity
+            item.setPrice(roomType.getPrice()); // Refresh lại giá hiện tại
+            item.setUpdatedBy(username);
+            item.setUpdatedAt(Instant.now());
+        } else {
+            // Chưa có → tạo CartItem mới
+            item = new CartItem();
+            item.setCartId(cart.getId());
+            item.setRoomTypeId(request.roomTypeId());
+            item.setQuantity(request.quantity());
+            item.setPrice(roomType.getPrice());
+            item.setDeleteFlag(false);
+            item.setCreatedBy(username);
+            item.setCreatedAt(Instant.now());
+            item.setUpdatedBy(null);
+            item.setUpdatedAt(null);
+        }
+
+        cartItemRepository.save(item);
+
+        // Calculate total price of a cart
+        subTotal = item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+
+        // Get room type name
+        String roomTypeName = getRoomTypeName(request.roomTypeId());
+
+        cartItemResponse = toCartItemResponse(item, roomTypeName, subTotal);
+        cartItemList.add(cartItemResponse);
+
+        return toCartResponse(cart, cartItemList, null);
+    }
+
+    private Cart getOrCreateCart(String userId, String username) {
         return cartRepository.findByUserIdAndDeleteFlagFalse(userId)
                 .orElseGet(() -> {
                     // tự tạo cart rỗng nếu chưa có cart
                     Cart cart = new Cart();
                     cart.setUserId(userId);
                     cart.setDeleteFlag(false);
+                    cart.setCreatedBy(username);
                     cart.setCreatedAt(Instant.now());
                     return cartRepository.save(cart);
                 });
@@ -99,6 +150,16 @@ public class CartService {
                 cart.getId(),
                 items,
                 totalAmount);
+    }
+
+    private String getUserId(String username) {
+        User user = requireUser(username);
+        return user.getId();
+    }
+
+    private String getRoomTypeName(String roomTypeId) {
+        RoomType roomType = requireRomeType(roomTypeId);
+        return roomType.getRoomTypeName();
     }
 
 }
