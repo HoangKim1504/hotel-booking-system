@@ -10,9 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/carts")
+@RequestMapping("/api/cart")
 @RequiredArgsConstructor
-@Tag(name = "Carts")
+@Tag(name = "Cart")
 public class CartController {
 
     private final CartService cartService;

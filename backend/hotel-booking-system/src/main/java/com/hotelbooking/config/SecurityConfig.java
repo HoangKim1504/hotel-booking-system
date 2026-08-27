@@ -60,7 +60,7 @@ public class SecurityConfig {
                         ).hasAuthority("USER_CREATE")
 
                         // Cart management
-                        .requestMatchers("/api/carts/**")
+                        .requestMatchers("/api/cart/**")
                         .authenticated()
 
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
