@@ -37,16 +37,14 @@ public class CartService {
         CartItemResponse cartItemResponse;
         List<CartItemResponse> cartItemList = new ArrayList<>();
 
-        User user = requireUser(username);
-        String userId = user.getId();
+        String userId = getUserId(username);
 
-        Cart cart = getOrCreateCart(userId);
+        Cart cart = getOrCreateCart(userId, username);
         List<CartItem> cartItems = cartItemRepository.findAllByDeleteFlagFalse();
 
         for (CartItem cartItem : cartItems) {
             // Get room type name
-            RoomType roomType = requireRomeType(cartItem.getRoomTypeId());
-            String roomTypeName = roomType.getRoomTypeName();
+            String roomTypeName = getRoomTypeName(cartItem.getRoomTypeId());
 
             // Calculate total price of a cart
             subTotal = cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
