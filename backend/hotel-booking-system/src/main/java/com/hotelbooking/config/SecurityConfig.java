@@ -59,6 +59,10 @@ public class SecurityConfig {
                                 "/api/users"
                         ).hasAuthority("USER_CREATE")
 
+                        // Cart management
+                        .requestMatchers("/api/carts/**")
+                        .authenticated()
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",
