@@ -69,6 +69,9 @@ public class CartService {
         Cart cart = getOrCreateCart(userId, username);
         RoomType roomType = requireRomeType(request.roomTypeId());
 
+        // Get room type name
+        String roomTypeName = roomType.getRoomTypeName();
+
         Optional<CartItem> existItem = cartItemRepository.findByCartIdAndRoomTypeIdAndDeleteFlagFalse(
                 cart.getId(),
                 request.roomTypeId());
@@ -98,9 +101,6 @@ public class CartService {
         // Calculate total price of a cart
         subTotal = item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
 
-        // Get room type name
-        String roomTypeName = getRoomTypeName(request.roomTypeId());
-
         cartItemResponse = toCartItemResponse(item, roomTypeName, subTotal);
         cartItemList.add(cartItemResponse);
 
@@ -110,38 +110,31 @@ public class CartService {
     public CartResponse updateQuantity(String itemId, UpdateCartItemRequest request, String username) {
         BigDecimal subTotal;
         CartItemResponse cartItemResponse;
-        CartItem item;
         List<CartItemResponse> cartItemList = new ArrayList<>();
         List<String> warningMessages;
 
         String userId = getUserId(username);
         Cart cart = getOrCreateCart(userId, username);
+        CartItem cartItem = requireCartItem(cart.getId(), itemId);
+        RoomType roomType = requireRomeType(cartItem.getRoomTypeId());
 
-        Optional<CartItem> existItem = cartItemRepository.findByCartIdAndIdAndDeleteFlagFalse(
-                cart.getId(),
-                itemId);
+        // Get room type name
+        String roomTypeName = roomType.getRoomTypeName();
 
-        if (existItem.isPresent()) {
-            item = existItem.get();
-            RoomType roomType = requireRomeType(item.getRoomTypeId());
-            String roomTypeName = roomType.getRoomTypeName();
-            warningMessages = checkChangeRoomTypePrice(item.getPrice(), roomType.getPrice(), roomTypeName);
+        warningMessages = checkChangeRoomTypePrice(cartItem.getPrice(), roomType.getPrice(), roomTypeName);
 
-            item.setQuantity(request.quantity());
-            item.setPrice(roomType.getPrice()); // Refresh lại giá hiện tại
-            item.setUpdatedBy(username);
-            item.setUpdatedAt(Instant.now());
+        cartItem.setQuantity(request.quantity());
+        cartItem.setPrice(roomType.getPrice()); // Refresh lại giá hiện tại
+        cartItem.setUpdatedBy(username);
+        cartItem.setUpdatedAt(Instant.now());
 
-            cartItemRepository.save(item);
+        cartItemRepository.save(cartItem);
 
-            // Calculate total price of a cart
-            subTotal = item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+        // Calculate total price of a cart
+        subTotal = cartItem.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
-            cartItemResponse = toCartItemResponse(item, roomTypeName, subTotal);
-            cartItemList.add(cartItemResponse);
-        } else {
-            throw new NotFoundException("Cart item not found:  " + itemId);
-        }
+        cartItemResponse = toCartItemResponse(cartItem, roomTypeName, subTotal);
+        cartItemList.add(cartItemResponse);
 
         return toCartResponse(cart, cartItemList, null, warningMessages);
     }
@@ -170,6 +163,13 @@ public class CartService {
         return roomTypeRepository.findByIdAndDeleteFlagFalse(id)
                 .orElseThrow(() ->
                         new NotFoundException("Room type not found: " + id)
+                );
+    }
+
+    private CartItem requireCartItem(String cartId, String itemId) {
+        return cartItemRepository.findByCartIdAndIdAndDeleteFlagFalse(cartId, itemId)
+                .orElseThrow(() ->
+                        new NotFoundException("Cart item not found:  " + itemId)
                 );
     }
 
