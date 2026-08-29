@@ -3,6 +3,7 @@ package com.hotelbooking.service;
 import com.hotelbooking.dto.AddCartItemRequest;
 import com.hotelbooking.dto.CartItemResponse;
 import com.hotelbooking.dto.CartResponse;
+import com.hotelbooking.dto.UpdateCartItemRequest;
 import com.hotelbooking.exception.NotFoundException;
 import com.hotelbooking.model.Cart;
 import com.hotelbooking.model.CartItem;
@@ -99,6 +100,45 @@ public class CartService {
 
         // Get room type name
         String roomTypeName = getRoomTypeName(request.roomTypeId());
+
+        cartItemResponse = toCartItemResponse(item, roomTypeName, subTotal);
+        cartItemList.add(cartItemResponse);
+
+        return toCartResponse(cart, cartItemList, null);
+    }
+
+    public CartResponse updateQuantity(String itemId, UpdateCartItemRequest request, String username) {
+        BigDecimal subTotal;
+        CartItemResponse cartItemResponse;
+        CartItem item;
+        List<CartItemResponse> cartItemList = new ArrayList<>();
+
+        String userId = getUserId(username);
+        Cart cart = getOrCreateCart(userId, username);
+
+        Optional<CartItem> existItem = cartItemRepository.findByCartIdAndIdAndDeleteFlagFalse(
+                cart.getId(),
+                itemId);
+
+        if (existItem.isPresent()) {
+            item = existItem.get();
+            RoomType roomType = requireRomeType(item.getRoomTypeId());
+
+            item.setQuantity(request.quantity());
+            item.setPrice(roomType.getPrice()); // Refresh lại giá hiện tại
+            item.setUpdatedBy(username);
+            item.setUpdatedAt(Instant.now());
+        } else {
+            throw new NotFoundException("Cart item not found:  " + itemId);
+        }
+
+        cartItemRepository.save(item);
+
+        // Calculate total price of a cart
+        subTotal = item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+
+        // Get room type name
+        String roomTypeName = getRoomTypeName(item.getRoomTypeId());
 
         cartItemResponse = toCartItemResponse(item, roomTypeName, subTotal);
         cartItemList.add(cartItemResponse);

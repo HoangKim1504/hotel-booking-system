@@ -2,6 +2,7 @@ package com.hotelbooking.controller;
 
 import com.hotelbooking.dto.AddCartItemRequest;
 import com.hotelbooking.dto.CartResponse;
+import com.hotelbooking.dto.UpdateCartItemRequest;
 import com.hotelbooking.service.CartService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,6 +29,13 @@ public class CartController {
                                 Authentication authentication) {
         String username = authentication.getName();
         return cartService.addCartItem(request, username);
+    }
+
+    @PutMapping("/items/{itemId}")
+    public CartResponse updateItem(@PathVariable String itemId, @Valid @RequestBody UpdateCartItemRequest request,
+                                   Authentication authentication) {
+        String username = authentication.getName();
+        return cartService.updateQuantity(itemId, request, username);
     }
 
 }
