@@ -4,6 +4,7 @@ import com.hotelbooking.dto.AddCartItemRequest;
 import com.hotelbooking.dto.CartItemResponse;
 import com.hotelbooking.dto.CartResponse;
 import com.hotelbooking.dto.UpdateCartItemRequest;
+import com.hotelbooking.exception.ForbiddenException;
 import com.hotelbooking.exception.NotFoundException;
 import com.hotelbooking.model.Cart;
 import com.hotelbooking.model.CartItem;
@@ -167,10 +168,18 @@ public class CartService {
     }
 
     private CartItem requireCartItem(String cartId, String itemId) {
-        return cartItemRepository.findByCartIdAndIdAndDeleteFlagFalse(cartId, itemId)
+        CartItem cartItem = cartItemRepository.findByIdAndDeleteFlagFalse(itemId)
                 .orElseThrow(() ->
-                        new NotFoundException("Cart item not found:  " + itemId)
+                        new NotFoundException("Cart item not found: " + itemId)
                 );
+
+        if (!cartItem.getCartId().equals(cartId)) {
+            throw new ForbiddenException(
+                    "Cart item does not belong to current user"
+            );
+        }
+
+        return cartItem;
     }
 
     private CartItemResponse toCartItemResponse(CartItem cartItem, String roomTypeName, BigDecimal subTotal) {
