@@ -38,4 +38,10 @@ public class CartController {
         return cartService.updateQuantity(itemId, request, username);
     }
 
+    @DeleteMapping("/items/{itemId}")
+    public CartResponse deleteItem(@PathVariable String itemId, Authentication authentication) {
+        String username = authentication.getName();
+        return cartService.deleteCartItem(itemId, username);
+    }
+
 }

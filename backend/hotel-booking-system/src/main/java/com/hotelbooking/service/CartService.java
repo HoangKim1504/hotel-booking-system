@@ -140,6 +140,18 @@ public class CartService {
         return toCartResponse(cart, cartItemList, null, warningMessages);
     }
 
+    public CartResponse deleteCartItem(String itemId, String username) {
+        List<CartItemResponse> cartItemList = new ArrayList<>();
+
+        String userId = getUserId(username);
+        Cart cart = getOrCreateCart(userId, username);
+        CartItem cartItem = requireCartItem(cart.getId(), itemId);
+
+        cartItemRepository.delete(cartItem);
+
+        return toCartResponse(cart, cartItemList, BigDecimal.valueOf(0), null);
+    }
+
     private Cart getOrCreateCart(String userId, String username) {
         return cartRepository.findByUserIdAndDeleteFlagFalse(userId)
                 .orElseGet(() -> {
