@@ -41,7 +41,7 @@ public class CartService {
         String userId = getUserId(username);
 
         Cart cart = getOrCreateCart(userId, username);
-        List<CartItem> cartItems = cartItemRepository.findAllByDeleteFlagFalse();
+        List<CartItem> cartItems = cartItemRepository.findByCartIdAndDeleteFlagFalse(cart.getId());
 
         for (CartItem cartItem : cartItems) {
             // Get room type name

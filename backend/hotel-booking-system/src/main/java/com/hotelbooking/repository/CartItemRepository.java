@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface CartItemRepository extends MongoRepository<CartItem, String> {
 
-    List<CartItem> findAllByDeleteFlagFalse();
+    List<CartItem> findByCartIdAndDeleteFlagFalse(String cartId);
 
     Optional<CartItem> findByCartIdAndRoomTypeIdAndDeleteFlagFalse(String cartId, String roomTypeId);
 
