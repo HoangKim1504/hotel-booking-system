@@ -4,6 +4,7 @@ import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomTypeResponse;
 import com.hotelbooking.model.RoomType;
 import com.hotelbooking.repository.RoomTypeRepository;
+import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import java.util.List;
 public class RoomTypeService {
 
     private final RoomTypeRepository roomTypeRepository;
+    private final EntityValidator entityValidator;
 
     /**
      * Search toàn bộ Room Type, có phân trang và max record mỗi trang
@@ -81,6 +83,13 @@ public class RoomTypeService {
                 totalRecords,
                 totalPages
         );
+    }
+
+    /**
+     * Tìm room type tương ứng vs MongoID. Room Type phải chưa được soft-delete
+     */
+    public RoomTypeResponse findById(String id) {
+        return toRoomTypeResponse(entityValidator.requireRomeType(id));
     }
 
 }

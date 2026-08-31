@@ -9,10 +9,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/room-types" )
@@ -49,6 +46,14 @@ public class RoomTypeController {
             String order
     ) {
         return roomTypeService.findAll(page, size, sortBy, order);
+    }
+
+    @GetMapping("/{id}" )
+    @SecurityRequirements // empty = không bắt Authorize khi Try it out login
+    public RoomTypeResponse findById(
+            @PathVariable String id
+    ) {
+        return roomTypeService.findById(id);
     }
 
 }

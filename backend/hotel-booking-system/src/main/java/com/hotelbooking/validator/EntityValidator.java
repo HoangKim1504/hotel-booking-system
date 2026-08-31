@@ -27,7 +27,7 @@ public class EntityValidator {
     public User requireUserByUserId(String id) {
         return userRepository.findByIdAndDeleteFlagFalse(id)
                 .orElseThrow(() ->
-                        new NotFoundException("User ID not found: " + id)
+                        new NotFoundException("User not found: " + id)
                 );
     }
 
@@ -72,7 +72,7 @@ public class EntityValidator {
     public RoomType requireRomeType(String id) {
         return roomTypeRepository.findByIdAndDeleteFlagFalse(id)
                 .orElseThrow(() ->
-                        new NotFoundException("Room type ID not found: " + id)
+                        new NotFoundException("Room type not found: " + id)
                 );
     }
 
