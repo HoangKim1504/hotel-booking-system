@@ -1,0 +1,79 @@
+package com.hotelbooking.validator;
+
+import com.hotelbooking.exception.ForbiddenException;
+import com.hotelbooking.exception.NotFoundException;
+import com.hotelbooking.exception.UnauthorizedException;
+import com.hotelbooking.model.CartItem;
+import com.hotelbooking.model.Role;
+import com.hotelbooking.model.RoomType;
+import com.hotelbooking.model.User;
+import com.hotelbooking.repository.CartItemRepository;
+import com.hotelbooking.repository.RoleRepository;
+import com.hotelbooking.repository.RoomTypeRepository;
+import com.hotelbooking.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class EntityValidator {
+
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final CartItemRepository cartItemRepository;
+    private final RoomTypeRepository roomTypeRepository;
+
+
+    public User requireUserByUserId(String id) {
+        return userRepository.findByIdAndDeleteFlagFalse(id)
+                .orElseThrow(() ->
+                        new NotFoundException("User ID not found: " + id)
+                );
+    }
+
+    public User requireUserLogin(String username) {
+        return userRepository.findByUsernameAndDeleteFlagFalse(username)
+                .orElseThrow(() ->
+                        new UnauthorizedException("Invalid username or password" )
+                );
+    }
+
+    public User requireUserByUsername(String username) {
+        return userRepository.findByUsernameAndDeleteFlagFalse(username)
+                .orElseThrow(() ->
+                        new NotFoundException("Username not found: " + username)
+                );
+    }
+
+    public Role requireRole(String roleCode) {
+        String code = roleCode.trim().toUpperCase();
+
+        return roleRepository.findByCodeAndDeleteFlagFalse(code)
+                .orElseThrow(() ->
+                        new NotFoundException("Role not found: " + roleCode)
+                );
+    }
+
+    public CartItem requireCartItem(String cartId, String itemId) {
+        CartItem cartItem = cartItemRepository.findByIdAndDeleteFlagFalse(itemId)
+                .orElseThrow(() ->
+                        new NotFoundException("Cart item not found: " + itemId)
+                );
+
+        if (!cartItem.getCartId().equals(cartId)) {
+            throw new ForbiddenException(
+                    "Cart item does not belong to current user"
+            );
+        }
+
+        return cartItem;
+    }
+
+    public RoomType requireRomeType(String id) {
+        return roomTypeRepository.findByIdAndDeleteFlagFalse(id)
+                .orElseThrow(() ->
+                        new NotFoundException("Room type ID not found: " + id)
+                );
+    }
+
+}
