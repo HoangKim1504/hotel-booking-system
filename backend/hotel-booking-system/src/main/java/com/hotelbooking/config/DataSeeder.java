@@ -41,8 +41,8 @@ public class DataSeeder implements ApplicationRunner {
         // 1. SEED PERMISSION / ROLE / USER
         // ========================================
 
-        if (userRepository.existsByUsername("admin")) {
-            log.info("RbacDataSeeder: RBAC data already present — skip");
+        if (userRepository.existsByUsername("admin" )) {
+            log.info("RbacDataSeeder: RBAC data already present — skip" );
         } else {
             seedRbacData();
         }
@@ -66,7 +66,7 @@ public class DataSeeder implements ApplicationRunner {
 
     private void seedRbacData() {
 
-        log.info("RbacDataSeeder: seeding permissions, roles, users...");
+        log.info("RbacDataSeeder: seeding permissions, roles, users..." );
 
         // ========================
         // Permissions
@@ -122,11 +122,11 @@ public class DataSeeder implements ApplicationRunner {
                 "ADMIN",
                 "Administrator",
                 List.of(
-                        perms.get("USER_VIEW"),
-                        perms.get("USER_CREATE"),
-                        perms.get("USER_UPDATE"),
-                        perms.get("USER_DELETE"),
-                        perms.get("USER_ASSIGN_ROLE")
+                        perms.get("USER_VIEW" ),
+                        perms.get("USER_CREATE" ),
+                        perms.get("USER_UPDATE" ),
+                        perms.get("USER_DELETE" ),
+                        perms.get("USER_ASSIGN_ROLE" )
                 )
         );
 
@@ -134,9 +134,9 @@ public class DataSeeder implements ApplicationRunner {
                 "EDITOR",
                 "Editor",
                 List.of(
-                        perms.get("USER_VIEW"),
-                        perms.get("USER_CREATE"),
-                        perms.get("USER_UPDATE")
+                        perms.get("USER_VIEW" ),
+                        perms.get("USER_CREATE" ),
+                        perms.get("USER_UPDATE" )
                 )
         );
 
@@ -144,7 +144,7 @@ public class DataSeeder implements ApplicationRunner {
                 "USER",
                 "User",
                 List.of(
-                        perms.get("USER_VIEW")
+                        perms.get("USER_VIEW" )
                 )
         );
 
@@ -191,11 +191,25 @@ public class DataSeeder implements ApplicationRunner {
                 List.of(roleUser.getId())
         );
 
+        saveUser(
+                "peter",
+                "peter@demo.local",
+                "@User456",
+                "Peter Tran",
+                Gender.MALE,
+                LocalDate.of(2001, 8, 5),
+                "0902000015",
+                "Ha Noi",
+                null,
+                List.of(roleUser.getId())
+        );
+
         log.info(
                 "RbacDataSeeder: done. " +
                         "Logins: admin/@Admin123, " +
                         "editor/@Editor123, " +
-                        "alice/@User123"
+                        "alice/@User123, " +
+                        "peter/@User456"
         );
     }
 
@@ -210,50 +224,54 @@ public class DataSeeder implements ApplicationRunner {
                 roomTypeRepository.findAllByDeleteFlagFalse();
 
         if (!existingRoomTypes.isEmpty()) {
-            log.info("RoomTypeSeeder: data already present — skip");
+            log.info("RoomTypeSeeder: data already present — skip" );
             return;
         }
 
-        log.info("RoomTypeSeeder: seeding room types...");
+        log.info("RoomTypeSeeder: seeding room types..." );
 
-        saveRoomType(
-                "Standard Room",
-                25,
-                "WiFi, TV, Air Conditioner",
-                2,
-                new BigDecimal("800000")
-        );
+        saveRoomType("Deluxe King Room", 35.5, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV, Safe", 2, new BigDecimal("120.00" ));
+        saveRoomType("Standard Twin Room", 22.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("75.50" ));
+        saveRoomType("Executive Suite", 55.0, "WiFi, Air Conditioning, Mini Bar, Jacuzzi, Living Area, Ocean View", 4, new BigDecimal("250.00" ));
+        saveRoomType("Family Room", 45.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV, Balcony", 5, new BigDecimal("180.75" ));
+        saveRoomType("Single Economy Room", 16.0, "WiFi, Fan, Shared Bathroom", 1, new BigDecimal("45.00" ));
+        saveRoomType("Superior Double Room", 28.0, "WiFi, Air Conditioning, Mini Fridge, Flat-screen TV", 2, new BigDecimal("95.00" ));
+        saveRoomType("Presidential Suite", 90.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Jacuzzi, Living Area", 6, new BigDecimal("500.00" ));
+        saveRoomType("Junior Suite", 42.0, "WiFi, Air Conditioning, Mini Bar, Sofa, City View", 3, new BigDecimal("160.00" ));
+        saveRoomType("Double Room with Balcony", 26.0, "WiFi, Air Conditioning, Balcony, Flat-screen TV", 2, new BigDecimal("88.00" ));
+        saveRoomType("Twin Room City View", 24.0, "WiFi, Air Conditioning, City View, Flat-screen TV", 2, new BigDecimal("80.00" ));
+        saveRoomType("Deluxe Queen Room", 32.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("110.00" ));
+        saveRoomType("Family Suite", 60.0, "WiFi, Air Conditioning, Kitchenette, 2 Bedrooms, Living Area", 6, new BigDecimal("220.00" ));
+        saveRoomType("Economy Single", 14.0, "WiFi, Fan", 1, new BigDecimal("38.00" ));
+        saveRoomType("Budget Double", 18.0, "WiFi, Air Conditioning", 2, new BigDecimal("55.00" ));
+        saveRoomType("Honeymoon Suite", 48.0, "WiFi, Air Conditioning, Jacuzzi, Mini Bar, Romantic Decor", 2, new BigDecimal("210.00" ));
+        saveRoomType("Accessible Room", 30.0, "WiFi, Air Conditioning, Wheelchair Access, Grab Bars", 2, new BigDecimal("90.00" ));
+        saveRoomType("Penthouse Suite", 120.0, "WiFi, Air Conditioning, Private Terrace, Jacuzzi, Bar, Panoramic View", 8, new BigDecimal("650.00" ));
+        saveRoomType("Standard Single Room", 15.0, "WiFi, Air Conditioning, Desk", 1, new BigDecimal("50.00" ));
+        saveRoomType("Deluxe Twin Room", 30.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("105.00" ));
+        saveRoomType("Garden View Room", 27.0, "WiFi, Air Conditioning, Garden View, Flat-screen TV", 2, new BigDecimal("92.00" ));
+        saveRoomType("Ocean View Suite", 50.0, "WiFi, Air Conditioning, Mini Bar, Ocean View, Balcony", 3, new BigDecimal("240.00" ));
+        saveRoomType("Studio Room", 25.0, "WiFi, Air Conditioning, Kitchenette, Flat-screen TV", 2, new BigDecimal("98.00" ));
+        saveRoomType("Loft Suite", 65.0, "WiFi, Air Conditioning, Mini Bar, Mezzanine, City View", 4, new BigDecimal("270.00" ));
+        saveRoomType("Connecting Family Room", 55.0, "WiFi, Air Conditioning, 2 Connecting Rooms, Flat-screen TV", 5, new BigDecimal("195.00" ));
+        saveRoomType("Poolside Room", 33.0, "WiFi, Air Conditioning, Pool Access, Flat-screen TV", 2, new BigDecimal("115.00" ));
+        saveRoomType("Business Room", 29.0, "WiFi, Air Conditioning, Work Desk, Flat-screen TV, Coffee Machine", 2, new BigDecimal("100.00" ));
+        saveRoomType("Royal Suite", 100.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Living Area, Dining Area", 6, new BigDecimal("580.00" ));
+        saveRoomType("Cozy Single Room", 13.0, "WiFi, Fan, Desk", 1, new BigDecimal("35.00" ));
+        saveRoomType("Mountain View Room", 31.0, "WiFi, Air Conditioning, Mountain View, Flat-screen TV", 2, new BigDecimal("102.00" ));
+        saveRoomType("Duplex Suite", 70.0, "WiFi, Air Conditioning, 2 Floors, Mini Bar, Living Area", 4, new BigDecimal("300.00" ));
+        saveRoomType("Classic Double Room", 23.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("78.00" ));
+        saveRoomType("VIP Suite", 85.0, "WiFi, Air Conditioning, Private Bar, Jacuzzi, Butler Service", 5, new BigDecimal("450.00" ));
+        saveRoomType("Compact Twin Room", 19.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("60.00" ));
+        saveRoomType("Skyline Suite", 58.0, "WiFi, Air Conditioning, Mini Bar, Panoramic City View, Balcony", 3, new BigDecimal("260.00" ));
+        saveRoomType("Traditional Family Room", 47.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV", 4, new BigDecimal("165.00" ));
 
-        saveRoomType(
-                "Deluxe Room",
-                35,
-                "WiFi, Smart TV, Air Conditioner, Mini Bar, Bathtub",
-                2,
-                new BigDecimal("1500000")
-        );
-
-        saveRoomType(
-                "Family Room",
-                45,
-                "WiFi, Smart TV, Air Conditioner, Mini Bar",
-                4,
-                new BigDecimal("2000000")
-        );
-
-        saveRoomType(
-                "Suite Room",
-                60,
-                "WiFi, Smart TV, Air Conditioner, Mini Bar, Bathtub, Living Room",
-                2,
-                new BigDecimal("3000000")
-        );
-
-        log.info("RoomTypeSeeder: done");
+        log.info("RoomTypeSeeder: done" );
     }
 
-    private RoomType saveRoomType(
+    private void saveRoomType(
             String roomTypeName,
-            Integer roomSize,
+            Double roomSize,
             String facility,
             Integer maximumPeople,
             BigDecimal price
@@ -262,7 +280,7 @@ public class DataSeeder implements ApplicationRunner {
         RoomType roomType = new RoomType();
 
         roomType.setRoomTypeName(roomTypeName);
-        roomType.setRoomSize(Double.valueOf(roomSize));
+        roomType.setRoomSize(roomSize);
         roomType.setFacility(facility);
         roomType.setMaximumPeople(maximumPeople);
         roomType.setPrice(price);
@@ -273,12 +291,12 @@ public class DataSeeder implements ApplicationRunner {
         // Audit
         Instant now = Instant.now();
 
-        roomType.setCreatedBy("admin");
+        roomType.setCreatedBy("admin" );
         roomType.setCreatedAt(now);
-        roomType.setUpdatedBy("admin");
+        roomType.setUpdatedBy("admin" );
         roomType.setUpdatedAt(now);
 
-        return roomTypeRepository.save(roomType);
+        roomTypeRepository.save(roomType);
     }
 
     // =========================================================
@@ -288,55 +306,83 @@ public class DataSeeder implements ApplicationRunner {
     private void seedCartData() {
 
         // ========================
-        // Find Alice
-        // ========================
-
-        User alice = userRepository
-                .findByUsernameAndDeleteFlagFalse("alice")
-                .orElse(null);
-
-        if (alice == null) {
-            log.warn("CartSeeder: alice not found — skip");
-            return;
-        }
-
-        // ========================
-        // Alice đã có cart active
-        // ========================
-
-        if (cartRepository
-                .findByUserIdAndDeleteFlagFalse(alice.getId())
-                .isPresent()) {
-
-            log.info("CartSeeder: alice already has cart — skip");
-            return;
-        }
-
-        // ========================
         // Find RoomTypes
         // ========================
-
         List<RoomType> roomTypes =
                 roomTypeRepository.findAllByDeleteFlagFalse();
 
         if (roomTypes.isEmpty()) {
-            log.warn("CartSeeder: no room types found — skip");
+            log.warn("CartSeeder: no room types found — skip" );
+            return;
+        }
+
+        // Alice:
+        // RoomType 1 x2
+        // RoomType 2 x1
+        seedCartForUser(
+                "alice",
+                roomTypes,
+                List.of(2, 1)
+        );
+
+        // Peter:
+        // RoomType 1 x5
+        // RoomType 2 x1
+        // RoomType 3 x7
+        seedCartForUser(
+                "peter",
+                roomTypes,
+                List.of(5, 1, 7)
+        );
+    }
+
+    private void seedCartForUser(
+            String username,
+            List<RoomType> roomTypes,
+            List<Integer> quantities
+    ) {
+
+        // ========================
+        // Find User
+        // ========================
+        User user = userRepository
+                .findByUsernameAndDeleteFlagFalse(username)
+                .orElse(null);
+
+        if (user == null) {
+            log.warn(
+                    "CartSeeder: user {} not found — skip",
+                    username
+            );
+            return;
+        }
+
+        // ========================
+        // User đã có cart active
+        // ========================
+        if (cartRepository
+                .findByUserIdAndDeleteFlagFalse(user.getId())
+                .isPresent()) {
+
+            log.info(
+                    "CartSeeder: {} already has cart — skip",
+                    username
+            );
+
             return;
         }
 
         // ========================
         // Create Cart
         // ========================
-
         Cart cart = new Cart();
 
-        cart.setUserId(alice.getId());
-
+        cart.setUserId(user.getId());
         cart.setDeleteFlag(false);
 
         Instant now = Instant.now();
 
-        cart.setCreatedBy("admin");
+        cart.setCreatedBy("admin" );
         cart.setCreatedAt(now);
         cart.setUpdatedBy(null);
         cart.setUpdatedAt(null);
@@ -344,35 +390,31 @@ public class DataSeeder implements ApplicationRunner {
         cart = cartRepository.save(cart);
 
         // ========================
-        // Cart Item 1
+        // Create Cart Items
         // ========================
 
-        RoomType roomType1 = roomTypes.get(0);
-
-        saveCartItem(
-                cart,
-                roomType1,
-                2
+        int itemCount = Math.min(
+                roomTypes.size(),
+                quantities.size()
         );
 
-        // ========================
-        // Cart Item 2
-        // ========================
+        for (int i = 0; i < itemCount; i++) {
 
-        if (roomTypes.size() > 1) {
-
-            RoomType roomType2 = roomTypes.get(1);
+            RoomType roomType = roomTypes.get(i);
+            Integer quantity = quantities.get(i);
 
             saveCartItem(
                     cart,
-                    roomType2,
-                    1
+                    roomType,
+                    quantity
             );
         }
 
         log.info(
-                "CartSeeder: created cart {} for alice",
-                cart.getId()
+                "CartSeeder: created cart {} for {} with {} items",
+                cart.getId(),
+                username,
+                itemCount
         );
     }
 
@@ -398,7 +440,7 @@ public class DataSeeder implements ApplicationRunner {
         // Audit
         Instant now = Instant.now();
 
-        item.setCreatedBy("admin");
+        item.setCreatedBy("admin" );
         item.setCreatedAt(now);
         item.setUpdatedBy(null);
         item.setUpdatedAt(null);
@@ -419,7 +461,7 @@ public class DataSeeder implements ApplicationRunner {
 
         permission.setCode(code);
         permission.setName(name);
-        permission.setDescription("");
+        permission.setDescription("" );
 
         return permissionRepository.save(permission);
     }
@@ -438,7 +480,7 @@ public class DataSeeder implements ApplicationRunner {
 
         role.setCode(code);
         role.setRoleName(name);
-        role.setDescription("");
+        role.setDescription("" );
 
         List<String> permissionIds = new ArrayList<>();
 
@@ -497,9 +539,9 @@ public class DataSeeder implements ApplicationRunner {
         // Audit
         Instant now = Instant.now();
 
-        user.setCreatedBy("admin");
+        user.setCreatedBy("admin" );
         user.setCreatedAt(now);
-        user.setUpdatedBy("admin");
+        user.setUpdatedBy("admin" );
         user.setUpdatedAt(now);
 
         userRepository.save(user);
