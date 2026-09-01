@@ -25,6 +25,29 @@ public class RoomTypeService {
      * Search toàn bộ Room Type, có phân trang và max record mỗi trang
      */
     public PageResponse<RoomTypeResponse> findAll(int currentPage, int pageSize, String sortBy, String order) {
+
+        Pageable pageable = createPageable(currentPage, pageSize, sortBy, order);
+
+        // Query DB
+        Page<RoomType> roomTypePage = roomTypeRepository.findAllByDeleteFlagFalse(pageable);
+
+        // Map Entity → DTO
+        List<RoomTypeResponse> roomTypeList = roomTypePage.getContent()
+                .stream()
+                .map(this::toRoomTypeResponse)
+                .toList();
+
+        return addPagingAttributes(roomTypeList, currentPage, pageSize, roomTypePage);
+    }
+
+    /**
+     * Tìm room type tương ứng vs MongoID. Room Type phải chưa được soft-delete
+     */
+    public RoomTypeResponse findById(String id) {
+        return toRoomTypeResponse(entityValidator.requireRomeType(id));
+    }
+
+    private Pageable createPageable(int currentPage, int pageSize, String sortBy, String order) {
         Pageable pageable;
 
         // Set vị trí trang hiện tại và lượng record max mỗi trang
@@ -37,17 +60,7 @@ public class RoomTypeService {
         } else {
             pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.fromString(order), sortBy);
         }
-
-        // Query DB
-        Page<RoomType> roomTypePage = roomTypeRepository.findAllByDeleteFlagFalse(pageable);
-
-        // Map Entity → DTO
-        List<RoomTypeResponse> roomTypeList = roomTypePage.getContent()
-                .stream()
-                .map(this::toRoomTypeResponse)
-                .toList();
-
-        return addPagingAttributes(roomTypeList, currentPage, pageSize, roomTypePage);
+        return pageable;
     }
 
     /**
@@ -83,13 +96,6 @@ public class RoomTypeService {
                 totalRecords,
                 totalPages
         );
-    }
-
-    /**
-     * Tìm room type tương ứng vs MongoID. Room Type phải chưa được soft-delete
-     */
-    public RoomTypeResponse findById(String id) {
-        return toRoomTypeResponse(entityValidator.requireRomeType(id));
     }
 
 }
