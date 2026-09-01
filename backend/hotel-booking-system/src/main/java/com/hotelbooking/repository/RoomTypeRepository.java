@@ -1,5 +1,6 @@
 package com.hotelbooking.repository;
 
+import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.model.RoomType;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
@@ -16,6 +17,8 @@ public interface RoomTypeRepository extends MongoRepository<RoomType, String> {
     List<RoomType> findAllByDeleteFlagFalse();
 
     Page<RoomType> findAllByDeleteFlagFalse(@NonNull Pageable pageable);
+
+    List<RoomType> findByDeleteFlagFalseAndStatus(RoomTypeStatus active);
 
 }
 
