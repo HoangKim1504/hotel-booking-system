@@ -1,10 +1,14 @@
 package com.hotelbooking.config;
 
+import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.enums.Gender;
+import com.hotelbooking.enums.RoomStatus;
+import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,35 +32,37 @@ public class DataSeeder implements ApplicationRunner {
     private final PermissionRepository permissionRepository;
 
     private final RoomTypeRepository roomTypeRepository;
+    private final RoomRepository roomRepository;
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
 
+    private final BookingRepository bookingRepository;
+    private final BookingItemRepository bookingItemRepository;
+    private final RoomAssignmentRepository roomAssignmentRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void run(@NonNull ApplicationArguments args) {
 
-        // ========================================
-        // 1. SEED PERMISSION / ROLE / USER
-        // ========================================
-
-        if (userRepository.existsByUsername("admin" )) {
-            log.info("RbacDataSeeder: RBAC data already present — skip" );
+        // 1. RBAC
+        if (userRepository.existsByUsername("admin")) {
+            log.info("RbacDataSeeder: RBAC data already present — skip");
         } else {
             seedRbacData();
         }
 
-        // ========================================
-        // 2. SEED ROOM TYPES
-        // ========================================
-
+        // 2. ROOM TYPES
         seedRoomTypeData();
 
-        // ========================================
-        // 3. SEED CART + CART ITEMS
-        // ========================================
+        // 3. ROOMS
+        seedRoomData();
 
+        // 4. BOOKING + BOOKING ITEMS + ROOM ASSIGNMENTS
+        seedSearchBookingData();
+
+        // 5. CART + CART ITEMS
         seedCartData();
     }
 
@@ -66,7 +72,7 @@ public class DataSeeder implements ApplicationRunner {
 
     private void seedRbacData() {
 
-        log.info("RbacDataSeeder: seeding permissions, roles, users..." );
+        log.info("RbacDataSeeder: seeding permissions, roles, users...");
 
         // ========================
         // Permissions
@@ -122,11 +128,11 @@ public class DataSeeder implements ApplicationRunner {
                 "ADMIN",
                 "Administrator",
                 List.of(
-                        perms.get("USER_VIEW" ),
-                        perms.get("USER_CREATE" ),
-                        perms.get("USER_UPDATE" ),
-                        perms.get("USER_DELETE" ),
-                        perms.get("USER_ASSIGN_ROLE" )
+                        perms.get("USER_VIEW"),
+                        perms.get("USER_CREATE"),
+                        perms.get("USER_UPDATE"),
+                        perms.get("USER_DELETE"),
+                        perms.get("USER_ASSIGN_ROLE")
                 )
         );
 
@@ -134,9 +140,9 @@ public class DataSeeder implements ApplicationRunner {
                 "EDITOR",
                 "Editor",
                 List.of(
-                        perms.get("USER_VIEW" ),
-                        perms.get("USER_CREATE" ),
-                        perms.get("USER_UPDATE" )
+                        perms.get("USER_VIEW"),
+                        perms.get("USER_CREATE"),
+                        perms.get("USER_UPDATE")
                 )
         );
 
@@ -144,7 +150,7 @@ public class DataSeeder implements ApplicationRunner {
                 "USER",
                 "User",
                 List.of(
-                        perms.get("USER_VIEW" )
+                        perms.get("USER_VIEW")
                 )
         );
 
@@ -224,49 +230,49 @@ public class DataSeeder implements ApplicationRunner {
                 roomTypeRepository.findAllByDeleteFlagFalse();
 
         if (!existingRoomTypes.isEmpty()) {
-            log.info("RoomTypeSeeder: data already present — skip" );
+            log.info("RoomTypeSeeder: data already present — skip");
             return;
         }
 
-        log.info("RoomTypeSeeder: seeding room types..." );
+        log.info("RoomTypeSeeder: seeding room types...");
 
-        saveRoomType("Deluxe King Room", 35.5, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV, Safe", 2, new BigDecimal("120.00" ));
-        saveRoomType("Standard Twin Room", 22.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("75.50" ));
-        saveRoomType("Executive Suite", 55.0, "WiFi, Air Conditioning, Mini Bar, Jacuzzi, Living Area, Ocean View", 4, new BigDecimal("250.00" ));
-        saveRoomType("Family Room", 45.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV, Balcony", 5, new BigDecimal("180.75" ));
-        saveRoomType("Single Economy Room", 16.0, "WiFi, Fan, Shared Bathroom", 1, new BigDecimal("45.00" ));
-        saveRoomType("Superior Double Room", 28.0, "WiFi, Air Conditioning, Mini Fridge, Flat-screen TV", 2, new BigDecimal("95.00" ));
-        saveRoomType("Presidential Suite", 90.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Jacuzzi, Living Area", 6, new BigDecimal("500.00" ));
-        saveRoomType("Junior Suite", 42.0, "WiFi, Air Conditioning, Mini Bar, Sofa, City View", 3, new BigDecimal("160.00" ));
-        saveRoomType("Double Room with Balcony", 26.0, "WiFi, Air Conditioning, Balcony, Flat-screen TV", 2, new BigDecimal("88.00" ));
-        saveRoomType("Twin Room City View", 24.0, "WiFi, Air Conditioning, City View, Flat-screen TV", 2, new BigDecimal("80.00" ));
-        saveRoomType("Deluxe Queen Room", 32.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("110.00" ));
-        saveRoomType("Family Suite", 60.0, "WiFi, Air Conditioning, Kitchenette, 2 Bedrooms, Living Area", 6, new BigDecimal("220.00" ));
-        saveRoomType("Economy Single", 14.0, "WiFi, Fan", 1, new BigDecimal("38.00" ));
-        saveRoomType("Budget Double", 18.0, "WiFi, Air Conditioning", 2, new BigDecimal("55.00" ));
-        saveRoomType("Honeymoon Suite", 48.0, "WiFi, Air Conditioning, Jacuzzi, Mini Bar, Romantic Decor", 2, new BigDecimal("210.00" ));
-        saveRoomType("Accessible Room", 30.0, "WiFi, Air Conditioning, Wheelchair Access, Grab Bars", 2, new BigDecimal("90.00" ));
-        saveRoomType("Penthouse Suite", 120.0, "WiFi, Air Conditioning, Private Terrace, Jacuzzi, Bar, Panoramic View", 8, new BigDecimal("650.00" ));
-        saveRoomType("Standard Single Room", 15.0, "WiFi, Air Conditioning, Desk", 1, new BigDecimal("50.00" ));
-        saveRoomType("Deluxe Twin Room", 30.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("105.00" ));
-        saveRoomType("Garden View Room", 27.0, "WiFi, Air Conditioning, Garden View, Flat-screen TV", 2, new BigDecimal("92.00" ));
-        saveRoomType("Ocean View Suite", 50.0, "WiFi, Air Conditioning, Mini Bar, Ocean View, Balcony", 3, new BigDecimal("240.00" ));
-        saveRoomType("Studio Room", 25.0, "WiFi, Air Conditioning, Kitchenette, Flat-screen TV", 2, new BigDecimal("98.00" ));
-        saveRoomType("Loft Suite", 65.0, "WiFi, Air Conditioning, Mini Bar, Mezzanine, City View", 4, new BigDecimal("270.00" ));
-        saveRoomType("Connecting Family Room", 55.0, "WiFi, Air Conditioning, 2 Connecting Rooms, Flat-screen TV", 5, new BigDecimal("195.00" ));
-        saveRoomType("Poolside Room", 33.0, "WiFi, Air Conditioning, Pool Access, Flat-screen TV", 2, new BigDecimal("115.00" ));
-        saveRoomType("Business Room", 29.0, "WiFi, Air Conditioning, Work Desk, Flat-screen TV, Coffee Machine", 2, new BigDecimal("100.00" ));
-        saveRoomType("Royal Suite", 100.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Living Area, Dining Area", 6, new BigDecimal("580.00" ));
-        saveRoomType("Cozy Single Room", 13.0, "WiFi, Fan, Desk", 1, new BigDecimal("35.00" ));
-        saveRoomType("Mountain View Room", 31.0, "WiFi, Air Conditioning, Mountain View, Flat-screen TV", 2, new BigDecimal("102.00" ));
-        saveRoomType("Duplex Suite", 70.0, "WiFi, Air Conditioning, 2 Floors, Mini Bar, Living Area", 4, new BigDecimal("300.00" ));
-        saveRoomType("Classic Double Room", 23.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("78.00" ));
-        saveRoomType("VIP Suite", 85.0, "WiFi, Air Conditioning, Private Bar, Jacuzzi, Butler Service", 5, new BigDecimal("450.00" ));
-        saveRoomType("Compact Twin Room", 19.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("60.00" ));
-        saveRoomType("Skyline Suite", 58.0, "WiFi, Air Conditioning, Mini Bar, Panoramic City View, Balcony", 3, new BigDecimal("260.00" ));
-        saveRoomType("Traditional Family Room", 47.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV", 4, new BigDecimal("165.00" ));
+        saveRoomType("Deluxe King Room", 35.5, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV, Safe", 2, new BigDecimal("120.00"));
+        saveRoomType("Standard Twin Room", 22.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("75.50"));
+        saveRoomType("Executive Suite", 55.0, "WiFi, Air Conditioning, Mini Bar, Jacuzzi, Living Area, Ocean View", 4, new BigDecimal("250.00"));
+        saveRoomType("Family Room", 45.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV, Balcony", 5, new BigDecimal("180.75"));
+        saveRoomType("Single Economy Room", 16.0, "WiFi, Fan, Shared Bathroom", 1, new BigDecimal("45.00"));
+        saveRoomType("Superior Double Room", 28.0, "WiFi, Air Conditioning, Mini Fridge, Flat-screen TV", 2, new BigDecimal("95.00"));
+        saveRoomType("Presidential Suite", 90.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Jacuzzi, Living Area", 6, new BigDecimal("500.00"));
+        saveRoomType("Junior Suite", 42.0, "WiFi, Air Conditioning, Mini Bar, Sofa, City View", 3, new BigDecimal("160.00"));
+        saveRoomType("Double Room with Balcony", 26.0, "WiFi, Air Conditioning, Balcony, Flat-screen TV", 2, new BigDecimal("88.00"));
+        saveRoomType("Twin Room City View", 24.0, "WiFi, Air Conditioning, City View, Flat-screen TV", 2, new BigDecimal("80.00"));
+        saveRoomType("Deluxe Queen Room", 32.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("110.00"));
+        saveRoomType("Family Suite", 60.0, "WiFi, Air Conditioning, Kitchenette, 2 Bedrooms, Living Area", 6, new BigDecimal("220.00"));
+        saveRoomType("Economy Single", 14.0, "WiFi, Fan", 1, new BigDecimal("38.00"));
+        saveRoomType("Budget Double", 18.0, "WiFi, Air Conditioning", 2, new BigDecimal("55.00"));
+        saveRoomType("Honeymoon Suite", 48.0, "WiFi, Air Conditioning, Jacuzzi, Mini Bar, Romantic Decor", 2, new BigDecimal("210.00"));
+        saveRoomType("Accessible Room", 30.0, "WiFi, Air Conditioning, Wheelchair Access, Grab Bars", 2, new BigDecimal("90.00"));
+        saveRoomType("Penthouse Suite", 120.0, "WiFi, Air Conditioning, Private Terrace, Jacuzzi, Bar, Panoramic View", 8, new BigDecimal("650.00"));
+        saveRoomType("Standard Single Room", 15.0, "WiFi, Air Conditioning, Desk", 1, new BigDecimal("50.00"));
+        saveRoomType("Deluxe Twin Room", 30.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("105.00"));
+        saveRoomType("Garden View Room", 27.0, "WiFi, Air Conditioning, Garden View, Flat-screen TV", 2, new BigDecimal("92.00"));
+        saveRoomType("Ocean View Suite", 50.0, "WiFi, Air Conditioning, Mini Bar, Ocean View, Balcony", 3, new BigDecimal("240.00"));
+        saveRoomType("Studio Room", 25.0, "WiFi, Air Conditioning, Kitchenette, Flat-screen TV", 2, new BigDecimal("98.00"));
+        saveRoomType("Loft Suite", 65.0, "WiFi, Air Conditioning, Mini Bar, Mezzanine, City View", 4, new BigDecimal("270.00"));
+        saveRoomType("Connecting Family Room", 55.0, "WiFi, Air Conditioning, 2 Connecting Rooms, Flat-screen TV", 5, new BigDecimal("195.00"));
+        saveRoomType("Poolside Room", 33.0, "WiFi, Air Conditioning, Pool Access, Flat-screen TV", 2, new BigDecimal("115.00"));
+        saveRoomType("Business Room", 29.0, "WiFi, Air Conditioning, Work Desk, Flat-screen TV, Coffee Machine", 2, new BigDecimal("100.00"));
+        saveRoomType("Royal Suite", 100.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Living Area, Dining Area", 6, new BigDecimal("580.00"));
+        saveRoomType("Cozy Single Room", 13.0, "WiFi, Fan, Desk", 1, new BigDecimal("35.00"));
+        saveRoomType("Mountain View Room", 31.0, "WiFi, Air Conditioning, Mountain View, Flat-screen TV", 2, new BigDecimal("102.00"));
+        saveRoomType("Duplex Suite", 70.0, "WiFi, Air Conditioning, 2 Floors, Mini Bar, Living Area", 4, new BigDecimal("300.00"));
+        saveRoomType("Classic Double Room", 23.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("78.00"));
+        saveRoomType("VIP Suite", 85.0, "WiFi, Air Conditioning, Private Bar, Jacuzzi, Butler Service", 5, new BigDecimal("450.00"));
+        saveRoomType("Compact Twin Room", 19.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("60.00"));
+        saveRoomType("Skyline Suite", 58.0, "WiFi, Air Conditioning, Mini Bar, Panoramic City View, Balcony", 3, new BigDecimal("260.00"));
+        saveRoomType("Traditional Family Room", 47.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV", 4, new BigDecimal("165.00"));
 
-        log.info("RoomTypeSeeder: done" );
+        log.info("RoomTypeSeeder: done");
     }
 
     private void saveRoomType(
@@ -284,6 +290,7 @@ public class DataSeeder implements ApplicationRunner {
         roomType.setFacility(facility);
         roomType.setMaximumPeople(maximumPeople);
         roomType.setPrice(price);
+        roomType.setStatus(RoomTypeStatus.ACTIVE);
 
         // Soft delete
         roomType.setDeleteFlag(false);
@@ -291,12 +298,325 @@ public class DataSeeder implements ApplicationRunner {
         // Audit
         Instant now = Instant.now();
 
-        roomType.setCreatedBy("admin" );
+        roomType.setCreatedBy("admin");
         roomType.setCreatedAt(now);
-        roomType.setUpdatedBy("admin" );
+        roomType.setUpdatedBy("admin");
         roomType.setUpdatedAt(now);
 
         roomTypeRepository.save(roomType);
+    }
+
+    // =========================================================
+    // ROOM
+    // =========================================================
+    private void seedRoomData() {
+
+        if (roomRepository.count() > 0) {
+            log.info("RoomSeeder: data already present — skip");
+            return;
+        }
+
+        List<RoomType> roomTypes =
+                roomTypeRepository.findAllByDeleteFlagFalse();
+
+        if (roomTypes.isEmpty()) {
+            log.warn("RoomSeeder: no room types found — skip");
+            return;
+        }
+
+        log.info("RoomSeeder: seeding rooms...");
+
+        // Deluxe King Room
+        RoomType deluxeKing =
+                requireSeedRoomType(roomTypes, "Deluxe King Room");
+
+        saveRoom(deluxeKing, "101", RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "102", RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "103", RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "104", RoomStatus.ACTIVE);
+
+        // Room này không được tính availability
+        saveRoom(deluxeKing, "105", RoomStatus.MAINTENANCE);
+
+
+        // Standard Twin Room
+        RoomType standardTwin =
+                requireSeedRoomType(roomTypes, "Standard Twin Room");
+
+        saveRoom(standardTwin, "201", RoomStatus.ACTIVE);
+        saveRoom(standardTwin, "202", RoomStatus.ACTIVE);
+        saveRoom(standardTwin, "203", RoomStatus.ACTIVE);
+
+
+        // Executive Suite
+        RoomType executive =
+                requireSeedRoomType(roomTypes, "Executive Suite");
+
+        saveRoom(executive, "301", RoomStatus.ACTIVE);
+        saveRoom(executive, "302", RoomStatus.ACTIVE);
+        saveRoom(executive, "303", RoomStatus.ACTIVE);
+
+
+        // Family Room
+        RoomType family =
+                requireSeedRoomType(roomTypes, "Family Room");
+
+        saveRoom(family, "401", RoomStatus.ACTIVE);
+        saveRoom(family, "402", RoomStatus.ACTIVE);
+        saveRoom(family, "403", RoomStatus.ACTIVE);
+
+
+        // Single Economy Room
+        RoomType single =
+                requireSeedRoomType(roomTypes, "Single Economy Room");
+
+        saveRoom(single, "501", RoomStatus.ACTIVE);
+        saveRoom(single, "502", RoomStatus.ACTIVE);
+
+
+        // Superior Double Room
+        RoomType superior =
+                requireSeedRoomType(roomTypes, "Superior Double Room");
+
+        saveRoom(superior, "601", RoomStatus.ACTIVE);
+        saveRoom(superior, "602", RoomStatus.ACTIVE);
+        saveRoom(superior, "603", RoomStatus.ACTIVE);
+
+
+        // Presidential Suite
+        RoomType presidential =
+                requireSeedRoomType(roomTypes, "Presidential Suite");
+
+        saveRoom(presidential, "701", RoomStatus.ACTIVE);
+        saveRoom(presidential, "702", RoomStatus.ACTIVE);
+
+
+        // Junior Suite
+        RoomType junior =
+                requireSeedRoomType(roomTypes, "Junior Suite");
+
+        saveRoom(junior, "801", RoomStatus.ACTIVE);
+        saveRoom(junior, "802", RoomStatus.ACTIVE);
+
+
+        // Double Room with Balcony
+        RoomType balcony =
+                requireSeedRoomType(roomTypes, "Double Room with Balcony");
+
+        saveRoom(balcony, "901", RoomStatus.ACTIVE);
+        saveRoom(balcony, "902", RoomStatus.ACTIVE);
+
+
+        // Twin Room City View
+        RoomType cityView =
+                requireSeedRoomType(roomTypes, "Twin Room City View");
+
+        saveRoom(cityView, "1001", RoomStatus.ACTIVE);
+        saveRoom(cityView, "1002", RoomStatus.ACTIVE);
+
+
+        // Deluxe Queen Room
+        RoomType queen =
+                requireSeedRoomType(roomTypes, "Deluxe Queen Room");
+
+        saveRoom(queen, "1101", RoomStatus.ACTIVE);
+        saveRoom(queen, "1102", RoomStatus.ACTIVE);
+
+
+        // Family Suite
+        RoomType familySuite =
+                requireSeedRoomType(roomTypes, "Family Suite");
+
+        saveRoom(familySuite, "1201", RoomStatus.ACTIVE);
+        saveRoom(familySuite, "1202", RoomStatus.ACTIVE);
+
+        log.info("RoomSeeder: done");
+    }
+
+    // =========================================================
+    // BOOKING
+    // =========================================================
+    private void seedSearchBookingData() {
+
+        if (bookingRepository.count() > 0) {
+            log.info("BookingSeeder: data already present — skip");
+            return;
+        }
+
+        User alice = userRepository
+                .findByUsernameAndDeleteFlagFalse("alice")
+                .orElseThrow();
+
+        User peter = userRepository
+                .findByUsernameAndDeleteFlagFalse("peter")
+                .orElseThrow();
+
+        List<RoomType> roomTypes =
+                roomTypeRepository.findAllByDeleteFlagFalse();
+
+        List<Room> rooms = roomRepository.findAll();
+
+        RoomType deluxeKing =
+                requireSeedRoomType(roomTypes, "Deluxe King Room");
+
+        RoomType executiveSuite =
+                requireSeedRoomType(roomTypes, "Executive Suite");
+
+        RoomType familyRoom =
+                requireSeedRoomType(roomTypes, "Family Room");
+
+
+        // =====================================================
+        // CASE 1
+        // CONFIRMED + overlap
+        // 10/09 -> 12/09
+        // Room 101 phải bị occupied
+        // =====================================================
+
+        Booking booking1 =
+                saveBooking(alice, BookingStatus.CONFIRMED);
+
+        BookingItem bookingItem1 =
+                saveBookingItem(
+                        booking1,
+                        deluxeKing,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 12),
+                        1
+                );
+
+        saveRoomAssignment(
+                bookingItem1,
+                requireSeedRoom(rooms, "101")
+        );
+
+
+        // =====================================================
+        // CASE 2
+        // PAID + overlap
+        // 11/09 -> 13/09
+        // Room 102 cũng phải bị occupied
+        // =====================================================
+
+        Booking booking2 =
+                saveBooking(peter, BookingStatus.PAID);
+
+        BookingItem bookingItem2 =
+                saveBookingItem(
+                        booking2,
+                        deluxeKing,
+                        LocalDate.of(2026, 9, 11),
+                        LocalDate.of(2026, 9, 13),
+                        1
+                );
+
+        saveRoomAssignment(
+                bookingItem2,
+                requireSeedRoom(rooms, "102")
+        );
+
+
+        // =====================================================
+        // CASE 3
+        // CANCELLED + overlap
+        // Room 103 KHÔNG được occupied
+        // =====================================================
+
+        Booking booking3 =
+                saveBooking(alice, BookingStatus.CANCELLED);
+
+        BookingItem bookingItem3 =
+                saveBookingItem(
+                        booking3,
+                        deluxeKing,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 12),
+                        1
+                );
+
+        saveRoomAssignment(
+                bookingItem3,
+                requireSeedRoom(rooms, "103")
+        );
+
+
+        // =====================================================
+        // CASE 4
+        // CONFIRMED nhưng checkout đúng ngày search check-in
+        //
+        // Booking: 08/09 -> 10/09
+        // Search : 10/09 -> 12/09
+        //
+        // KHÔNG overlap vì đang dùng < và >
+        // Room 104 vẫn available
+        // =====================================================
+
+        Booking booking4 =
+                saveBooking(peter, BookingStatus.CONFIRMED);
+
+        BookingItem bookingItem4 =
+                saveBookingItem(
+                        booking4,
+                        deluxeKing,
+                        LocalDate.of(2026, 9, 8),
+                        LocalDate.of(2026, 9, 10),
+                        1
+                );
+
+        saveRoomAssignment(
+                bookingItem4,
+                requireSeedRoom(rooms, "104")
+        );
+
+
+        // =====================================================
+        // CASE 5
+        // PENDING + overlap Executive Suite
+        // Room 301 bị occupied
+        // =====================================================
+
+        Booking booking5 =
+                saveBooking(alice, BookingStatus.PENDING);
+
+        BookingItem bookingItem5 =
+                saveBookingItem(
+                        booking5,
+                        executiveSuite,
+                        LocalDate.of(2026, 9, 9),
+                        LocalDate.of(2026, 9, 11),
+                        1
+                );
+
+        saveRoomAssignment(
+                bookingItem5,
+                requireSeedRoom(rooms, "301")
+        );
+
+
+        // =====================================================
+        // CASE 6
+        // EXPIRED + overlap Family Room
+        // Room 401 KHÔNG được occupied
+        // =====================================================
+
+        Booking booking6 =
+                saveBooking(peter, BookingStatus.EXPIRED);
+
+        BookingItem bookingItem6 =
+                saveBookingItem(
+                        booking6,
+                        familyRoom,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 13),
+                        1
+                );
+
+        saveRoomAssignment(
+                bookingItem6,
+                requireSeedRoom(rooms, "401")
+        );
+
+        log.info("BookingSeeder: search test data done");
     }
 
     // =========================================================
@@ -312,7 +632,7 @@ public class DataSeeder implements ApplicationRunner {
                 roomTypeRepository.findAllByDeleteFlagFalse();
 
         if (roomTypes.isEmpty()) {
-            log.warn("CartSeeder: no room types found — skip" );
+            log.warn("CartSeeder: no room types found — skip");
             return;
         }
 
@@ -382,7 +702,7 @@ public class DataSeeder implements ApplicationRunner {
 
         Instant now = Instant.now();
 
-        cart.setCreatedBy("admin" );
+        cart.setCreatedBy("admin");
         cart.setCreatedAt(now);
         cart.setUpdatedBy(null);
         cart.setUpdatedAt(null);
@@ -440,7 +760,7 @@ public class DataSeeder implements ApplicationRunner {
         // Audit
         Instant now = Instant.now();
 
-        item.setCreatedBy("admin" );
+        item.setCreatedBy("admin");
         item.setCreatedAt(now);
         item.setUpdatedBy(null);
         item.setUpdatedAt(null);
@@ -461,7 +781,7 @@ public class DataSeeder implements ApplicationRunner {
 
         permission.setCode(code);
         permission.setName(name);
-        permission.setDescription("" );
+        permission.setDescription("");
 
         return permissionRepository.save(permission);
     }
@@ -480,7 +800,7 @@ public class DataSeeder implements ApplicationRunner {
 
         role.setCode(code);
         role.setRoleName(name);
-        role.setDescription("" );
+        role.setDescription("");
 
         List<String> permissionIds = new ArrayList<>();
 
@@ -539,11 +859,138 @@ public class DataSeeder implements ApplicationRunner {
         // Audit
         Instant now = Instant.now();
 
-        user.setCreatedBy("admin" );
+        user.setCreatedBy("admin");
         user.setCreatedAt(now);
-        user.setUpdatedBy("admin" );
+        user.setUpdatedBy("admin");
         user.setUpdatedAt(now);
 
         userRepository.save(user);
     }
+
+    private void saveRoom(
+            RoomType roomType,
+            String roomNumber,
+            RoomStatus status
+    ) {
+        Room room = new Room();
+
+        room.setRoomTypeId(roomType.getId());
+        room.setRoomNumber(roomNumber);
+        room.setStatus(status);
+
+        room.setDeleteFlag(false);
+
+        Instant now = Instant.now();
+
+        room.setCreatedBy("admin");
+        room.setCreatedAt(now);
+        room.setUpdatedBy("admin");
+        room.setUpdatedAt(now);
+
+        roomRepository.save(room);
+    }
+
+    private Booking saveBooking(
+            User user,
+            BookingStatus status
+    ) {
+        Booking booking = new Booking();
+
+        booking.setUserId(user.getId());
+        booking.setStatus(status);
+
+        booking.setDeleteFlag(false);
+
+        Instant now = Instant.now();
+
+        booking.setCreatedBy("admin");
+        booking.setCreatedAt(now);
+        booking.setUpdatedBy("admin");
+        booking.setUpdatedAt(now);
+
+        return bookingRepository.save(booking);
+    }
+
+    private BookingItem saveBookingItem(
+            Booking booking,
+            RoomType roomType,
+            LocalDate checkInDate,
+            LocalDate checkOutDate,
+            int quantity
+    ) {
+        BookingItem bookingItem = new BookingItem();
+
+        bookingItem.setBookingId(booking.getId());
+        bookingItem.setRoomTypeId(roomType.getId());
+
+        bookingItem.setCheckInDate(checkInDate);
+        bookingItem.setCheckOutDate(checkOutDate);
+
+        bookingItem.setQuantity(quantity);
+
+        bookingItem.setDeleteFlag(false);
+
+        Instant now = Instant.now();
+
+        bookingItem.setCreatedBy("admin");
+        bookingItem.setCreatedAt(now);
+        bookingItem.setUpdatedBy("admin");
+        bookingItem.setUpdatedAt(now);
+
+        return bookingItemRepository.save(bookingItem);
+    }
+
+    private void saveRoomAssignment(
+            BookingItem bookingItem,
+            Room room
+    ) {
+        RoomAssignment assignment = new RoomAssignment();
+
+        assignment.setBookingItemId(bookingItem.getId());
+        assignment.setRoomId(room.getId());
+
+        assignment.setDeleteFlag(false);
+
+        Instant now = Instant.now();
+
+        assignment.setCreatedBy("admin");
+        assignment.setCreatedAt(now);
+        assignment.setUpdatedBy("admin");
+        assignment.setUpdatedAt(now);
+
+        roomAssignmentRepository.save(assignment);
+    }
+
+    private RoomType requireSeedRoomType(
+            List<RoomType> roomTypes,
+            String roomTypeName
+    ) {
+        return roomTypes.stream()
+                .filter(roomType ->
+                        roomTypeName.equals(roomType.getRoomTypeName())
+                )
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Seeder room type not found: " + roomTypeName
+                        )
+                );
+    }
+
+    private Room requireSeedRoom(
+            List<Room> rooms,
+            String roomNumber
+    ) {
+        return rooms.stream()
+                .filter(room ->
+                        roomNumber.equals(room.getRoomNumber())
+                )
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Seeder room not found: " + roomNumber
+                        )
+                );
+    }
+
 }
