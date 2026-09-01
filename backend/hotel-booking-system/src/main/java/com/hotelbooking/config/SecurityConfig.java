@@ -54,24 +54,22 @@ public class SecurityConfig {
                         ).permitAll()
 
                         // Public các chức năng GET cơ bản
-                        // - Get toàn bộ các loại phòng
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/room-types",
-                                "/api/room-types/*"
+                                "/api/room-types/**"
                         ).permitAll()
 
                         // Public -> có thể thấy Spring trả đúng lỗi gốc
-                        .requestMatchers("/error" ).permitAll()
+                        .requestMatchers("/error").permitAll()
 
                         // User management
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/users"
-                        ).hasAuthority("USER_CREATE" )
+                        ).hasAuthority("USER_CREATE")
 
                         // Cart management
-                        .requestMatchers("/api/cart/**" )
+                        .requestMatchers("/api/cart/**")
                         .authenticated()
 
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
@@ -79,7 +77,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs",
-                                "/v3/api-docs/**" ).permitAll()
+                                "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())
 
                 // JSON 401 / 403 (không redirect HTML /login)
@@ -95,18 +93,18 @@ public class SecurityConfig {
 
     private AuthenticationEntryPoint json401EntryPoint() {
         return (request, response, authException)
-                -> writeJson(response, HttpStatus.UNAUTHORIZED, "Unauthorized" );
+                -> writeJson(response, HttpStatus.UNAUTHORIZED, "Unauthorized");
     }
 
     private AccessDeniedHandler json403Handler() {
         return (request, response, accessDeniedException)
-                -> writeJson(response, HttpStatus.FORBIDDEN, "Forbidden" );
+                -> writeJson(response, HttpStatus.FORBIDDEN, "Forbidden");
     }
 
     private static void writeJson(HttpServletResponse response, HttpStatus status, String error) throws IOException {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().write("{\"error\":\"" + error + "\"}" );
+        response.getWriter().write("{\"error\":\"" + error + "\"}");
     }
 
 }
