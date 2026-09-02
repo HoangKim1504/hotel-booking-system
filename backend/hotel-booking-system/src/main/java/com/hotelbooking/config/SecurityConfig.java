@@ -82,10 +82,15 @@ public class SecurityConfig {
 
                         // Limit các chức năng liên quan update Room Type
                         // - Insert một Room Type mới
+                        // - Update Room Type có sẵn
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/room-types"
                         ).hasAuthority("USER_CREATE")
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/room-types/*"
+                        ).hasAuthority("USER_UPDATE")
 
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
