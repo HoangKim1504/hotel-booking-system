@@ -4,14 +4,8 @@ import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.exception.ForbiddenException;
 import com.hotelbooking.exception.NotFoundException;
 import com.hotelbooking.exception.UnauthorizedException;
-import com.hotelbooking.model.CartItem;
-import com.hotelbooking.model.Role;
-import com.hotelbooking.model.RoomType;
-import com.hotelbooking.model.User;
-import com.hotelbooking.repository.CartItemRepository;
-import com.hotelbooking.repository.RoleRepository;
-import com.hotelbooking.repository.RoomTypeRepository;
-import com.hotelbooking.repository.UserRepository;
+import com.hotelbooking.model.*;
+import com.hotelbooking.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +17,7 @@ public class EntityValidator {
     private final RoleRepository roleRepository;
     private final CartItemRepository cartItemRepository;
     private final RoomTypeRepository roomTypeRepository;
+    private final RoomRepository roomRepository;
 
     // ========================
     // User
@@ -92,6 +87,16 @@ public class EntityValidator {
         return roomTypeRepository.findByIdAndStatusAndDeleteFlagFalse(id, status)
                 .orElseThrow(() ->
                         new NotFoundException("Room type not found: " + id)
+                );
+    }
+
+    // ========================
+    // Room
+    // ========================
+    public Room requireAdminRoom(String id) {
+        return roomRepository.findByIdAndDeleteFlagFalse(id)
+                .orElseThrow(() ->
+                        new NotFoundException("Room not found: " + id)
                 );
     }
 

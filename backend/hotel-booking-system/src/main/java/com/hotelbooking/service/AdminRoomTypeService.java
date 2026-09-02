@@ -7,7 +7,9 @@ import com.hotelbooking.dto.UpdateRoomTypeRequest;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.Room;
+import com.hotelbooking.model.RoomAssignment;
 import com.hotelbooking.model.RoomType;
+import com.hotelbooking.repository.RoomAssignmentRepository;
 import com.hotelbooking.repository.RoomRepository;
 import com.hotelbooking.repository.RoomTypeRepository;
 import com.hotelbooking.utils.PageableUtils;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,7 @@ public class AdminRoomTypeService {
 
     private final RoomTypeRepository roomTypeRepository;
     private final RoomRepository roomRepository;
+    private final RoomAssignmentRepository roomAssignmentRepository;
     private final EntityValidator entityValidator;
 
     Instant now = Instant.now();
@@ -108,17 +113,21 @@ public class AdminRoomTypeService {
      * Search Room Type có sẵn và update data với Room Type input vào DB
      */
     public RoomTypeResponse update(UpdateRoomTypeRequest request, String id, String username) {
-        // Tìm room type tương ứng vs MongoID. Không tìm thấy -> 404
+        // 1. Tìm RoomType hiện tại
         RoomType existingRoomType = entityValidator.requireAdminRoomType(id);
 
-        // Kiểm tra có RoomType KHÁC đang sử dụng tên này hay không
-        if (roomTypeRepository.existsByRoomTypeNameIgnoreCaseAndIdNotAndDeleteFlagFalse(
-                request.roomTypeName().trim(),
-                id
-        )) {
-            throw new ConflictException("Room type name already exists");
+        // 2. Chỉ check duplicate khi tên thực sự thay đổi
+        if (!request.roomTypeName().trim().equalsIgnoreCase(existingRoomType.getRoomTypeName().trim())) {
+            checkDuplicateRoomTypeName(request.roomTypeName(), id);
         }
 
+        // 3. Chuyển ACTIVE -> INACTIVE thì kiểm tra các phòng đang được sử dụng
+        if (!request.status().equals(existingRoomType.getStatus())
+                && RoomTypeStatus.INACTIVE.equals(request.status())) {
+            checkOccupiedRoomIds(id);
+        }
+
+        // 4. Update RoomType
         RoomType updateRoomType = setCurrentRoomType(request, existingRoomType, username);
 
         return toRoomTypeResponse(roomTypeRepository.save(updateRoomType));
@@ -195,6 +204,33 @@ public class AdminRoomTypeService {
         roomType.setUpdatedAt(null);
 
         return roomType;
+    }
+
+    private void checkDuplicateRoomTypeName(String roomTypeName, String id) {
+        if (roomTypeRepository.existsByRoomTypeNameIgnoreCaseAndIdNotAndDeleteFlagFalse(
+                roomTypeName.trim(),
+                id
+        )) {
+            throw new ConflictException("Room type name already exists");
+        }
+    }
+
+    private void checkOccupiedRoomIds(String id) {
+        Set<String> roomIds = roomRepository
+                .findByRoomTypeIdAndDeleteFlagFalse(id)
+                .stream()
+                .map(Room::getId)
+                .collect(Collectors.toSet());
+
+        if (roomIds.isEmpty()) {
+            return;
+        }
+
+        List<RoomAssignment> occupiedRoomIds = roomAssignmentRepository.findByDeleteFlagFalseAndRoomIdIn(roomIds);
+
+        if (!occupiedRoomIds.isEmpty()) {
+            throw new ConflictException("Cannot deactivate room type because some rooms are currently assigned");
+        }
     }
 
     private RoomType setCurrentRoomType(UpdateRoomTypeRequest request, RoomType existingRoomType, String username) {
