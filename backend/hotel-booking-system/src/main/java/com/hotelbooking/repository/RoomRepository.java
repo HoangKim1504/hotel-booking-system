@@ -12,4 +12,6 @@ public interface RoomRepository extends MongoRepository<Room, String> {
     List<Room> findByDeleteFlagFalseAndStatusAndRoomTypeIdInAndIdNotIn(
             RoomStatus roomStatus, List<String> eligibleRoomTypeIds, Set<String> occupiedRoomIds);
 
+    List<Room> findByRoomTypeIdAndDeleteFlagFalse(String id);
+
 }

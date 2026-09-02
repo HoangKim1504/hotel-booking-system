@@ -6,7 +6,9 @@ import com.hotelbooking.dto.RoomTypeResponse;
 import com.hotelbooking.dto.UpdateRoomTypeRequest;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.exception.ConflictException;
+import com.hotelbooking.model.Room;
 import com.hotelbooking.model.RoomType;
+import com.hotelbooking.repository.RoomRepository;
 import com.hotelbooking.repository.RoomTypeRepository;
 import com.hotelbooking.utils.PageableUtils;
 import com.hotelbooking.validator.EntityValidator;
@@ -23,6 +25,7 @@ import java.util.List;
 public class AdminRoomTypeService {
 
     private final RoomTypeRepository roomTypeRepository;
+    private final RoomRepository roomRepository;
     private final EntityValidator entityValidator;
 
     Instant now = Instant.now();
@@ -119,6 +122,25 @@ public class AdminRoomTypeService {
     }
 
     /**
+     * Xoá Room Type dựa trên MongodID của Room Type
+     */
+    public void delete(String id, String username) {
+        // Tìm room type tương ứng vs MongoID. Không tìm thấy -> 404
+        RoomType existingRoomType = entityValidator.requireAdminRoomType(id);
+
+        // Tìm list các phòng dựa trên
+        List<Room> roomsAvailableList = roomRepository.findByRoomTypeIdAndDeleteFlagFalse(id);
+        if (!roomsAvailableList.isEmpty()) {
+            throw new ConflictException("Cannot delete room type because it still has associated rooms");
+        }
+
+        RoomType softDeleteRoomType = setSoftDeleteRoomType(existingRoomType, username);
+
+        // Thực thi soft-delete và update DB
+        roomTypeRepository.save(softDeleteRoomType);
+    }
+
+    /**
      * Convert sang class Response để trả về Controller
      */
     private RoomTypeResponse toRoomTypeResponse(RoomType roomType) {
@@ -178,6 +200,15 @@ public class AdminRoomTypeService {
         existingRoomType.setMaximumPeople(request.maximumPeople());
         existingRoomType.setPrice(request.price());
         existingRoomType.setStatus(request.status());
+        existingRoomType.setUpdatedBy(username);
+        existingRoomType.setUpdatedAt(now);
+
+        return existingRoomType;
+    }
+
+    private RoomType setSoftDeleteRoomType(RoomType existingRoomType, String username) {
+        existingRoomType.setStatus(RoomTypeStatus.INACTIVE);
+        existingRoomType.setDeleteFlag(true);
         existingRoomType.setUpdatedBy(username);
         existingRoomType.setUpdatedAt(now);
 
