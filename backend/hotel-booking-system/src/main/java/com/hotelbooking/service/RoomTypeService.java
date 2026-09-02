@@ -6,10 +6,7 @@ import com.hotelbooking.dto.SearchRoomTypeResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.enums.RoomStatus;
 import com.hotelbooking.enums.RoomTypeStatus;
-import com.hotelbooking.model.BookingItem;
-import com.hotelbooking.model.Room;
-import com.hotelbooking.model.RoomAssignment;
-import com.hotelbooking.model.RoomType;
+import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
@@ -200,28 +197,35 @@ public class RoomTypeService {
     }
 
     private List<BookingItem> findOccupiedBookingItems(LocalDate checkInDate, LocalDate checkOutDate) {
-        // Tìm BookingItem bị overlap theo checkInDate và checkOutDate
+        // 1. Tìm BookingItem bị overlap với khoảng ngày search
         List<BookingItem> overlappingBookingItems =
                 bookingItemRepository.findByDeleteFlagFalseAndCheckInDateLessThanAndCheckOutDateGreaterThan(
                         checkOutDate, checkInDate);
 
-        // Tìm loại booking không còn hiệu lực: CANCELLED / EXPIRED / REFUNDED...
+        // 2. Các BookingStatus vẫn đang giữ phòng
         List<BookingStatus> activeStatuses = List.of(
                 BookingStatus.PENDING,
                 BookingStatus.PAID,
                 BookingStatus.CONFIRMED,
                 BookingStatus.CHECKED_IN
         );
-        List<String> validBookingIds = getValidBookingIds(activeStatuses);
 
+        // 3. Lấy bookingId của các Booking còn hiệu lực
+        Set<String> validBookingIds = getValidBookingIds(activeStatuses);
+
+        // 4. Chỉ giữ BookingItem thuộc Booking còn hiệu lực
         return overlappingBookingItems
                 .stream()
                 .filter(item -> validBookingIds.contains(item.getBookingId()))
                 .toList();
     }
 
-    private List<String> getValidBookingIds(List<BookingStatus> activeStatuses) {
-        return bookingRepository.findByDeleteFlagFalseAndStatusIn(activeStatuses);
+    private Set<String> getValidBookingIds(Collection<BookingStatus> activeStatuses) {
+        return bookingRepository
+                .findByDeleteFlagFalseAndStatusIn(activeStatuses)
+                .stream()
+                .map(Booking::getId)
+                .collect(Collectors.toSet());
     }
 
     private Set<String> findOccupiedRoomIds(List<String> occupiedBookingItemIds) {
