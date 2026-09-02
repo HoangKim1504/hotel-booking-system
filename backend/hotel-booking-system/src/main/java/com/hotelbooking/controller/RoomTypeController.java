@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -71,6 +72,7 @@ public class RoomTypeController {
             LocalDate checkOutDate,
 
             @RequestParam("maxPeople")
+            @NotNull(message = "Number of people is required")
             @Min(value = 1, message = "Number of people must be at least 1")
             @Max(value = 10, message = "Number of people cannot be over 10")
             int maxPeople,

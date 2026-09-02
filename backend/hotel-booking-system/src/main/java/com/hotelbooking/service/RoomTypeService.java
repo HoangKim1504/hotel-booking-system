@@ -6,6 +6,7 @@ import com.hotelbooking.dto.SearchRoomTypeResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.enums.RoomStatus;
 import com.hotelbooking.enums.RoomTypeStatus;
+import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
 import com.hotelbooking.validator.EntityValidator;
@@ -174,11 +175,11 @@ public class RoomTypeService {
      * Check ngày check-in phải trước ngày check-out.
      */
     private void validateCheckInOutDate(LocalDate checkIn, LocalDate checkOut) {
-        if (!checkIn.isBefore(checkOut)) {
-            throw new IllegalArgumentException("Check-in date must be before check-out date");
-        }
         if (checkIn.isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Check-in date cannot be in the past");
+            throw new BadRequestException("checkInDate", "Check-in date cannot be in the past");
+        }
+        if (!checkIn.isBefore(checkOut)) {
+            throw new BadRequestException("checkOutDate", "Check-out date must be after check-in date");
         }
     }
 
