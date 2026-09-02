@@ -1,7 +1,10 @@
 package com.hotelbooking.service;
 
+import com.hotelbooking.dto.CreateRoomTypeRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomTypeResponse;
+import com.hotelbooking.enums.RoomTypeStatus;
+import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.RoomType;
 import com.hotelbooking.repository.RoomTypeRepository;
 import com.hotelbooking.utils.PageableUtils;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -81,6 +85,20 @@ public class AdminRoomTypeService {
     }
 
     /**
+     * Insert Room Type mới vào DB
+     */
+    public RoomTypeResponse create(CreateRoomTypeRequest request, String username) {
+        // TH tồn tại Room Type chung tên thì sẽ trả mã lỗi 409
+        if (roomTypeRepository.existsByRoomTypeNameAndDeleteFlagFalse(request.roomTypeName().trim())) {
+            throw new ConflictException("Room type name already exists");
+        }
+
+        RoomType newRoomType = setNewRoomType(request, username);
+
+        return toRoomTypeResponse(roomTypeRepository.save(newRoomType));
+    }
+
+    /**
      * Convert sang class Response để trả về Controller
      */
     private RoomTypeResponse toRoomTypeResponse(RoomType roomType) {
@@ -113,6 +131,25 @@ public class AdminRoomTypeService {
                 totalRecords,
                 totalPages
         );
+    }
+
+    private RoomType setNewRoomType(CreateRoomTypeRequest request, String username) {
+        RoomType roomType = new RoomType();
+        Instant now = Instant.now();
+
+        roomType.setRoomTypeName(request.roomTypeName());
+        roomType.setRoomSize(request.roomSize());
+        roomType.setFacility(request.facility());
+        roomType.setMaximumPeople(request.maximumPeople());
+        roomType.setPrice(request.price());
+        roomType.setStatus(RoomTypeStatus.ACTIVE);
+        roomType.setDeleteFlag(false);
+        roomType.setCreatedBy(username);
+        roomType.setCreatedAt(now);
+        roomType.setUpdatedBy(null);
+        roomType.setUpdatedAt(null);
+
+        return roomType;
     }
 
 }

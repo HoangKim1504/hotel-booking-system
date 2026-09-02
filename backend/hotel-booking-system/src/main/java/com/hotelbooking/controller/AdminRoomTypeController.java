@@ -1,14 +1,18 @@
 package com.hotelbooking.controller;
 
+import com.hotelbooking.dto.CreateRoomTypeRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomTypeResponse;
 import com.hotelbooking.service.AdminRoomTypeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -86,6 +90,17 @@ public class AdminRoomTypeController {
             String order
     ) {
         return adminRoomTypeService.searchByCriteria(roomTypeName, page, size, sortBy, order);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('USER_CREATE')")
+    public RoomTypeResponse create(
+            @Valid @RequestBody CreateRoomTypeRequest createRoomTypeRequest,
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        return adminRoomTypeService.create(createRoomTypeRequest, username);
     }
 
 }
