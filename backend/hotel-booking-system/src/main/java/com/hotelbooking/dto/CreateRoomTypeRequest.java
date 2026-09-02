@@ -15,7 +15,7 @@ public record CreateRoomTypeRequest(
         @DecimalMax(value = "1000.0", message = "Room size must not exceed 1000")
         Double roomSize,
 
-        @NotBlank(message = "Facility is required")
+        @NotBlank(message = "At least one facility must be provided")
         String facility,
 
         @NotNull(message = "Maximum people is required")

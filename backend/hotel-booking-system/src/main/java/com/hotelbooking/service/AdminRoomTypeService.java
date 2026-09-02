@@ -150,7 +150,8 @@ public class AdminRoomTypeService {
                 roomType.getRoomSize(),
                 roomType.getFacility(),
                 roomType.getMaximumPeople(),
-                roomType.getPrice()
+                roomType.getPrice(),
+                roomType.getStatus()
         );
     }
 

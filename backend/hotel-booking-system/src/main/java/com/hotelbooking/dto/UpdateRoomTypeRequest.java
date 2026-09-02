@@ -15,6 +15,7 @@ public record UpdateRoomTypeRequest(
         @DecimalMax(value = "1000.0", message = "Room size must not exceed 1000")
         Double roomSize,
 
+        @NotBlank(message = "At least one facility must be provided")
         String facility,
 
         @NotNull(message = "Maximum people is required")
@@ -27,7 +28,7 @@ public record UpdateRoomTypeRequest(
         @Digits(integer = 12, fraction = 0, message = "Price must be a whole number with up to 12 digits")
         BigDecimal price,
 
-        @NotNull(message = "Room type status is required when updating user information")
+        @NotNull(message = "Room type status is required when updating room type information")
         RoomTypeStatus status
 
 ) {

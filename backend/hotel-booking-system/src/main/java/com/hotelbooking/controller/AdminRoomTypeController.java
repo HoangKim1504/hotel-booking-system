@@ -119,8 +119,9 @@ public class AdminRoomTypeController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('USER_DELETE')")
-    public void update(@PathVariable String id, Authentication authentication) {
+    public void delete(@PathVariable String id, Authentication authentication) {
         String username = authentication.getName();
         adminRoomTypeService.delete(id, username);
     }
+    
 }

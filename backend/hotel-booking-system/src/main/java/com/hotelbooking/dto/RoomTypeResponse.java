@@ -1,5 +1,7 @@
 package com.hotelbooking.dto;
 
+import com.hotelbooking.enums.RoomTypeStatus;
+
 import java.math.BigDecimal;
 
 /**
@@ -11,5 +13,6 @@ public record RoomTypeResponse(
         Double roomSize,
         String facility,
         Integer maximumPeople,
-        BigDecimal price) {
+        BigDecimal price,
+        RoomTypeStatus status) {
 }
