@@ -25,7 +25,7 @@ public record UpdateRoomTypeRequest(
 
         @NotNull(message = "Price is required")
         @Positive(message = "Price must be greater than 0")
-        @Digits(integer = 12, fraction = 0, message = "Price must be a whole number with up to 12 digits")
+        @Digits(integer = 12, fraction = 2, message = "Price must have up to 12 integer digits and 2 decimal places")
         BigDecimal price,
 
         @NotNull(message = "Room type status is required when updating room type information")
