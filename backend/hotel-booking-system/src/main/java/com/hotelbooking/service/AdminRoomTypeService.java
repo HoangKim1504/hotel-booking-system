@@ -4,6 +4,7 @@ import com.hotelbooking.dto.CreateRoomTypeRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomTypeResponse;
 import com.hotelbooking.dto.UpdateRoomTypeRequest;
+import com.hotelbooking.enums.RoomStatus;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.Room;
@@ -124,7 +125,7 @@ public class AdminRoomTypeService {
         // 3. Chuyển ACTIVE -> INACTIVE thì kiểm tra các phòng đang được sử dụng
         if (!request.status().equals(existingRoomType.getStatus())
                 && RoomTypeStatus.INACTIVE.equals(request.status())) {
-            checkOccupiedRoomIds(id);
+            checkOccupiedRoomIds(id, true);
         }
 
         // 4. Update RoomType
@@ -140,10 +141,16 @@ public class AdminRoomTypeService {
         // Tìm room type tương ứng vs MongoID. Không tìm thấy -> 404
         RoomType existingRoomType = entityValidator.requireAdminRoomType(id);
 
-        // Tìm list các phòng dựa trên
-        List<Room> roomsAvailableList = roomRepository.findByRoomTypeIdAndDeleteFlagFalse(id);
-        if (!roomsAvailableList.isEmpty()) {
-            throw new ConflictException("Cannot delete room type because it still has associated rooms");
+        // Kiểm tra các phòng đang được sử dụng
+        checkOccupiedRoomIds(id, false);
+
+        Set<String> roomIds = findRoomIdsByRoomTypeId(id);
+        if (!roomIds.isEmpty()) {
+            for (String roomId : roomIds) {
+                Room currentRoom = entityValidator.requireAdminRoom(roomId);
+                Room updateRoomStatus = setRoomStatus(currentRoom, username);
+                roomRepository.save(updateRoomStatus);
+            }
         }
 
         RoomType softDeleteRoomType = setSoftDeleteRoomType(existingRoomType, username);
@@ -215,12 +222,8 @@ public class AdminRoomTypeService {
         }
     }
 
-    private void checkOccupiedRoomIds(String id) {
-        Set<String> roomIds = roomRepository
-                .findByRoomTypeIdAndDeleteFlagFalse(id)
-                .stream()
-                .map(Room::getId)
-                .collect(Collectors.toSet());
+    private void checkOccupiedRoomIds(String id, boolean updateFlag) {
+        Set<String> roomIds = findRoomIdsByRoomTypeId(id);
 
         if (roomIds.isEmpty()) {
             return;
@@ -228,9 +231,20 @@ public class AdminRoomTypeService {
 
         List<RoomAssignment> occupiedRoomIds = roomAssignmentRepository.findByDeleteFlagFalseAndRoomIdIn(roomIds);
 
-        if (!occupiedRoomIds.isEmpty()) {
+        if (!occupiedRoomIds.isEmpty() && updateFlag) {
             throw new ConflictException("Cannot deactivate room type because some rooms are currently assigned");
         }
+        if (!occupiedRoomIds.isEmpty()) {
+            throw new ConflictException("Cannot delete room type because some rooms are currently assigned");
+        }
+    }
+
+    private Set<String> findRoomIdsByRoomTypeId(String id) {
+        return roomRepository
+                .findByRoomTypeIdAndDeleteFlagFalse(id)
+                .stream()
+                .map(Room::getId)
+                .collect(Collectors.toSet());
     }
 
     private RoomType setCurrentRoomType(UpdateRoomTypeRequest request, RoomType existingRoomType, String username) {
@@ -244,6 +258,15 @@ public class AdminRoomTypeService {
         existingRoomType.setUpdatedAt(now);
 
         return existingRoomType;
+    }
+
+    private Room setRoomStatus(Room currentRoom, String username) {
+        currentRoom.setStatus(RoomStatus.OUT_OF_SERVICE);
+        currentRoom.setDeleteFlag(false);
+        currentRoom.setUpdatedBy(username);
+        currentRoom.setUpdatedAt(now);
+
+        return currentRoom;
     }
 
     private RoomType setSoftDeleteRoomType(RoomType existingRoomType, String username) {
