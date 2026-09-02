@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -26,10 +26,10 @@ public class BookingItem extends BaseModel {
 
     private Integer quantity;
 
-    @Field("check_in_time")
-    private LocalDateTime checkInTime;
+    @Field("check_in_date")
+    private LocalDate checkInDate;
 
-    @Field("check_out_time")
-    private LocalDateTime checkOutTime;
+    @Field("check_out_date")
+    private LocalDate checkOutDate;
 
 }

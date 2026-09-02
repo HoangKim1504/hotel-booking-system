@@ -5,7 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.LocalDate;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -67,10 +70,67 @@ public class RestExceptionHandler {
                 .body(Map.of("errors", errors));
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> badRequest(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("error", ex.getMessage()));
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<Map<String, Map<String, String>>> handleMethodValidation(
+            HandlerMethodValidationException ex
+    ) {
+        // @RequestParam / @PathVariable validation fail → 400
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        ex.getParameterValidationResults()
+                .forEach(result -> {
+                    String field = result.getMethodParameter().getParameterName();
+                    result.getResolvableErrors().forEach(error ->
+                            errors.putIfAbsent(
+                                    field,
+                                    error.getDefaultMessage()
+                            )
+                    );
+                });
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("errors", errors));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Map<String, String>>> handleMethodArgumentTypeMismatch(
+            MethodArgumentTypeMismatchException ex
+    ) {
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        if (ex.getRequiredType() == LocalDate.class) {
+            errors.put(
+                    ex.getName(),
+                    "Invalid date format. Expected yyyy-MM-dd"
+            );
+        } else {
+            errors.put(
+                    ex.getName(),
+                    "Invalid value format"
+            );
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("errors", errors));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<Map<String, Map<String, String>>> handleBadRequestException(
+            BadRequestException ex
+    ) {
+        // Business validation fail → 400
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        errors.put(
+                ex.getField(),
+                ex.getMessage()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("errors", errors));
     }
 
 }

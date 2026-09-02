@@ -53,6 +53,15 @@ public class SecurityConfig {
                                 "/api/auth/register"
                         ).permitAll()
 
+                        // Public các chức năng GET cơ bản
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/room-types/**"
+                        ).permitAll()
+
+                        // Public -> có thể thấy Spring trả đúng lỗi gốc
+                        .requestMatchers("/error").permitAll()
+
                         // User management
                         .requestMatchers(
                                 HttpMethod.POST,
