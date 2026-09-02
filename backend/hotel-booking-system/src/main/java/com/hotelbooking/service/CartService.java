@@ -4,6 +4,7 @@ import com.hotelbooking.dto.AddCartItemRequest;
 import com.hotelbooking.dto.CartItemResponse;
 import com.hotelbooking.dto.CartResponse;
 import com.hotelbooking.dto.UpdateCartItemRequest;
+import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.model.Cart;
 import com.hotelbooking.model.CartItem;
 import com.hotelbooking.model.RoomType;
@@ -64,7 +65,7 @@ public class CartService {
 
         String userId = getUserId(username);
         Cart cart = getOrCreateCart(userId, username);
-        RoomType roomType = entityValidator.requireRomeType(request.roomTypeId());
+        RoomType roomType = entityValidator.requireRoomType(request.roomTypeId(), RoomTypeStatus.ACTIVE);
 
         // Get room type name
         String roomTypeName = roomType.getRoomTypeName();
@@ -113,7 +114,7 @@ public class CartService {
         String userId = getUserId(username);
         Cart cart = getOrCreateCart(userId, username);
         CartItem cartItem = entityValidator.requireCartItem(cart.getId(), itemId);
-        RoomType roomType = entityValidator.requireRomeType(cartItem.getRoomTypeId());
+        RoomType roomType = entityValidator.requireRoomType(cartItem.getRoomTypeId(), RoomTypeStatus.ACTIVE);
 
         // Get room type name
         String roomTypeName = roomType.getRoomTypeName();
@@ -187,7 +188,7 @@ public class CartService {
     }
 
     private String getRoomTypeName(String roomTypeId) {
-        RoomType roomType = entityValidator.requireRomeType(roomTypeId);
+        RoomType roomType = entityValidator.requireRoomType(roomTypeId, RoomTypeStatus.ACTIVE);
         return roomType.getRoomTypeName();
     }
 
