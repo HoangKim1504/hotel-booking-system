@@ -72,6 +72,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/cart/**")
                         .authenticated()
 
+                        // Room type management
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/admin/room-types",
+                                "/api/admin/room-types/*",
+                                "/api/admin/room-types/search"
+                        ).hasAuthority("ADMIN_VIEW")
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",
