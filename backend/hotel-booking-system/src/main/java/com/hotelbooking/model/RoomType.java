@@ -1,9 +1,7 @@
 package com.hotelbooking.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import com.hotelbooking.enums.RoomTypeStatus;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -36,4 +34,8 @@ public class RoomType extends BaseModel {
     private Integer maximumPeople;
 
     private BigDecimal price;
+
+    @Builder.Default
+    private RoomTypeStatus status = RoomTypeStatus.ACTIVE;
+
 }

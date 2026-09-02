@@ -4,11 +4,10 @@ import com.hotelbooking.dto.CreateUserRequest;
 import com.hotelbooking.dto.UpdateUserRequest;
 import com.hotelbooking.dto.UserResponse;
 import com.hotelbooking.exception.ConflictException;
-import com.hotelbooking.exception.NotFoundException;
 import com.hotelbooking.model.Role;
 import com.hotelbooking.model.User;
-import com.hotelbooking.repository.RoleRepository;
 import com.hotelbooking.repository.UserRepository;
+import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,7 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final EntityValidator entityValidator;
     private final PermissionLoader permissionLoader;
     private final PasswordEncoder passwordEncoder;
 
@@ -41,21 +40,21 @@ public class UserService {
     }
 
     public UserResponse findById(String id) {
-        return toResponse(requireUser(id));
+        return toResponse(entityValidator.requireUserByUserId(id));
     }
 
     public UserResponse create(CreateUserRequest request) {
         // Trùng username / email → 409
         if (userRepository.existsByUsername(request.username())) {
-            throw new ConflictException("Username already exists");
+            throw new ConflictException("Username already exists" );
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new ConflictException("Email already exists");
+            throw new ConflictException("Email already exists" );
         }
 
         // Resolve role codes (mặc định USER)
         List<String> roleCodes = (request.roleCodes() == null || request.roleCodes().isEmpty())
-                ? List.of("USER")
+                ? List.of("USER" )
                 : request.roleCodes();
         List<String> roleIds = resolveRoleIds(roleCodes);
 
@@ -84,7 +83,7 @@ public class UserService {
 
     public UserResponse update(String id, UpdateUserRequest request) {
         // Không tồn tại hoặc đã soft delete → 404
-        User user = requireUser(id);
+        User user = entityValidator.requireUserByUserId(id);
 
         // Cập nhật từng field nếu client gửi
         if (request.fullName() != null) {
@@ -101,7 +100,7 @@ public class UserService {
 
         if (request.email() != null) {
             if (userRepository.existsByEmail(request.email())) {
-                throw new ConflictException("Email already exists");
+                throw new ConflictException("Email already exists" );
             }
             user.setEmail(request.email());
         }
@@ -135,7 +134,7 @@ public class UserService {
 
     public void delete(String id) {
         // Không tồn tại hoặc đã soft delete → 404
-        User user = requireUser(id);
+        User user = entityValidator.requireUserByUserId(id);
 
         // Soft delete
         user.setEnabled(false);
@@ -148,10 +147,10 @@ public class UserService {
 
     public UserResponse assignRole(String userId, String roleCode) {
         // User không tồn tại hoặc đã soft delete → 404
-        User user = requireUser(userId);
+        User user = entityValidator.requireUserByUserId(userId);
 
         // Role không tồn tại hoặc đã soft delete → 404
-        Role role = requireRole(roleCode);
+        Role role = entityValidator.requireRole(roleCode);
 
         // Tránh NullPointerException
         List<String> roleIds = user.getRoleIds() == null
@@ -160,7 +159,7 @@ public class UserService {
 
         // Đã có role thì không thêm lại
         if (roleIds.contains(role.getId())) {
-            throw new ConflictException("Role already exists");
+            throw new ConflictException("Role already exists" );
         } else {
             // Add role
             roleIds.add(role.getId());
@@ -175,10 +174,10 @@ public class UserService {
 
     public UserResponse removeRole(String userId, String roleCode) {
         // User không tồn tại hoặc đã soft delete → 404
-        User user = requireUser(userId);
+        User user = entityValidator.requireUserByUserId(userId);
 
         // Role không tồn tại hoặc đã soft delete → 404
-        Role role = requireRole(roleCode);
+        Role role = entityValidator.requireRole(roleCode);
 
         // Tránh NullPointerException
         List<String> roleIds = user.getRoleIds() == null
@@ -200,26 +199,10 @@ public class UserService {
         return toResponse(user);
     }
 
-    private User requireUser(String id) {
-        return userRepository.findByIdAndDeleteFlagFalse(id)
-                .orElseThrow(() ->
-                        new NotFoundException("User not found: " + id)
-                );
-    }
-
-    private Role requireRole(String roleCode) {
-        String code = roleCode.trim().toUpperCase();
-
-        return roleRepository.findByCodeAndDeleteFlagFalse(code)
-                .orElseThrow(() ->
-                        new NotFoundException("Role not found: " + roleCode)
-                );
-    }
-
     private List<String> resolveRoleIds(List<String> roleCodes) {
         List<String> ids = new ArrayList<>();
         for (String code : roleCodes) {
-            Role role = requireRole(code);
+            Role role = entityValidator.requireRole(code);
             ids.add(role.getId());
         }
         return ids;

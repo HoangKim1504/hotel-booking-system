@@ -4,16 +4,13 @@ import com.hotelbooking.dto.AddCartItemRequest;
 import com.hotelbooking.dto.CartItemResponse;
 import com.hotelbooking.dto.CartResponse;
 import com.hotelbooking.dto.UpdateCartItemRequest;
-import com.hotelbooking.exception.ForbiddenException;
-import com.hotelbooking.exception.NotFoundException;
 import com.hotelbooking.model.Cart;
 import com.hotelbooking.model.CartItem;
 import com.hotelbooking.model.RoomType;
 import com.hotelbooking.model.User;
 import com.hotelbooking.repository.CartItemRepository;
 import com.hotelbooking.repository.CartRepository;
-import com.hotelbooking.repository.RoomTypeRepository;
-import com.hotelbooking.repository.UserRepository;
+import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,10 +24,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CartService {
 
-    private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final RoomTypeRepository roomTypeRepository;
+    private final EntityValidator entityValidator;
 
     public CartResponse findByUsername(String username) {
 
@@ -68,7 +64,7 @@ public class CartService {
 
         String userId = getUserId(username);
         Cart cart = getOrCreateCart(userId, username);
-        RoomType roomType = requireRomeType(request.roomTypeId());
+        RoomType roomType = entityValidator.requireRomeType(request.roomTypeId());
 
         // Get room type name
         String roomTypeName = roomType.getRoomTypeName();
@@ -116,8 +112,8 @@ public class CartService {
 
         String userId = getUserId(username);
         Cart cart = getOrCreateCart(userId, username);
-        CartItem cartItem = requireCartItem(cart.getId(), itemId);
-        RoomType roomType = requireRomeType(cartItem.getRoomTypeId());
+        CartItem cartItem = entityValidator.requireCartItem(cart.getId(), itemId);
+        RoomType roomType = entityValidator.requireRomeType(cartItem.getRoomTypeId());
 
         // Get room type name
         String roomTypeName = roomType.getRoomTypeName();
@@ -145,7 +141,7 @@ public class CartService {
 
         String userId = getUserId(username);
         Cart cart = getOrCreateCart(userId, username);
-        CartItem cartItem = requireCartItem(cart.getId(), itemId);
+        CartItem cartItem = entityValidator.requireCartItem(cart.getId(), itemId);
 
         cartItemRepository.delete(cartItem);
 
@@ -163,35 +159,6 @@ public class CartService {
                     cart.setCreatedAt(Instant.now());
                     return cartRepository.save(cart);
                 });
-    }
-
-    private User requireUser(String username) {
-        return userRepository.findByUsernameAndDeleteFlagFalse(username)
-                .orElseThrow(() ->
-                        new NotFoundException("User not found: " + username)
-                );
-    }
-
-    private RoomType requireRomeType(String id) {
-        return roomTypeRepository.findByIdAndDeleteFlagFalse(id)
-                .orElseThrow(() ->
-                        new NotFoundException("Room type not found: " + id)
-                );
-    }
-
-    private CartItem requireCartItem(String cartId, String itemId) {
-        CartItem cartItem = cartItemRepository.findByIdAndDeleteFlagFalse(itemId)
-                .orElseThrow(() ->
-                        new NotFoundException("Cart item not found: " + itemId)
-                );
-
-        if (!cartItem.getCartId().equals(cartId)) {
-            throw new ForbiddenException(
-                    "Cart item does not belong to current user"
-            );
-        }
-
-        return cartItem;
     }
 
     private CartItemResponse toCartItemResponse(CartItem cartItem, String roomTypeName, BigDecimal subTotal) {
@@ -215,12 +182,12 @@ public class CartService {
     }
 
     private String getUserId(String username) {
-        User user = requireUser(username);
+        User user = entityValidator.requireUserByUsername(username);
         return user.getId();
     }
 
     private String getRoomTypeName(String roomTypeId) {
-        RoomType roomType = requireRomeType(roomTypeId);
+        RoomType roomType = entityValidator.requireRomeType(roomTypeId);
         return roomType.getRoomTypeName();
     }
 
