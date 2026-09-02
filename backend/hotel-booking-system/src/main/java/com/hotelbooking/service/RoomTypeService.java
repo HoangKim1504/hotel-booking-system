@@ -116,7 +116,7 @@ public class RoomTypeService {
         List<SearchRoomTypeResponse> sortedResponses = sortSearchResults(results, sortBy, order);
 
         // 10. Pagination
-        return paginateSearchResults(results, currentPage, pageSize);
+        return paginateSearchResults(sortedResponses, currentPage, pageSize);
     }
 
     private Pageable createPageable(int currentPage, int pageSize, String sortBy, String order) {
