@@ -3,6 +3,7 @@ package com.hotelbooking.service;
 import com.hotelbooking.dto.CreateRoomTypeRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomTypeResponse;
+import com.hotelbooking.dto.UpdateRoomTypeRequest;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.RoomType;
@@ -23,6 +24,8 @@ public class AdminRoomTypeService {
 
     private final RoomTypeRepository roomTypeRepository;
     private final EntityValidator entityValidator;
+
+    Instant now = Instant.now();
 
     /**
      * Search toàn bộ Room Type, có phân trang và max record mỗi trang
@@ -99,6 +102,23 @@ public class AdminRoomTypeService {
     }
 
     /**
+     * Search Room Type có sẵn và update data với Room Type input vào DB
+     */
+    public RoomTypeResponse update(UpdateRoomTypeRequest request, String id, String username) {
+        // Tìm room type tương ứng vs MongoID. Không tìm thấy -> 404
+        RoomType existingRoomType = entityValidator.requireAdminRoomType(id);
+
+        // TH tồn tại Room Type chung tên thì sẽ trả mã lỗi 409
+        if (request.roomTypeName().trim().equals(existingRoomType.getRoomTypeName().trim())) {
+            throw new ConflictException("Room type name already exists");
+        }
+
+        RoomType updateRoomType = setCurrentRoomType(request, existingRoomType, username);
+
+        return toRoomTypeResponse(roomTypeRepository.save(updateRoomType));
+    }
+
+    /**
      * Convert sang class Response để trả về Controller
      */
     private RoomTypeResponse toRoomTypeResponse(RoomType roomType) {
@@ -135,7 +155,6 @@ public class AdminRoomTypeService {
 
     private RoomType setNewRoomType(CreateRoomTypeRequest request, String username) {
         RoomType roomType = new RoomType();
-        Instant now = Instant.now();
 
         roomType.setRoomTypeName(request.roomTypeName());
         roomType.setRoomSize(request.roomSize());
@@ -150,6 +169,19 @@ public class AdminRoomTypeService {
         roomType.setUpdatedAt(null);
 
         return roomType;
+    }
+
+    private RoomType setCurrentRoomType(UpdateRoomTypeRequest request, RoomType existingRoomType, String username) {
+        existingRoomType.setRoomTypeName(request.roomTypeName());
+        existingRoomType.setRoomSize(request.roomSize());
+        existingRoomType.setFacility(request.facility());
+        existingRoomType.setMaximumPeople(request.maximumPeople());
+        existingRoomType.setPrice(request.price());
+        existingRoomType.setStatus(request.status());
+        existingRoomType.setUpdatedBy(username);
+        existingRoomType.setUpdatedAt(now);
+
+        return existingRoomType;
     }
 
 }

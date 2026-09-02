@@ -3,6 +3,7 @@ package com.hotelbooking.controller;
 import com.hotelbooking.dto.CreateRoomTypeRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomTypeResponse;
+import com.hotelbooking.dto.UpdateRoomTypeRequest;
 import com.hotelbooking.service.AdminRoomTypeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -96,11 +97,23 @@ public class AdminRoomTypeController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('USER_CREATE')")
     public RoomTypeResponse create(
-            @Valid @RequestBody CreateRoomTypeRequest createRoomTypeRequest,
+            @Valid @RequestBody CreateRoomTypeRequest request,
             Authentication authentication
     ) {
         String username = authentication.getName();
-        return adminRoomTypeService.create(createRoomTypeRequest, username);
+        return adminRoomTypeService.create(request, username);
+    }
+
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    public RoomTypeResponse update(
+            @Valid @RequestBody UpdateRoomTypeRequest request,
+            @PathVariable String id,
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        return adminRoomTypeService.update(request, id, username);
     }
 
 }
