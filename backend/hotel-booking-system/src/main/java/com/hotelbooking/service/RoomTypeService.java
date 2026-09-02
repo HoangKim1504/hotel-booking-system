@@ -40,7 +40,7 @@ public class RoomTypeService {
                 createPageable(currentPage, pageSize, sortBy, order);
 
         // Query DB
-        Page<RoomType> roomTypePage = roomTypeRepository.findAllByDeleteFlagFalse(pageable);
+        Page<RoomType> roomTypePage = roomTypeRepository.findAllByDeleteFlagFalseAndStatus(RoomTypeStatus.ACTIVE, pageable);
 
         // Map Entity → DTO
         List<RoomTypeResponse> roomTypeList = roomTypePage.getContent()
@@ -55,7 +55,7 @@ public class RoomTypeService {
      * Tìm room type tương ứng vs MongoID. Room Type phải chưa được soft-delete
      */
     public RoomTypeResponse findById(String id) {
-        return toRoomTypeResponse(entityValidator.requireRomeType(id));
+        return toRoomTypeResponse(entityValidator.requireRoomType(id, RoomTypeStatus.ACTIVE));
     }
 
     /**

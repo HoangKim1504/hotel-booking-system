@@ -14,11 +14,17 @@ public interface RoomTypeRepository extends MongoRepository<RoomType, String> {
 
     Optional<RoomType> findByIdAndDeleteFlagFalse(String id);
 
+    Optional<RoomType> findByIdAndStatusAndDeleteFlagFalse(String id, RoomTypeStatus status);
+
     List<RoomType> findAllByDeleteFlagFalse();
 
     Page<RoomType> findAllByDeleteFlagFalse(@NonNull Pageable pageable);
 
-    List<RoomType> findByDeleteFlagFalseAndStatus(RoomTypeStatus active);
+    Page<RoomType> findAllByDeleteFlagFalseAndStatus(RoomTypeStatus status, @NonNull Pageable pageable);
+
+    List<RoomType> findByDeleteFlagFalseAndStatus(RoomTypeStatus status);
+
+    Page<RoomType> findByRoomTypeNameContainingIgnoreCaseAndDeleteFlagFalse(String roomTypeName, @NonNull Pageable pageable);
 
 }
 
