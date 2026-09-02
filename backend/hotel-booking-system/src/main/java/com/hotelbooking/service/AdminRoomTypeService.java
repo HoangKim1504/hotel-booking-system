@@ -111,8 +111,11 @@ public class AdminRoomTypeService {
         // Tìm room type tương ứng vs MongoID. Không tìm thấy -> 404
         RoomType existingRoomType = entityValidator.requireAdminRoomType(id);
 
-        // TH tồn tại Room Type chung tên thì sẽ trả mã lỗi 409
-        if (request.roomTypeName().trim().equals(existingRoomType.getRoomTypeName().trim())) {
+        // Kiểm tra có RoomType KHÁC đang sử dụng tên này hay không
+        if (roomTypeRepository.existsByRoomTypeNameIgnoreCaseAndIdNotAndDeleteFlagFalse(
+                request.roomTypeName().trim(),
+                id
+        )) {
             throw new ConflictException("Room type name already exists");
         }
 
