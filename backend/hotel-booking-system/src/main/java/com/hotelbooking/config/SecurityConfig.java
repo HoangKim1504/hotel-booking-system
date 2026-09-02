@@ -80,6 +80,13 @@ public class SecurityConfig {
                                 "/api/admin/room-types/search"
                         ).hasAuthority("ADMIN_VIEW")
 
+                        // Limit các chức năng liên quan update Room Type
+                        // - Insert một Room Type mới
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/room-types"
+                        ).hasAuthority("USER_CREATE")
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",
