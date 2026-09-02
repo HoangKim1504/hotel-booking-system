@@ -62,7 +62,7 @@ public class RoomTypeService {
      * Search Room Type, có phân trang và max record mỗi trang, dựa trên điều kiện cho trước
      */
     public PageResponse<SearchRoomTypeResponse> searchByCriteria(LocalDate checkInDate, LocalDate checkOutDate,
-                                                                 int maxPeople, int currentPage, int pageSize,
+                                                                 int maximumPeople, int currentPage, int pageSize,
                                                                  String sortBy, String order) {
         List<String> eligibleRoomTypeIds;
 
@@ -70,7 +70,7 @@ public class RoomTypeService {
         validateCheckInOutDate(checkInDate, checkOutDate);
 
         // 2. Lấy RoomType phù hợp: deleteFlag = false, status = ACTIVE, maximumPeople >= people
-        List<RoomType> eligibleRoomTypes = findEligibleRoomTypes(maxPeople);
+        List<RoomType> eligibleRoomTypes = findEligibleRoomTypes(maximumPeople);
 
         if (eligibleRoomTypes.isEmpty()) {
             return new PageResponse<>(

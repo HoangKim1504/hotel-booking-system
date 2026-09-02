@@ -71,11 +71,11 @@ public class RoomTypeController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate checkOutDate,
 
-            @RequestParam("maxPeople")
+            @RequestParam("maximumPeople")
             @NotNull(message = "Number of people is required")
             @Min(value = 1, message = "Number of people must be at least 1")
             @Max(value = 10, message = "Number of people cannot be over 10")
-            int maxPeople,
+            int maximumPeople,
 
             @RequestParam(defaultValue = "1")
             @Min(value = 1, message = "Page must be at least 1")
@@ -100,7 +100,7 @@ public class RoomTypeController {
             )
             String order
     ) {
-        return roomTypeService.searchByCriteria(checkInDate, checkOutDate, maxPeople, page, size, sortBy, order);
+        return roomTypeService.searchByCriteria(checkInDate, checkOutDate, maximumPeople, page, size, sortBy, order);
     }
 
 }
