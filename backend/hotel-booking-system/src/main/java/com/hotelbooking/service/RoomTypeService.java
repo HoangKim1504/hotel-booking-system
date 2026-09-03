@@ -9,12 +9,11 @@ import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
+import com.hotelbooking.utils.PageableUtils;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -36,11 +35,12 @@ public class RoomTypeService {
      * Search toàn bộ Room Type, có phân trang và max record mỗi trang
      */
     public PageResponse<RoomTypeResponse> findAll(int currentPage, int pageSize, String sortBy, String order) {
-        Pageable pageable =
-                createPageable(currentPage, pageSize, sortBy, order);
+
+        // Create pageable
+        Pageable pageable = PageableUtils.createPageable(currentPage, pageSize, sortBy, order);
 
         // Query DB
-        Page<RoomType> roomTypePage = roomTypeRepository.findAllByDeleteFlagFalse(pageable);
+        Page<RoomType> roomTypePage = roomTypeRepository.findAllByDeleteFlagFalseAndStatus(RoomTypeStatus.ACTIVE, pageable);
 
         // Map Entity → DTO
         List<RoomTypeResponse> roomTypeList = roomTypePage.getContent()
@@ -55,14 +55,14 @@ public class RoomTypeService {
      * Tìm room type tương ứng vs MongoID. Room Type phải chưa được soft-delete
      */
     public RoomTypeResponse findById(String id) {
-        return toRoomTypeResponse(entityValidator.requireRomeType(id));
+        return toRoomTypeResponse(entityValidator.requireRoomType(id, RoomTypeStatus.ACTIVE));
     }
 
     /**
      * Search Room Type, có phân trang và max record mỗi trang, dựa trên điều kiện cho trước
      */
     public PageResponse<SearchRoomTypeResponse> searchByCriteria(LocalDate checkInDate, LocalDate checkOutDate,
-                                                                 int maxPeople, int currentPage, int pageSize,
+                                                                 int maximumPeople, int currentPage, int pageSize,
                                                                  String sortBy, String order) {
         List<String> eligibleRoomTypeIds;
 
@@ -70,7 +70,7 @@ public class RoomTypeService {
         validateCheckInOutDate(checkInDate, checkOutDate);
 
         // 2. Lấy RoomType phù hợp: deleteFlag = false, status = ACTIVE, maximumPeople >= people
-        List<RoomType> eligibleRoomTypes = findEligibleRoomTypes(maxPeople);
+        List<RoomType> eligibleRoomTypes = findEligibleRoomTypes(maximumPeople);
 
         if (eligibleRoomTypes.isEmpty()) {
             return new PageResponse<>(
@@ -120,22 +120,6 @@ public class RoomTypeService {
         return paginateSearchResults(sortedResponses, currentPage, pageSize);
     }
 
-    private Pageable createPageable(int currentPage, int pageSize, String sortBy, String order) {
-        Pageable pageable;
-
-        // Set vị trí trang hiện tại và lượng record max mỗi trang
-        // Lưu ý: API bắt đầu từ page = 1, Spring Data Pageable bắt đầu từ page = 0
-        int pageNumber = currentPage - 1;
-
-        // Không truyền sortBy → chỉ pagination
-        if (sortBy == null || sortBy.isBlank()) {
-            pageable = PageRequest.of(pageNumber, pageSize);
-        } else {
-            pageable = PageRequest.of(pageNumber, pageSize, Sort.Direction.fromString(order), sortBy);
-        }
-        return pageable;
-    }
-
     /**
      * Convert sang class Response để trả về Controller
      */
@@ -146,7 +130,8 @@ public class RoomTypeService {
                 roomType.getRoomSize(),
                 roomType.getFacility(),
                 roomType.getMaximumPeople(),
-                roomType.getPrice()
+                roomType.getPrice(),
+                roomType.getStatus()
         );
     }
 

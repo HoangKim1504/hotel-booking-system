@@ -120,6 +120,14 @@ public class DataSeeder implements ApplicationRunner {
                 )
         );
 
+        perms.put(
+                "ADMIN_VIEW",
+                savePermission(
+                        "ADMIN_VIEW",
+                        "Admin can view"
+                )
+        );
+
         // ========================
         // Roles
         // ========================
@@ -132,7 +140,8 @@ public class DataSeeder implements ApplicationRunner {
                         perms.get("USER_CREATE"),
                         perms.get("USER_UPDATE"),
                         perms.get("USER_DELETE"),
-                        perms.get("USER_ASSIGN_ROLE")
+                        perms.get("USER_ASSIGN_ROLE"),
+                        perms.get("ADMIN_VIEW")
                 )
         );
 
@@ -142,7 +151,8 @@ public class DataSeeder implements ApplicationRunner {
                 List.of(
                         perms.get("USER_VIEW"),
                         perms.get("USER_CREATE"),
-                        perms.get("USER_UPDATE")
+                        perms.get("USER_UPDATE"),
+                        perms.get("ADMIN_VIEW")
                 )
         );
 
@@ -236,41 +246,41 @@ public class DataSeeder implements ApplicationRunner {
 
         log.info("RoomTypeSeeder: seeding room types...");
 
-        saveRoomType("Deluxe King Room", 35.5, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV, Safe", 2, new BigDecimal("120.00"));
-        saveRoomType("Standard Twin Room", 22.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("75.50"));
-        saveRoomType("Executive Suite", 55.0, "WiFi, Air Conditioning, Mini Bar, Jacuzzi, Living Area, Ocean View", 4, new BigDecimal("250.00"));
-        saveRoomType("Family Room", 45.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV, Balcony", 5, new BigDecimal("180.75"));
-        saveRoomType("Single Economy Room", 16.0, "WiFi, Fan, Shared Bathroom", 1, new BigDecimal("45.00"));
-        saveRoomType("Superior Double Room", 28.0, "WiFi, Air Conditioning, Mini Fridge, Flat-screen TV", 2, new BigDecimal("95.00"));
-        saveRoomType("Presidential Suite", 90.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Jacuzzi, Living Area", 6, new BigDecimal("500.00"));
-        saveRoomType("Junior Suite", 42.0, "WiFi, Air Conditioning, Mini Bar, Sofa, City View", 3, new BigDecimal("160.00"));
-        saveRoomType("Double Room with Balcony", 26.0, "WiFi, Air Conditioning, Balcony, Flat-screen TV", 2, new BigDecimal("88.00"));
-        saveRoomType("Twin Room City View", 24.0, "WiFi, Air Conditioning, City View, Flat-screen TV", 2, new BigDecimal("80.00"));
-        saveRoomType("Deluxe Queen Room", 32.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("110.00"));
-        saveRoomType("Family Suite", 60.0, "WiFi, Air Conditioning, Kitchenette, 2 Bedrooms, Living Area", 6, new BigDecimal("220.00"));
-        saveRoomType("Economy Single", 14.0, "WiFi, Fan", 1, new BigDecimal("38.00"));
-        saveRoomType("Budget Double", 18.0, "WiFi, Air Conditioning", 2, new BigDecimal("55.00"));
-        saveRoomType("Honeymoon Suite", 48.0, "WiFi, Air Conditioning, Jacuzzi, Mini Bar, Romantic Decor", 2, new BigDecimal("210.00"));
-        saveRoomType("Accessible Room", 30.0, "WiFi, Air Conditioning, Wheelchair Access, Grab Bars", 2, new BigDecimal("90.00"));
-        saveRoomType("Penthouse Suite", 120.0, "WiFi, Air Conditioning, Private Terrace, Jacuzzi, Bar, Panoramic View", 8, new BigDecimal("650.00"));
-        saveRoomType("Standard Single Room", 15.0, "WiFi, Air Conditioning, Desk", 1, new BigDecimal("50.00"));
-        saveRoomType("Deluxe Twin Room", 30.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("105.00"));
-        saveRoomType("Garden View Room", 27.0, "WiFi, Air Conditioning, Garden View, Flat-screen TV", 2, new BigDecimal("92.00"));
-        saveRoomType("Ocean View Suite", 50.0, "WiFi, Air Conditioning, Mini Bar, Ocean View, Balcony", 3, new BigDecimal("240.00"));
-        saveRoomType("Studio Room", 25.0, "WiFi, Air Conditioning, Kitchenette, Flat-screen TV", 2, new BigDecimal("98.00"));
-        saveRoomType("Loft Suite", 65.0, "WiFi, Air Conditioning, Mini Bar, Mezzanine, City View", 4, new BigDecimal("270.00"));
-        saveRoomType("Connecting Family Room", 55.0, "WiFi, Air Conditioning, 2 Connecting Rooms, Flat-screen TV", 5, new BigDecimal("195.00"));
-        saveRoomType("Poolside Room", 33.0, "WiFi, Air Conditioning, Pool Access, Flat-screen TV", 2, new BigDecimal("115.00"));
-        saveRoomType("Business Room", 29.0, "WiFi, Air Conditioning, Work Desk, Flat-screen TV, Coffee Machine", 2, new BigDecimal("100.00"));
-        saveRoomType("Royal Suite", 100.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Living Area, Dining Area", 6, new BigDecimal("580.00"));
-        saveRoomType("Cozy Single Room", 13.0, "WiFi, Fan, Desk", 1, new BigDecimal("35.00"));
-        saveRoomType("Mountain View Room", 31.0, "WiFi, Air Conditioning, Mountain View, Flat-screen TV", 2, new BigDecimal("102.00"));
-        saveRoomType("Duplex Suite", 70.0, "WiFi, Air Conditioning, 2 Floors, Mini Bar, Living Area", 4, new BigDecimal("300.00"));
-        saveRoomType("Classic Double Room", 23.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("78.00"));
-        saveRoomType("VIP Suite", 85.0, "WiFi, Air Conditioning, Private Bar, Jacuzzi, Butler Service", 5, new BigDecimal("450.00"));
-        saveRoomType("Compact Twin Room", 19.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("60.00"));
-        saveRoomType("Skyline Suite", 58.0, "WiFi, Air Conditioning, Mini Bar, Panoramic City View, Balcony", 3, new BigDecimal("260.00"));
-        saveRoomType("Traditional Family Room", 47.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV", 4, new BigDecimal("165.00"));
+        saveRoomType("Deluxe King Room", 35.5, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV, Safe", 2, new BigDecimal("120.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Standard Twin Room", 22.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("75.50"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Executive Suite", 55.0, "WiFi, Air Conditioning, Mini Bar, Jacuzzi, Living Area, Ocean View", 4, new BigDecimal("250.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Family Room", 45.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV, Balcony", 5, new BigDecimal("180.75"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Single Economy Room", 16.0, "WiFi, Fan, Shared Bathroom", 1, new BigDecimal("45.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Superior Double Room", 28.0, "WiFi, Air Conditioning, Mini Fridge, Flat-screen TV", 2, new BigDecimal("95.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Presidential Suite", 90.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Jacuzzi, Living Area", 6, new BigDecimal("500.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Junior Suite", 42.0, "WiFi, Air Conditioning, Mini Bar, Sofa, City View", 3, new BigDecimal("160.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Double Room with Balcony", 26.0, "WiFi, Air Conditioning, Balcony, Flat-screen TV", 2, new BigDecimal("88.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Twin Room City View", 24.0, "WiFi, Air Conditioning, City View, Flat-screen TV", 2, new BigDecimal("80.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Deluxe Queen Room", 32.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("110.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Family Suite", 60.0, "WiFi, Air Conditioning, Kitchenette, 2 Bedrooms, Living Area", 6, new BigDecimal("220.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Economy Single", 14.0, "WiFi, Fan", 1, new BigDecimal("38.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Budget Double", 18.0, "WiFi, Air Conditioning", 2, new BigDecimal("55.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Honeymoon Suite", 48.0, "WiFi, Air Conditioning, Jacuzzi, Mini Bar, Romantic Decor", 2, new BigDecimal("210.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Accessible Room", 30.0, "WiFi, Air Conditioning, Wheelchair Access, Grab Bars", 2, new BigDecimal("90.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Penthouse Suite", 120.0, "WiFi, Air Conditioning, Private Terrace, Jacuzzi, Bar, Panoramic View", 8, new BigDecimal("650.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Standard Single Room", 15.0, "WiFi, Air Conditioning, Desk", 1, new BigDecimal("50.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Deluxe Twin Room", 30.0, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV", 2, new BigDecimal("105.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Garden View Room", 27.0, "WiFi, Air Conditioning, Garden View, Flat-screen TV", 2, new BigDecimal("92.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Ocean View Suite", 50.0, "WiFi, Air Conditioning, Mini Bar, Ocean View, Balcony", 3, new BigDecimal("240.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Studio Room", 25.0, "WiFi, Air Conditioning, Kitchenette, Flat-screen TV", 2, new BigDecimal("98.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Loft Suite", 65.0, "WiFi, Air Conditioning, Mini Bar, Mezzanine, City View", 4, new BigDecimal("270.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Connecting Family Room", 55.0, "WiFi, Air Conditioning, 2 Connecting Rooms, Flat-screen TV", 5, new BigDecimal("195.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Poolside Room", 33.0, "WiFi, Air Conditioning, Pool Access, Flat-screen TV", 2, new BigDecimal("115.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Business Room", 29.0, "WiFi, Air Conditioning, Work Desk, Flat-screen TV, Coffee Machine", 2, new BigDecimal("100.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Royal Suite", 100.0, "WiFi, Air Conditioning, Private Pool, Butler Service, Living Area, Dining Area", 6, new BigDecimal("580.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Cozy Single Room", 13.0, "WiFi, Fan, Desk", 1, new BigDecimal("35.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Mountain View Room", 31.0, "WiFi, Air Conditioning, Mountain View, Flat-screen TV", 2, new BigDecimal("102.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Duplex Suite", 70.0, "WiFi, Air Conditioning, 2 Floors, Mini Bar, Living Area", 4, new BigDecimal("300.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Classic Double Room", 23.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("78.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("VIP Suite", 85.0, "WiFi, Air Conditioning, Private Bar, Jacuzzi, Butler Service", 5, new BigDecimal("450.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Compact Twin Room", 19.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("60.00"), RoomTypeStatus.INACTIVE);
+        saveRoomType("Skyline Suite", 58.0, "WiFi, Air Conditioning, Mini Bar, Panoramic City View, Balcony", 3, new BigDecimal("260.00"), RoomTypeStatus.ACTIVE);
+        saveRoomType("Traditional Family Room", 47.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV", 4, new BigDecimal("165.00"), RoomTypeStatus.ACTIVE);
 
         log.info("RoomTypeSeeder: done");
     }
@@ -280,7 +290,8 @@ public class DataSeeder implements ApplicationRunner {
             Double roomSize,
             String facility,
             Integer maximumPeople,
-            BigDecimal price
+            BigDecimal price,
+            RoomTypeStatus status
     ) {
 
         RoomType roomType = new RoomType();
@@ -290,7 +301,7 @@ public class DataSeeder implements ApplicationRunner {
         roomType.setFacility(facility);
         roomType.setMaximumPeople(maximumPeople);
         roomType.setPrice(price);
-        roomType.setStatus(RoomTypeStatus.ACTIVE);
+        roomType.setStatus(status);
 
         // Soft delete
         roomType.setDeleteFlag(false);
