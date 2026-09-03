@@ -97,6 +97,12 @@ public class SecurityConfig {
                                 "/api/room-types/*"
                         ).hasAuthority("USER_DELETE")
 
+                        // Room management
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/admin/rooms"
+                        ).hasAuthority("ADMIN_VIEW")
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",
