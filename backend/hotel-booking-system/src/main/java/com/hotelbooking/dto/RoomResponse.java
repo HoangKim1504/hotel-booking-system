@@ -9,7 +9,7 @@ public record RoomResponse(
         String id,
         String roomTypeId,
         String roomTypeName,
-        String roomNumber,
+        int roomNumber,
         int floorNumber,
         RoomStatus status) {
 }

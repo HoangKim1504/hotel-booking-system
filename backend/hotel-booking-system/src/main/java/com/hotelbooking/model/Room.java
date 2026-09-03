@@ -24,7 +24,7 @@ public class Room extends BaseModel {
 
     @Indexed(unique = true)
     @Field("room_number")
-    private String roomNumber;
+    private Integer roomNumber;
 
     @Field("floor_number")
     private Integer floorNumber;

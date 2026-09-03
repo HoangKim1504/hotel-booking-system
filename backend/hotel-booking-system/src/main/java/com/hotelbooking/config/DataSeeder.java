@@ -371,76 +371,76 @@ public class DataSeeder implements ApplicationRunner {
                 requireSeedRoomType(roomTypes, "Duplex Suite");
 
         // Tầng 1 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(deluxeKing, "101", 1, RoomStatus.ACTIVE);
-        saveRoom(standardTwin, "102", 1, RoomStatus.ACTIVE);
-        saveRoom(executiveSuite, "103", 1, RoomStatus.ACTIVE);
-        saveRoom(familyRoom, "104", 1, RoomStatus.ACTIVE);
-        saveRoom(singleEconomy, "105", 1, RoomStatus.ACTIVE);
-        saveRoom(deluxeQueen, "106", 1, RoomStatus.MAINTENANCE);
+        saveRoom(deluxeKing, 101, 1, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, 102, 1, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, 103, 1, RoomStatus.ACTIVE);
+        saveRoom(familyRoom, 104, 1, RoomStatus.ACTIVE);
+        saveRoom(singleEconomy, 105, 1, RoomStatus.ACTIVE);
+        saveRoom(deluxeQueen, 106, 1, RoomStatus.MAINTENANCE);
 
         // Tầng 2 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(standardTwin, "201", 2, RoomStatus.ACTIVE);
-        saveRoom(deluxeQueen, "202", 2, RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "203", 2, RoomStatus.ACTIVE);
-        saveRoom(familySuite, "204", 2, RoomStatus.ACTIVE);
-        saveRoom(executiveSuite, "205", 2, RoomStatus.ACTIVE);
-        saveRoom(accessibleRoom, "206", 2, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, 201, 2, RoomStatus.ACTIVE);
+        saveRoom(deluxeQueen, 202, 2, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, 203, 2, RoomStatus.ACTIVE);
+        saveRoom(familySuite, 204, 2, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, 205, 2, RoomStatus.ACTIVE);
+        saveRoom(accessibleRoom, 206, 2, RoomStatus.ACTIVE);
 
         // Tầng 3 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(familyRoom, "301", 3, RoomStatus.ACTIVE);
-        saveRoom(gardenView, "302", 3, RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "303", 3, RoomStatus.ACTIVE);
-        saveRoom(standardTwin, "304", 3, RoomStatus.ACTIVE);
-        saveRoom(executiveSuite, "305", 3, RoomStatus.ACTIVE);
-        saveRoom(studioRoom, "306", 3, RoomStatus.MAINTENANCE);
+        saveRoom(familyRoom, 301, 3, RoomStatus.ACTIVE);
+        saveRoom(gardenView, 302, 3, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, 303, 3, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, 304, 3, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, 305, 3, RoomStatus.ACTIVE);
+        saveRoom(studioRoom, 306, 3, RoomStatus.MAINTENANCE);
 
         // Tầng 4 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(oceanViewSuite, "401", 4, RoomStatus.ACTIVE);
-        saveRoom(familySuite, "402", 4, RoomStatus.ACTIVE);
-        saveRoom(standardTwin, "403", 4, RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "404", 4, RoomStatus.ACTIVE);
-        saveRoom(honeymoonSuite, "405", 4, RoomStatus.ACTIVE);
-        saveRoom(accessibleRoom, "406", 4, RoomStatus.OUT_OF_SERVICE);
+        saveRoom(oceanViewSuite, 401, 4, RoomStatus.ACTIVE);
+        saveRoom(familySuite, 402, 4, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, 403, 4, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, 404, 4, RoomStatus.ACTIVE);
+        saveRoom(honeymoonSuite, 405, 4, RoomStatus.ACTIVE);
+        saveRoom(accessibleRoom, 406, 4, RoomStatus.OUT_OF_SERVICE);
 
         // Tầng 5 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(executiveSuite, "501", 5, RoomStatus.ACTIVE);
-        saveRoom(familyRoom, "502", 5, RoomStatus.ACTIVE);
-        saveRoom(deluxeQueen, "503", 5, RoomStatus.ACTIVE);
-        saveRoom(gardenView, "504", 5, RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "505", 5, RoomStatus.ACTIVE);
-        saveRoom(classicDouble, "506", 5, RoomStatus.MAINTENANCE);
+        saveRoom(executiveSuite, 501, 5, RoomStatus.ACTIVE);
+        saveRoom(familyRoom, 502, 5, RoomStatus.ACTIVE);
+        saveRoom(deluxeQueen, 503, 5, RoomStatus.ACTIVE);
+        saveRoom(gardenView, 504, 5, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, 505, 5, RoomStatus.ACTIVE);
+        saveRoom(classicDouble, 506, 5, RoomStatus.MAINTENANCE);
 
         // Tầng 6 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(singleEconomy, "601", 6, RoomStatus.ACTIVE);
-        saveRoom(standardTwin, "602", 6, RoomStatus.ACTIVE);
-        saveRoom(familyRoom, "603", 6, RoomStatus.ACTIVE);
-        saveRoom(executiveSuite, "604", 6, RoomStatus.ACTIVE);
-        saveRoom(mountainView, "605", 6, RoomStatus.ACTIVE);
-        saveRoom(studioRoom, "606", 6, RoomStatus.ACTIVE);
+        saveRoom(singleEconomy, 601, 6, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, 602, 6, RoomStatus.ACTIVE);
+        saveRoom(familyRoom, 603, 6, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, 604, 6, RoomStatus.ACTIVE);
+        saveRoom(mountainView, 605, 6, RoomStatus.ACTIVE);
+        saveRoom(studioRoom, 606, 6, RoomStatus.ACTIVE);
 
         // Tầng 7 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(deluxeKing, "701", 7, RoomStatus.ACTIVE);
-        saveRoom(executiveSuite, "702", 7, RoomStatus.ACTIVE);
-        saveRoom(familySuite, "703", 7, RoomStatus.ACTIVE);
-        saveRoom(poolsideRoom, "704", 7, RoomStatus.ACTIVE);
-        saveRoom(classicDouble, "705", 7, RoomStatus.ACTIVE);
-        saveRoom(accessibleRoom, "706", 7, RoomStatus.OUT_OF_SERVICE);
+        saveRoom(deluxeKing, 701, 7, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, 702, 7, RoomStatus.ACTIVE);
+        saveRoom(familySuite, 703, 7, RoomStatus.ACTIVE);
+        saveRoom(poolsideRoom, 704, 7, RoomStatus.ACTIVE);
+        saveRoom(classicDouble, 705, 7, RoomStatus.ACTIVE);
+        saveRoom(accessibleRoom, 706, 7, RoomStatus.OUT_OF_SERVICE);
 
         // Tầng 8 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(familyRoom, "801", 8, RoomStatus.ACTIVE);
-        saveRoom(standardTwin, "802", 8, RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "803", 8, RoomStatus.ACTIVE);
-        saveRoom(executiveSuite, "804", 8, RoomStatus.ACTIVE);
-        saveRoom(oceanViewSuite, "805", 8, RoomStatus.ACTIVE);
-        saveRoom(deluxeQueen, "806", 8, RoomStatus.MAINTENANCE);
+        saveRoom(familyRoom, 801, 8, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, 802, 8, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, 803, 8, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, 804, 8, RoomStatus.ACTIVE);
+        saveRoom(oceanViewSuite, 805, 8, RoomStatus.ACTIVE);
+        saveRoom(deluxeQueen, 806, 8, RoomStatus.MAINTENANCE);
 
         // Tầng 9 - 6 phòng, nhiều loại phòng hỗn hợp
-        saveRoom(duplexSuite, "901", 9, RoomStatus.ACTIVE);
-        saveRoom(executiveSuite, "902", 9, RoomStatus.ACTIVE);
-        saveRoom(familyRoom, "903", 9, RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "904", 9, RoomStatus.ACTIVE);
-        saveRoom(honeymoonSuite, "905", 9, RoomStatus.ACTIVE);
-        saveRoom(mountainView, "906", 9, RoomStatus.ACTIVE);
+        saveRoom(duplexSuite, 901, 9, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, 902, 9, RoomStatus.ACTIVE);
+        saveRoom(familyRoom, 903, 9, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, 904, 9, RoomStatus.ACTIVE);
+        saveRoom(honeymoonSuite, 905, 9, RoomStatus.ACTIVE);
+        saveRoom(mountainView, 906, 9, RoomStatus.ACTIVE);
 
         log.info("RoomSeeder: done");
     }
@@ -499,7 +499,7 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem1,
-                requireSeedRoom(rooms, "101")
+                requireSeedRoom(rooms, 101)
         );
 
 
@@ -524,7 +524,7 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem2,
-                requireSeedRoom(rooms, "203")
+                requireSeedRoom(rooms, 203)
         );
 
 
@@ -548,7 +548,7 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem3,
-                requireSeedRoom(rooms, "303")
+                requireSeedRoom(rooms, 303)
         );
 
 
@@ -577,7 +577,7 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem4,
-                requireSeedRoom(rooms, "404")
+                requireSeedRoom(rooms, 404)
         );
 
 
@@ -601,7 +601,7 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem5,
-                requireSeedRoom(rooms, "702")
+                requireSeedRoom(rooms, 702)
         );
 
 
@@ -625,7 +625,7 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem6,
-                requireSeedRoom(rooms, "903")
+                requireSeedRoom(rooms, 903)
         );
 
         log.info("BookingSeeder: search test data done");
@@ -881,7 +881,7 @@ public class DataSeeder implements ApplicationRunner {
 
     private void saveRoom(
             RoomType roomType,
-            String roomNumber,
+            Integer roomNumber,
             Integer floorNumber,
             RoomStatus status
     ) {
@@ -993,7 +993,7 @@ public class DataSeeder implements ApplicationRunner {
 
     private Room requireSeedRoom(
             List<Room> rooms,
-            String roomNumber
+            Integer roomNumber
     ) {
         return rooms.stream()
                 .filter(room ->
