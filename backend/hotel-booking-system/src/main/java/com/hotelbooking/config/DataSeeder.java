@@ -337,109 +337,110 @@ public class DataSeeder implements ApplicationRunner {
 
         log.info("RoomSeeder: seeding rooms...");
 
-        // Deluxe King Room
         RoomType deluxeKing =
                 requireSeedRoomType(roomTypes, "Deluxe King Room");
-
-        saveRoom(deluxeKing, "101", RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "102", RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "103", RoomStatus.ACTIVE);
-        saveRoom(deluxeKing, "104", RoomStatus.ACTIVE);
-
-        // Room này không được tính availability
-        saveRoom(deluxeKing, "105", RoomStatus.MAINTENANCE);
-
-
-        // Standard Twin Room
         RoomType standardTwin =
                 requireSeedRoomType(roomTypes, "Standard Twin Room");
-
-        saveRoom(standardTwin, "201", RoomStatus.ACTIVE);
-        saveRoom(standardTwin, "202", RoomStatus.ACTIVE);
-        saveRoom(standardTwin, "203", RoomStatus.ACTIVE);
-
-
-        // Executive Suite
-        RoomType executive =
+        RoomType executiveSuite =
                 requireSeedRoomType(roomTypes, "Executive Suite");
-
-        saveRoom(executive, "301", RoomStatus.ACTIVE);
-        saveRoom(executive, "302", RoomStatus.ACTIVE);
-        saveRoom(executive, "303", RoomStatus.ACTIVE);
-
-
-        // Family Room
-        RoomType family =
+        RoomType familyRoom =
                 requireSeedRoomType(roomTypes, "Family Room");
-
-        saveRoom(family, "401", RoomStatus.ACTIVE);
-        saveRoom(family, "402", RoomStatus.ACTIVE);
-        saveRoom(family, "403", RoomStatus.ACTIVE);
-
-
-        // Single Economy Room
-        RoomType single =
+        RoomType singleEconomy =
                 requireSeedRoomType(roomTypes, "Single Economy Room");
-
-        saveRoom(single, "501", RoomStatus.ACTIVE);
-        saveRoom(single, "502", RoomStatus.ACTIVE);
-
-
-        // Superior Double Room
-        RoomType superior =
-                requireSeedRoomType(roomTypes, "Superior Double Room");
-
-        saveRoom(superior, "601", RoomStatus.ACTIVE);
-        saveRoom(superior, "602", RoomStatus.ACTIVE);
-        saveRoom(superior, "603", RoomStatus.ACTIVE);
-
-
-        // Presidential Suite
-        RoomType presidential =
-                requireSeedRoomType(roomTypes, "Presidential Suite");
-
-        saveRoom(presidential, "701", RoomStatus.ACTIVE);
-        saveRoom(presidential, "702", RoomStatus.ACTIVE);
-
-
-        // Junior Suite
-        RoomType junior =
-                requireSeedRoomType(roomTypes, "Junior Suite");
-
-        saveRoom(junior, "801", RoomStatus.ACTIVE);
-        saveRoom(junior, "802", RoomStatus.ACTIVE);
-
-
-        // Double Room with Balcony
-        RoomType balcony =
-                requireSeedRoomType(roomTypes, "Double Room with Balcony");
-
-        saveRoom(balcony, "901", RoomStatus.ACTIVE);
-        saveRoom(balcony, "902", RoomStatus.ACTIVE);
-
-
-        // Twin Room City View
-        RoomType cityView =
-                requireSeedRoomType(roomTypes, "Twin Room City View");
-
-        saveRoom(cityView, "1001", RoomStatus.ACTIVE);
-        saveRoom(cityView, "1002", RoomStatus.ACTIVE);
-
-
-        // Deluxe Queen Room
-        RoomType queen =
+        RoomType deluxeQueen =
                 requireSeedRoomType(roomTypes, "Deluxe Queen Room");
-
-        saveRoom(queen, "1101", RoomStatus.ACTIVE);
-        saveRoom(queen, "1102", RoomStatus.ACTIVE);
-
-
-        // Family Suite
         RoomType familySuite =
                 requireSeedRoomType(roomTypes, "Family Suite");
+        RoomType honeymoonSuite =
+                requireSeedRoomType(roomTypes, "Honeymoon Suite");
+        RoomType accessibleRoom =
+                requireSeedRoomType(roomTypes, "Accessible Room");
+        RoomType gardenView =
+                requireSeedRoomType(roomTypes, "Garden View Room");
+        RoomType oceanViewSuite =
+                requireSeedRoomType(roomTypes, "Ocean View Suite");
+        RoomType studioRoom =
+                requireSeedRoomType(roomTypes, "Studio Room");
+        RoomType poolsideRoom =
+                requireSeedRoomType(roomTypes, "Poolside Room");
+        RoomType classicDouble =
+                requireSeedRoomType(roomTypes, "Classic Double Room");
+        RoomType mountainView =
+                requireSeedRoomType(roomTypes, "Mountain View Room");
+        RoomType duplexSuite =
+                requireSeedRoomType(roomTypes, "Duplex Suite");
 
-        saveRoom(familySuite, "1201", RoomStatus.ACTIVE);
-        saveRoom(familySuite, "1202", RoomStatus.ACTIVE);
+        // Tầng 1 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(deluxeKing, "101", 1, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, "102", 1, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, "103", 1, RoomStatus.ACTIVE);
+        saveRoom(familyRoom, "104", 1, RoomStatus.ACTIVE);
+        saveRoom(singleEconomy, "105", 1, RoomStatus.ACTIVE);
+        saveRoom(deluxeQueen, "106", 1, RoomStatus.MAINTENANCE);
+
+        // Tầng 2 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(standardTwin, "201", 2, RoomStatus.ACTIVE);
+        saveRoom(deluxeQueen, "202", 2, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "203", 2, RoomStatus.ACTIVE);
+        saveRoom(familySuite, "204", 2, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, "205", 2, RoomStatus.ACTIVE);
+        saveRoom(accessibleRoom, "206", 2, RoomStatus.ACTIVE);
+
+        // Tầng 3 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(familyRoom, "301", 3, RoomStatus.ACTIVE);
+        saveRoom(gardenView, "302", 3, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "303", 3, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, "304", 3, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, "305", 3, RoomStatus.ACTIVE);
+        saveRoom(studioRoom, "306", 3, RoomStatus.MAINTENANCE);
+
+        // Tầng 4 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(oceanViewSuite, "401", 4, RoomStatus.ACTIVE);
+        saveRoom(familySuite, "402", 4, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, "403", 4, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "404", 4, RoomStatus.ACTIVE);
+        saveRoom(honeymoonSuite, "405", 4, RoomStatus.ACTIVE);
+        saveRoom(accessibleRoom, "406", 4, RoomStatus.OUT_OF_SERVICE);
+
+        // Tầng 5 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(executiveSuite, "501", 5, RoomStatus.ACTIVE);
+        saveRoom(familyRoom, "502", 5, RoomStatus.ACTIVE);
+        saveRoom(deluxeQueen, "503", 5, RoomStatus.ACTIVE);
+        saveRoom(gardenView, "504", 5, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "505", 5, RoomStatus.ACTIVE);
+        saveRoom(classicDouble, "506", 5, RoomStatus.MAINTENANCE);
+
+        // Tầng 6 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(singleEconomy, "601", 6, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, "602", 6, RoomStatus.ACTIVE);
+        saveRoom(familyRoom, "603", 6, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, "604", 6, RoomStatus.ACTIVE);
+        saveRoom(mountainView, "605", 6, RoomStatus.ACTIVE);
+        saveRoom(studioRoom, "606", 6, RoomStatus.ACTIVE);
+
+        // Tầng 7 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(deluxeKing, "701", 7, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, "702", 7, RoomStatus.ACTIVE);
+        saveRoom(familySuite, "703", 7, RoomStatus.ACTIVE);
+        saveRoom(poolsideRoom, "704", 7, RoomStatus.ACTIVE);
+        saveRoom(classicDouble, "705", 7, RoomStatus.ACTIVE);
+        saveRoom(accessibleRoom, "706", 7, RoomStatus.OUT_OF_SERVICE);
+
+        // Tầng 8 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(familyRoom, "801", 8, RoomStatus.ACTIVE);
+        saveRoom(standardTwin, "802", 8, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "803", 8, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, "804", 8, RoomStatus.ACTIVE);
+        saveRoom(oceanViewSuite, "805", 8, RoomStatus.ACTIVE);
+        saveRoom(deluxeQueen, "806", 8, RoomStatus.MAINTENANCE);
+
+        // Tầng 9 - 6 phòng, nhiều loại phòng hỗn hợp
+        saveRoom(duplexSuite, "901", 9, RoomStatus.ACTIVE);
+        saveRoom(executiveSuite, "902", 9, RoomStatus.ACTIVE);
+        saveRoom(familyRoom, "903", 9, RoomStatus.ACTIVE);
+        saveRoom(deluxeKing, "904", 9, RoomStatus.ACTIVE);
+        saveRoom(honeymoonSuite, "905", 9, RoomStatus.ACTIVE);
+        saveRoom(mountainView, "906", 9, RoomStatus.ACTIVE);
 
         log.info("RoomSeeder: done");
     }
@@ -481,7 +482,7 @@ public class DataSeeder implements ApplicationRunner {
         // CASE 1
         // CONFIRMED + overlap
         // 10/09 -> 12/09
-        // Room 101 phải bị occupied
+        // Room 101 (tầng 1) phải bị occupied
         // =====================================================
 
         Booking booking1 =
@@ -506,7 +507,7 @@ public class DataSeeder implements ApplicationRunner {
         // CASE 2
         // PAID + overlap
         // 11/09 -> 13/09
-        // Room 102 cũng phải bị occupied
+        // Room 203 (tầng 2) cũng phải bị occupied
         // =====================================================
 
         Booking booking2 =
@@ -523,14 +524,14 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem2,
-                requireSeedRoom(rooms, "102")
+                requireSeedRoom(rooms, "203")
         );
 
 
         // =====================================================
         // CASE 3
         // CANCELLED + overlap
-        // Room 103 KHÔNG được occupied
+        // Room 303 (tầng 3) KHÔNG được occupied
         // =====================================================
 
         Booking booking3 =
@@ -547,7 +548,7 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem3,
-                requireSeedRoom(rooms, "103")
+                requireSeedRoom(rooms, "303")
         );
 
 
@@ -559,7 +560,7 @@ public class DataSeeder implements ApplicationRunner {
         // Search : 10/09 -> 12/09
         //
         // KHÔNG overlap vì đang dùng < và >
-        // Room 104 vẫn available
+        // Room 404 (tầng 4) vẫn available
         // =====================================================
 
         Booking booking4 =
@@ -576,14 +577,14 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem4,
-                requireSeedRoom(rooms, "104")
+                requireSeedRoom(rooms, "404")
         );
 
 
         // =====================================================
         // CASE 5
         // PENDING + overlap Executive Suite
-        // Room 301 bị occupied
+        // Room 702 (tầng 7) bị occupied
         // =====================================================
 
         Booking booking5 =
@@ -600,14 +601,14 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem5,
-                requireSeedRoom(rooms, "301")
+                requireSeedRoom(rooms, "702")
         );
 
 
         // =====================================================
         // CASE 6
         // EXPIRED + overlap Family Room
-        // Room 401 KHÔNG được occupied
+        // Room 903 (tầng 9) KHÔNG được occupied
         // =====================================================
 
         Booking booking6 =
@@ -624,7 +625,7 @@ public class DataSeeder implements ApplicationRunner {
 
         saveRoomAssignment(
                 bookingItem6,
-                requireSeedRoom(rooms, "401")
+                requireSeedRoom(rooms, "903")
         );
 
         log.info("BookingSeeder: search test data done");
@@ -881,12 +882,14 @@ public class DataSeeder implements ApplicationRunner {
     private void saveRoom(
             RoomType roomType,
             String roomNumber,
+            Integer floorNumber,
             RoomStatus status
     ) {
         Room room = new Room();
 
         room.setRoomTypeId(roomType.getId());
         room.setRoomNumber(roomNumber);
+        room.setFloorNumber(floorNumber);
         room.setStatus(status);
 
         room.setDeleteFlag(false);
