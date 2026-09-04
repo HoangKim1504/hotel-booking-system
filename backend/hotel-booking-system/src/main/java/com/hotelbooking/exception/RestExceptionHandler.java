@@ -9,8 +9,10 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Map exception nghiệp vụ → HTTP status.
@@ -93,29 +95,6 @@ public class RestExceptionHandler {
                 .body(Map.of("errors", errors));
     }
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<Map<String, Map<String, String>>> handleMethodArgumentTypeMismatch(
-            MethodArgumentTypeMismatchException ex
-    ) {
-        Map<String, String> errors = new LinkedHashMap<>();
-
-        if (ex.getRequiredType() == LocalDate.class) {
-            errors.put(
-                    ex.getName(),
-                    "Invalid date format. Expected yyyy-MM-dd"
-            );
-        } else {
-            errors.put(
-                    ex.getName(),
-                    "Invalid value format"
-            );
-        }
-
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("errors", errors));
-    }
-
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, Map<String, String>>> handleBadRequestException(
             BadRequestException ex
@@ -131,6 +110,70 @@ public class RestExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("errors", errors));
+    }
+
+    /**
+     * Handle lỗi khi request parameter không thể convert sang kiểu dữ liệu yêu cầu.
+     * Hỗ trợ Date, Enum và các kiểu dữ liệu khác.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Map<String, String>>> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex
+    ) {
+        Map<String, String> errors = new LinkedHashMap<>();
+
+        Class<?> requiredType = ex.getRequiredType();
+
+        // Sai format LocalDate
+        if (requiredType == LocalDate.class) {
+            errors.put(
+                    ex.getName(),
+                    "Invalid date format. Expected yyyy-MM-dd"
+            );
+
+            // Sai giá trị Enum
+        } else if (requiredType != null && requiredType.isEnum()) {
+            String allowedValues = Arrays.stream(requiredType.getEnumConstants())
+                    .map(Object::toString)
+                    .collect(Collectors.joining(", "));
+
+            errors.put(
+                    ex.getName(),
+                    String.format(
+                            "%s must be one of: %s",
+                            formatFieldName(ex.getName()),
+                            allowedValues
+                    )
+            );
+
+            // Các trường hợp sai kiểu dữ liệu khác
+        } else {
+            errors.put(
+                    ex.getName(),
+                    "Invalid value format"
+            );
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("errors", errors));
+    }
+
+
+    /**
+     * Convert tên field dạng camelCase sang chuỗi dễ đọc.
+     * Ví dụ:
+     * roomStatus     -> Room status
+     * bookingStatus  -> Booking status
+     * roomTypeStatus -> Room type status
+     */
+    private String formatFieldName(String fieldName) {
+        String formatted = fieldName
+                .replaceAll("([a-z])([A-Z])", "$1 $2")
+                .toLowerCase();
+
+        return Character.toUpperCase(formatted.charAt(0))
+                + formatted.substring(1);
     }
 
 }

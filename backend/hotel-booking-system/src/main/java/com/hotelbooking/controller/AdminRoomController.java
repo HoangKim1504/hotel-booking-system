@@ -59,10 +59,6 @@ public class AdminRoomController {
             String roomTypeName,
 
             @RequestParam(required = false)
-            @Pattern(
-                    regexp = "(?i)ACTIVE|MAINTENANCE|OUT_OF_SERVICE",
-                    message = "Room status must be one of: ACTIVE, MAINTENANCE, OUT_OF_SERVICE"
-            )
             RoomStatus roomStatus,
 
             @RequestParam(required = false)
