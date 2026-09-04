@@ -100,7 +100,8 @@ public class SecurityConfig {
                         // Room management
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/admin/rooms"
+                                "/api/admin/rooms",
+                                "/api/admin/rooms/search"
                         ).hasAuthority("ADMIN_VIEW")
 
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
