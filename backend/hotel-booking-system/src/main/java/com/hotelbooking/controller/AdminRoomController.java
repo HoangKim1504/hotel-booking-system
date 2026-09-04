@@ -1,19 +1,21 @@
 package com.hotelbooking.controller;
 
+import com.hotelbooking.dto.CreateRoomRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomResponse;
 import com.hotelbooking.enums.RoomStatus;
+import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.service.AdminRoomService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/admin/rooms")
@@ -90,6 +92,31 @@ public class AdminRoomController {
             String order
     ) {
         return adminRoomService.searchByCriteria(roomTypeName, roomStatus, roomNumber, page, size, sortBy, order);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('USER_CREATE')")
+    public RoomResponse create(
+            @Valid @RequestBody CreateRoomRequest request,
+            Authentication authentication
+    ) {
+        // Check ký tự đầu của roomNumber giống với roomFloor không
+        validateRoomNumberWithFloor(request.roomNumber(), request.floorNumber());
+
+        String username = authentication.getName();
+        return adminRoomService.create(request, username);
+    }
+
+    /**
+     * Check ký tự đầu của roomNumber giống với roomFloor không
+     */
+    private void validateRoomNumberWithFloor(int roomNumber, int floorNumber) {
+        int roomFloor = roomNumber / 100;
+
+        if (roomFloor != floorNumber) {
+            throw new BadRequestException("roomNumber", "Room number must match the floor number");
+        }
     }
 
 }

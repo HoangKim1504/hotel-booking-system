@@ -32,5 +32,7 @@ public interface RoomTypeRepository extends MongoRepository<RoomType, String> {
 
     boolean existsByRoomTypeNameIgnoreCaseAndIdNotAndDeleteFlagFalse(String roomTypeName, String roomTypeId);
 
+    Optional<RoomType> findByRoomTypeNameAndDeleteFlagFalse(String roomTypeName);
+
 }
 

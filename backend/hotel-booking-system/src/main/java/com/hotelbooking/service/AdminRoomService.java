@@ -1,8 +1,10 @@
 package com.hotelbooking.service;
 
+import com.hotelbooking.dto.CreateRoomRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomResponse;
 import com.hotelbooking.enums.RoomStatus;
+import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.Room;
 import com.hotelbooking.model.RoomType;
 import com.hotelbooking.repository.RoomRepository;
@@ -18,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,8 @@ public class AdminRoomService {
 
     private final EntityValidator entityValidator;
     private final MongoTemplate mongoTemplate;
+
+    Instant now = Instant.now();
 
     /**
      * Search toàn bộ Room, có phân trang và max record mỗi trang
@@ -150,6 +155,23 @@ public class AdminRoomService {
     }
 
     /**
+     * Insert Room mới vào DB
+     */
+    public RoomResponse create(CreateRoomRequest request, String username) {
+        // Tìm RoomType theo tên. Không tìm thấy -> 404
+        RoomType existingRoomType = entityValidator.requireAdminRoomTypeByName(request.roomTypeName());
+
+        // TH tồn tại Room Number chung số thì sẽ trả mã lỗi 409
+        if (roomRepository.existsByRoomNumberAndDeleteFlagFalse(request.roomNumber())) {
+            throw new ConflictException("Current room number already exists");
+        }
+
+        Room newRoom = setNewRoom(request, existingRoomType.getId(), username);
+
+        return toRoomResponse(roomRepository.save(newRoom));
+    }
+
+    /**
      * Convert Room sang RoomResponse.
      * Tìm RoomType tương ứng để lấy roomTypeName trước khi tạo response.
      */
@@ -198,6 +220,22 @@ public class AdminRoomService {
                 totalRecords,
                 totalPages
         );
+    }
+
+    private Room setNewRoom(CreateRoomRequest request, String roomTypeId, String username) {
+        Room room = new Room();
+
+        room.setRoomTypeId(roomTypeId);
+        room.setRoomNumber(request.roomNumber());
+        room.setFloorNumber(request.floorNumber());
+        room.setStatus(RoomStatus.ACTIVE);
+        room.setDeleteFlag(false);
+        room.setCreatedBy(username);
+        room.setCreatedAt(now);
+        room.setUpdatedBy(null);
+        room.setUpdatedAt(null);
+
+        return room;
     }
 
 }

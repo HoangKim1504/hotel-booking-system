@@ -22,4 +22,6 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     Page<Room> findAllByDeleteFlagFalse(@NonNull Pageable pageable);
 
+    boolean existsByRoomNumberAndDeleteFlagFalse(int roomNumber);
+
 }
