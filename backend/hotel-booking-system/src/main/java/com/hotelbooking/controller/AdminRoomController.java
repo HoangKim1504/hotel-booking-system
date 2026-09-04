@@ -111,7 +111,7 @@ public class AdminRoomController {
     /**
      * Check ký tự đầu của roomNumber giống với roomFloor không
      */
-    private void validateRoomNumberWithFloor(int roomNumber, int floorNumber) {
+    private void validateRoomNumberWithFloor(Integer roomNumber, Integer floorNumber) {
         int roomFloor = roomNumber / 100;
 
         if (roomFloor != floorNumber) {

@@ -13,12 +13,12 @@ public record CreateRoomRequest(
         @NotNull(message = "Room number is required")
         @Min(value = 100, message = "Room number must be at least 100")
         @Max(value = 999, message = "Room number must not exceed 999")
-        int roomNumber,
+        Integer roomNumber,
 
         @NotNull(message = "Floor number is required")
         @Min(value = 1, message = "Floor number must be at least 1")
         @Max(value = 9, message = "Floor number must not exceed 9")
-        int floorNumber
+        Integer floorNumber
 
 ) {
 }
