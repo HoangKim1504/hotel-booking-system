@@ -96,7 +96,8 @@ public class SecurityConfig {
                         ).hasAuthority("USER_UPDATE")
                         .requestMatchers(
                                 HttpMethod.DELETE,
-                                "/api/room-types/*"
+                                "/api/room-types/*",
+                                "/api/admin/rooms/*"
                         ).hasAuthority("USER_DELETE")
 
                         // Room management
