@@ -12,4 +12,6 @@ public interface RoomAssignmentRepository extends MongoRepository<RoomAssignment
 
     List<RoomAssignment> findByDeleteFlagFalseAndRoomIdIn(Collection<String> bookingItemIds);
 
+    boolean existsByRoomIdAndDeleteFlagFalse(String roomId);
+
 }

@@ -3,10 +3,13 @@ package com.hotelbooking.service;
 import com.hotelbooking.dto.CreateRoomRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomResponse;
+import com.hotelbooking.dto.UpdateRoomRequest;
 import com.hotelbooking.enums.RoomStatus;
+import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.Room;
 import com.hotelbooking.model.RoomType;
+import com.hotelbooking.repository.RoomAssignmentRepository;
 import com.hotelbooking.repository.RoomRepository;
 import com.hotelbooking.repository.RoomTypeRepository;
 import com.hotelbooking.utils.PageableUtils;
@@ -30,6 +33,7 @@ public class AdminRoomService {
 
     private final RoomRepository roomRepository;
     private final RoomTypeRepository roomTypeRepository;
+    private final RoomAssignmentRepository roomAssignmentRepository;
 
     private final EntityValidator entityValidator;
     private final MongoTemplate mongoTemplate;
@@ -158,6 +162,9 @@ public class AdminRoomService {
      * Insert Room mới vào DB
      */
     public RoomResponse create(CreateRoomRequest request, String username) {
+        // Check ký tự đầu của roomNumber giống với roomFloor không
+        validateRoomNumberWithFloor(request.roomNumber(), request.floorNumber());
+
         // Tìm RoomType theo tên. Không tìm thấy -> 404
         RoomType existingRoomType = entityValidator.requireAdminRoomTypeByName(request.roomTypeName());
 
@@ -169,6 +176,31 @@ public class AdminRoomService {
         Room newRoom = setNewRoom(request, existingRoomType.getId(), username);
 
         return toRoomResponse(roomRepository.save(newRoom));
+    }
+
+    public RoomResponse update(UpdateRoomRequest request, String id, String username) {
+        // Check ký tự đầu của roomNumber giống với roomFloor không
+        validateRoomNumberWithFloor(request.roomNumber(), request.floorNumber());
+
+        // Tìm room tồn tại
+        Room existingRoom = entityValidator.requireAdminRoom(id);
+
+        // Tìm room type tồn tại
+        RoomType existingRoomType = entityValidator.requireAdminRoomType(existingRoom.getRoomTypeId());
+
+        // Kiểm tra Room khác có cùng roomNumber
+        if (roomRepository.existsByRoomNumberAndIdNotAndDeleteFlagFalse(request.roomNumber(), id)) {
+            throw new ConflictException("Current room number already exists in another room");
+        }
+
+        // Kiểm tra phòng có đang được dùng không
+        if (roomAssignmentRepository.existsByRoomIdAndDeleteFlagFalse(id)) {
+            throw new ConflictException("Room is currently assigned and cannot be updated");
+        }
+
+        Room updateRoom = setUpdateRoom(request, existingRoom, id, username);
+
+        return buildRoomResponse(roomRepository.save(updateRoom), existingRoomType.getRoomTypeName());
     }
 
     /**
@@ -222,6 +254,17 @@ public class AdminRoomService {
         );
     }
 
+    /**
+     * Check ký tự đầu của roomNumber giống với roomFloor không
+     */
+    private void validateRoomNumberWithFloor(Integer roomNumber, Integer floorNumber) {
+        int roomFloor = roomNumber / 100;
+
+        if (roomFloor != floorNumber) {
+            throw new BadRequestException("roomNumber", "Room number must match the floor number");
+        }
+    }
+
     private Room setNewRoom(CreateRoomRequest request, String roomTypeId, String username) {
         Room room = new Room();
 
@@ -236,6 +279,17 @@ public class AdminRoomService {
         room.setUpdatedAt(null);
 
         return room;
+    }
+
+    private Room setUpdateRoom(UpdateRoomRequest request, Room existingRoom, String id, String username) {
+        existingRoom.setRoomTypeId(id);
+        existingRoom.setRoomNumber(request.roomNumber());
+        existingRoom.setFloorNumber(request.floorNumber());
+        existingRoom.setStatus(request.status());
+        existingRoom.setUpdatedBy(username);
+        existingRoom.setUpdatedAt(now);
+
+        return existingRoom;
     }
 
 }

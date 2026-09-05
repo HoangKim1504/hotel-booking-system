@@ -3,8 +3,8 @@ package com.hotelbooking.controller;
 import com.hotelbooking.dto.CreateRoomRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.RoomResponse;
+import com.hotelbooking.dto.UpdateRoomRequest;
 import com.hotelbooking.enums.RoomStatus;
-import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.service.AdminRoomService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -101,22 +101,20 @@ public class AdminRoomController {
             @Valid @RequestBody CreateRoomRequest request,
             Authentication authentication
     ) {
-        // Check ký tự đầu của roomNumber giống với roomFloor không
-        validateRoomNumberWithFloor(request.roomNumber(), request.floorNumber());
-
         String username = authentication.getName();
         return adminRoomService.create(request, username);
     }
 
-    /**
-     * Check ký tự đầu của roomNumber giống với roomFloor không
-     */
-    private void validateRoomNumberWithFloor(Integer roomNumber, Integer floorNumber) {
-        int roomFloor = roomNumber / 100;
-
-        if (roomFloor != floorNumber) {
-            throw new BadRequestException("roomNumber", "Room number must match the floor number");
-        }
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    public RoomResponse update(
+            @Valid @RequestBody UpdateRoomRequest request,
+            @PathVariable String id,
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        return adminRoomService.update(request, id, username);
     }
 
 }

@@ -24,4 +24,5 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     boolean existsByRoomNumberAndDeleteFlagFalse(int roomNumber);
 
+    boolean existsByRoomNumberAndIdNotAndDeleteFlagFalse(int roomNumber, String id);
 }
