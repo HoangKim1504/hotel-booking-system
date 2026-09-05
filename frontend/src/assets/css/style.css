@@ -627,3 +627,25 @@
 .error-popup-body li:not(:last-child) {
     margin-bottom: 12px;
 }
+
+/* Room list */
+.room-list-section {
+    scroll-margin-top: 80px;
+}
+
+/* Room card */
+.room-card-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+/* Room facility */
+.room-facility {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    min-height: 48px;
+}

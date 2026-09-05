@@ -4,14 +4,14 @@ import defaultRoomImage from "../../assets/images/room-1.jpg";
 
 function RoomCard({ room }) {
     return (
-        <div className="col-lg-4 col-md-6">
-            <div className="room-item shadow rounded overflow-hidden">
+        <div className="col-lg-4 col-md-6 d-flex">
+            <div className="room-item shadow rounded overflow-hidden d-flex flex-column w-100 h-100">
 
                 {/* Room Image */}
                 <div className="position-relative">
 
                     <img
-                        className="img-fluid"
+                        className="img-fluid room-card-image"
                         src={defaultRoomImage}
                         alt={room.roomTypeName}
                     />
@@ -23,7 +23,7 @@ function RoomCard({ room }) {
                 </div>
 
                 {/* Room Information */}
-                <div className="p-4 mt-2">
+                <div className="p-4 mt-2 d-flex flex-column flex-grow-1">
 
                     <div className="d-flex justify-content-between mb-3">
 
@@ -49,13 +49,12 @@ function RoomCard({ room }) {
                      </div>
 
                     {/* Facility */}
-                    <p className="text-body mb-3">
+                    <p className="text-body mb-3 room-facility">
                         {room.facility}
                     </p>
 
                     {/* Buttons */}
-                    <div className="d-flex justify-content-between">
-
+                    <div className="d-flex justify-content-between mt-auto">
                         <Link
                             className="btn btn-sm btn-primary rounded py-2 px-4"
                             to={`/rooms/${room.id}`}
@@ -69,7 +68,6 @@ function RoomCard({ room }) {
                         >
                             Book Now
                         </Link>
-
                     </div>
 
                 </div>
