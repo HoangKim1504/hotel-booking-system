@@ -194,13 +194,27 @@ public class AdminRoomService {
         }
 
         // Kiểm tra phòng có đang được dùng không
-        if (roomAssignmentRepository.existsByRoomIdAndDeleteFlagFalse(id)) {
-            throw new ConflictException("Room is currently assigned and cannot be updated");
-        }
+        checkOccupiedRoomId(id, true);
 
         Room updateRoom = setUpdateRoom(request, existingRoom, id, username);
 
         return buildRoomResponse(roomRepository.save(updateRoom), existingRoomType.getRoomTypeName());
+    }
+
+    /**
+     * Xoá Room dựa trên MongodID của Room
+     */
+    public void delete(String id, String username) {
+        // Tìm room tồn tại
+        Room existingRoom = entityValidator.requireAdminRoom(id);
+
+        // Kiểm tra phòng có đang được dùng không
+        checkOccupiedRoomId(id, false);
+
+        Room softDeleteRoom = setSoftDeleteRoom(existingRoom, username);
+
+        // Thực thi soft-delete và update DB
+        roomRepository.save(softDeleteRoom);
     }
 
     /**
@@ -290,6 +304,25 @@ public class AdminRoomService {
         existingRoom.setUpdatedAt(now);
 
         return existingRoom;
+    }
+
+    private void checkOccupiedRoomId(String id, boolean updateFlag) {
+        // Kiểm tra phòng có đang được dùng không
+        boolean occupiedRoomId = roomAssignmentRepository.existsByRoomIdAndDeleteFlagFalse(id);
+
+        if (occupiedRoomId && updateFlag) {
+            throw new ConflictException("Room is currently assigned and cannot be updated");
+        } else if (occupiedRoomId) {
+            throw new ConflictException("Room is currently assigned and cannot be deleted");
+        }
+    }
+
+    private Room setSoftDeleteRoom(Room room, String username) {
+        room.setStatus(RoomStatus.OUT_OF_SERVICE);
+        room.setDeleteFlag(true);
+        room.setUpdatedBy(username);
+        room.setUpdatedAt(now);
+        return room;
     }
 
 }

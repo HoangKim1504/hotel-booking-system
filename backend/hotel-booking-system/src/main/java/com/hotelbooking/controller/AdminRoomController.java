@@ -117,4 +117,15 @@ public class AdminRoomController {
         return adminRoomService.update(request, id, username);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('USER_DELETE')")
+    public void delete(
+            @PathVariable String id,
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        adminRoomService.delete(id, username);
+    }
+
 }
