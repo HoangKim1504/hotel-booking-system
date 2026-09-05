@@ -61,6 +61,13 @@ public class AdminRoomService {
     }
 
     /**
+     * Tìm room tương ứng vs MongoID. Room phải chưa được soft-delete
+     */
+    public RoomResponse findById(String id) {
+        return toRoomResponse(entityValidator.requireAdminRoom(id));
+    }
+
+    /**
      * Search Room Type, có phân trang và max record mỗi trang, dựa trên điều kiện cho trước
      */
     public PageResponse<RoomResponse> searchByCriteria(String roomTypeName, RoomStatus roomStatus, Integer roomNumber,

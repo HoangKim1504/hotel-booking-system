@@ -54,6 +54,14 @@ public class AdminRoomController {
         return adminRoomService.findAll(page, size, sortBy, order);
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN_VIEW')")
+    public RoomResponse findById(
+            @PathVariable String id
+    ) {
+        return adminRoomService.findById(id);
+    }
+
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('ADMIN_VIEW')")
     public PageResponse<RoomResponse> search(
