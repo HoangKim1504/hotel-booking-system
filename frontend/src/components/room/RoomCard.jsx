@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import defaultRoomImage from "../../assets/images/room-1.jpg";
+
 function RoomCard({ room }) {
     return (
         <div className="col-lg-4 col-md-6">
@@ -10,8 +12,8 @@ function RoomCard({ room }) {
 
                     <img
                         className="img-fluid"
-                        src={room.image}
-                        alt={room.name}
+                        src={defaultRoomImage}
+                        alt={room.roomTypeName}
                     />
 
                     <small className="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">
@@ -26,50 +28,29 @@ function RoomCard({ room }) {
                     <div className="d-flex justify-content-between mb-3">
 
                         <h5 className="mb-0">
-                            {room.name}
+                            {room.roomTypeName}
                         </h5>
-
-                        <div className="ps-2">
-
-                            {Array.from(
-                                { length: room.rating },
-                                (_, index) => (
-                                    <small
-                                        key={index}
-                                        className="fa fa-star text-primary"
-                                    />
-                                )
-                            )}
-
-                        </div>
 
                     </div>
 
                     {/* Facilities */}
-                    <div className="d-flex mb-3">
+                     <div className="d-flex mb-3">
 
-                        <small className="border-end me-3 pe-3">
-                            <i className="fa fa-bed text-primary me-2" />
-                            {room.beds} Bed
-                        </small>
+                         <small className="border-end me-3 pe-3">
+                             <i className="fa fa-expand text-primary me-2" />
+                             {room.roomSize} m²
+                         </small>
 
-                        <small className="border-end me-3 pe-3">
-                            <i className="fa fa-bath text-primary me-2" />
-                            {room.baths} Bath
-                        </small>
+                         <small>
+                             <i className="fa fa-users text-primary me-2" />
+                             {room.maximumPeople} People
+                         </small>
 
-                        {room.wifi && (
-                            <small>
-                                <i className="fa fa-wifi text-primary me-2" />
-                                Wifi
-                            </small>
-                        )}
+                     </div>
 
-                    </div>
-
-                    {/* Description */}
+                    {/* Facility */}
                     <p className="text-body mb-3">
-                        {room.description}
+                        {room.facility}
                     </p>
 
                     {/* Buttons */}

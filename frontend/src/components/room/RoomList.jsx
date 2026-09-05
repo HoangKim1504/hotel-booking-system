@@ -1,4 +1,5 @@
 import RoomCard from "./RoomCard";
+import { useEffect, useState } from "react";
 
 import room1 from "../../assets/images/room-1.jpg";
 import room2 from "../../assets/images/room-2.jpg";
@@ -6,91 +7,23 @@ import room3 from "../../assets/images/room-3.jpg";
 
 function RoomList({ limit }) {
 
-    // TODO: Replace mock room data with Spring Boot API
-    // Example:
-    // GET /api/rooms
-    //
-    // Search available rooms:
-    // GET /api/rooms/available?checkIn=...&checkOut=...
+    const [apiRoomTypes, setApiRoomTypes] = useState([]);
 
-    const rooms = [
-        {
-            id: 1,
-            name: "Junior Suite",
-            price: 100,
-            image: room1,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet lorem.",
-        },
-        {
-            id: 2,
-            name: "Executive Suite",
-            price: 100,
-            image: room2,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet lorem.",
-        },
-        {
-            id: 3,
-            name: "Super Deluxe",
-            price: 100,
-            image: room3,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet lorem.",
-        },
-        {
-            id: 4,
-            name: "Super Deluxe",
-            price: 100,
-            image: room3,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet lorem.",
-        },
-        {
-            id: 5,
-            name: "Junior Suite",
-            price: 100,
-            image: room1,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet lorem.",
-        },
-        {
-            id: 6,
-            name: "Executive Suite",
-            price: 100,
-            image: room2,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet lorem.",
-        },
-    ];
+    useEffect(() => {
+        fetch("http://localhost:8080/api/room-types")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Data room types: ", data);
+                setApiRoomTypes(data.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching room types:", error);
+            })
+    }, []);
 
-    const displayedRooms = limit
-        ? rooms.slice(0, limit)
-        : rooms;
+    const displayedRoomTypes = limit
+        ? apiRoomTypes.slice(0, limit)
+        : apiRoomTypes;
 
     return (
         <div className="container-xxl py-5">
@@ -115,7 +48,7 @@ function RoomList({ limit }) {
                 {/* Room List */}
                 <div className="row g-4">
 
-                    {displayedRooms.map((room) => (
+                    {displayedRoomTypes.map((room) => (
                         <RoomCard
                             key={room.id}
                             room={room}
@@ -124,7 +57,7 @@ function RoomList({ limit }) {
 
                 </div>
 
-                {displayedRooms.length === 0 && (
+                {displayedRoomTypes.length === 0 && (
                     <div className="text-center">
                         <p>No rooms available.</p>
                     </div>
