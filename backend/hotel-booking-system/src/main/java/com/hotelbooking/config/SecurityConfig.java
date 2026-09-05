@@ -104,6 +104,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/admin/rooms",
+                                "/api/admin/rooms/*",
                                 "/api/admin/rooms/search"
                         ).hasAuthority("ADMIN_VIEW")
 
