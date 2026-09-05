@@ -1,0 +1,13 @@
+{
+  "name": "hotel-booking-system",
+  "version": "1.0.0",
+  "scripts": {
+    "backend": "cd backend/hotel-booking-system && docker compose up --build",
+    "frontend": "npm --prefix frontend run dev",
+    "dev": "concurrently -k -n BACKEND,FRONTEND \"npm:backend\" \"npm:frontend\"",
+    "down": "cd backend/hotel-booking-system && docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
