@@ -2,6 +2,9 @@ package com.hotelbooking.repository;
 
 import com.hotelbooking.enums.RoomStatus;
 import com.hotelbooking.model.Room;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -17,4 +20,9 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     Optional<Room> findByIdAndDeleteFlagFalse(String id);
 
+    Page<Room> findAllByDeleteFlagFalse(@NonNull Pageable pageable);
+
+    boolean existsByRoomNumberAndDeleteFlagFalse(int roomNumber);
+
+    boolean existsByRoomNumberAndIdNotAndDeleteFlagFalse(int roomNumber, String id);
 }

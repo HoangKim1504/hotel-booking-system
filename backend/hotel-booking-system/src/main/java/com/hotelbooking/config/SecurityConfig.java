@@ -80,22 +80,33 @@ public class SecurityConfig {
                                 "/api/admin/room-types/search"
                         ).hasAuthority("ADMIN_VIEW")
 
-                        // Limit các chức năng liên quan update Room Type
-                        // - Insert một Room Type mới
-                        // - Update Room Type có sẵn
-                        // - Soft-delete Room Type có sẵn
+                        // Limit các chức năng liên quan update Room Type và Room
+                        // - Insert một Room Type/ Room mới
+                        // - Update Room Type/ Room có sẵn
+                        // - Soft-delete Room Type/ Room có sẵn
                         .requestMatchers(
                                 HttpMethod.POST,
-                                "/api/room-types"
+                                "/api/room-types",
+                                "/api/admin/rooms"
                         ).hasAuthority("USER_CREATE")
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "/api/room-types/*"
+                                "/api/room-types/*",
+                                "/api/admin/rooms/*"
                         ).hasAuthority("USER_UPDATE")
                         .requestMatchers(
                                 HttpMethod.DELETE,
-                                "/api/room-types/*"
+                                "/api/room-types/*",
+                                "/api/admin/rooms/*"
                         ).hasAuthority("USER_DELETE")
+
+                        // Room management
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/admin/rooms",
+                                "/api/admin/rooms/*",
+                                "/api/admin/rooms/search"
+                        ).hasAuthority("ADMIN_VIEW")
 
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(

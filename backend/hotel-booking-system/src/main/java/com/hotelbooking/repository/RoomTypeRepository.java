@@ -26,9 +26,13 @@ public interface RoomTypeRepository extends MongoRepository<RoomType, String> {
 
     Page<RoomType> findByRoomTypeNameContainingIgnoreCaseAndDeleteFlagFalse(String roomTypeName, @NonNull Pageable pageable);
 
+    List<RoomType> findByRoomTypeNameContainingIgnoreCaseAndDeleteFlagFalse(String roomTypeName);
+
     boolean existsByRoomTypeNameAndDeleteFlagFalse(String roomTypeName);
 
     boolean existsByRoomTypeNameIgnoreCaseAndIdNotAndDeleteFlagFalse(String roomTypeName, String roomTypeId);
+
+    Optional<RoomType> findByRoomTypeNameAndDeleteFlagFalse(String roomTypeName);
 
 }
 
