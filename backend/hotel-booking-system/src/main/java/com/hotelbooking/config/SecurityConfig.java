@@ -91,7 +91,8 @@ public class SecurityConfig {
                         ).hasAuthority("USER_CREATE")
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "/api/room-types/*"
+                                "/api/room-types/*",
+                                "/api/admin/rooms/*"
                         ).hasAuthority("USER_UPDATE")
                         .requestMatchers(
                                 HttpMethod.DELETE,
