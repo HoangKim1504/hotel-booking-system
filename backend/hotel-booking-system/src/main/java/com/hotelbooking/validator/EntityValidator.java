@@ -83,6 +83,13 @@ public class EntityValidator {
                 );
     }
 
+    public RoomType requireAdminRoomTypeByName(String roomTypeName) {
+        return roomTypeRepository.findByRoomTypeNameAndDeleteFlagFalse(roomTypeName)
+                .orElseThrow(() ->
+                        new NotFoundException("Room type name not found: " + roomTypeName)
+                );
+    }
+
     public RoomType requireRoomType(String id, RoomTypeStatus status) {
         return roomTypeRepository.findByIdAndStatusAndDeleteFlagFalse(id, status)
                 .orElseThrow(() ->
