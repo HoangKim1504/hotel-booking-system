@@ -1,4 +1,5 @@
 import RoomCard from "./RoomCard";
+import LoadingSpinner from "../common/LoadingSpinner";
 import { useEffect, useState } from "react";
 
 import room1 from "../../assets/images/room-1.jpg";
@@ -8,6 +9,7 @@ import room3 from "../../assets/images/room-3.jpg";
 function RoomList({ limit }) {
 
     const [apiRoomTypes, setApiRoomTypes] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetch("http://localhost:8080/api/room-types")
@@ -19,6 +21,9 @@ function RoomList({ limit }) {
             .catch((error) => {
                 console.error("Error fetching room types:", error);
             })
+            .finally(() => {
+                setLoading(false);
+            });
     }, []);
 
     const displayedRoomTypes = limit
@@ -26,45 +31,49 @@ function RoomList({ limit }) {
         : apiRoomTypes;
 
     return (
-        <div className="container-xxl py-5">
-            <div className="container">
+        <>
+            <LoadingSpinner show={loading} />
 
-                {/* Title */}
-                <div className="text-center">
+            <div className="container-xxl py-5">
+                <div className="container">
 
-                    <h6 className="section-title text-center text-primary text-uppercase">
-                        Our Rooms
-                    </h6>
-
-                    <h1 className="mb-5">
-                        Explore Our{" "}
-                        <span className="text-primary text-uppercase">
-                            Rooms
-                        </span>
-                    </h1>
-
-                </div>
-
-                {/* Room List */}
-                <div className="row g-4">
-
-                    {displayedRoomTypes.map((room) => (
-                        <RoomCard
-                            key={room.id}
-                            room={room}
-                        />
-                    ))}
-
-                </div>
-
-                {displayedRoomTypes.length === 0 && (
+                    {/* Title */}
                     <div className="text-center">
-                        <p>No rooms available.</p>
-                    </div>
-                )}
 
+                        <h6 className="section-title text-center text-primary text-uppercase">
+                            Our Rooms
+                        </h6>
+
+                        <h1 className="mb-5">
+                            Explore Our{" "}
+                            <span className="text-primary text-uppercase">
+                                Rooms
+                            </span>
+                        </h1>
+
+                    </div>
+
+                    {/* Room List */}
+                    <div className="row g-4">
+
+                        {displayedRoomTypes.map((room) => (
+                            <RoomCard
+                                key={room.id}
+                                room={room}
+                            />
+                        ))}
+
+                    </div>
+
+                    {displayedRoomTypes.length === 0 && (
+                        <div className="text-center">
+                            <p>No rooms available.</p>
+                        </div>
+                    )}
+
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 
