@@ -16,6 +16,8 @@ function RoomList({ limit }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize] = useState(9);
     const [totalPages, setTotalPages] = useState(1);
+    const [sortBy, setSortBy] = useState("");
+    const [order, setOrder] = useState("");
 
     const roomListRef = useRef(null);
 
@@ -26,6 +28,14 @@ function RoomList({ limit }) {
             page: currentPage,
             size: pageSize,
         });
+
+        if (sortBy) {
+            params.append("sortBy", sortBy);
+        }
+
+        if (order) {
+            params.append("order", order);
+        }
 
         fetch(`http://localhost:8080/api/room-types?${params}`)
             .then(async (response) => {
@@ -62,7 +72,7 @@ function RoomList({ limit }) {
                 setLoading(false);
             });
 
-    }, [currentPage, pageSize]);
+    }, [currentPage, pageSize, sortBy, order]);
 
     const displayedRoomTypes = limit
         ? apiRoomTypes.slice(0, limit)
@@ -104,6 +114,26 @@ function RoomList({ limit }) {
         });
     };
 
+    const handleSortChange = (event) => {
+        const value = event.target.value;
+
+        // Default - không sort
+        if (!value) {
+            setSortBy("");
+            setOrder("");
+            setCurrentPage(1);
+            return;
+        }
+
+        const [selectedSortBy, selectedOrder] = value.split("-");
+
+        setSortBy(selectedSortBy);
+        setOrder(selectedOrder);
+
+        // Khi đổi sort thì quay về page 1
+        setCurrentPage(1);
+    };
+
     return (
         <>
             <LoadingSpinner show={loading} />
@@ -136,6 +166,57 @@ function RoomList({ limit }) {
                         </h1>
 
                     </div>
+
+                    {/* Sort by */}
+                     <div className="room-sort-wrapper">
+                         <label
+                             htmlFor="roomSort"
+                             className="room-sort-label"
+                         >
+                             Sort by
+                         </label>
+
+                         <select
+                             id="roomSort"
+                             className="room-sort-select"
+                             onChange={handleSortChange}
+                             defaultValue=""
+                         >
+                             <option value="">Default</option>
+
+                             <option value="roomTypeName-ASC">
+                                 Name: A - Z
+                             </option>
+
+                             <option value="roomTypeName-DESC">
+                                 Name: Z - A
+                             </option>
+
+                             <option value="price-ASC">
+                                 Price: Low to High
+                             </option>
+
+                             <option value="price-DESC">
+                                 Price: High to Low
+                             </option>
+
+                             <option value="roomSize-ASC">
+                                 Size: Small to Large
+                             </option>
+
+                             <option value="roomSize-DESC">
+                                 Size: Large to Small
+                             </option>
+
+                             <option value="maximumPeople-ASC">
+                                 Capacity: Low to High
+                             </option>
+
+                             <option value="maximumPeople-DESC">
+                                 Capacity: High to Low
+                             </option>
+                         </select>
+                     </div>
 
                     {/* Room List */}
                     <div className="row g-4">
