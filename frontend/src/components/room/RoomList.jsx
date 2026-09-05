@@ -1,5 +1,6 @@
 import RoomCard from "./RoomCard";
 import LoadingSpinner from "../common/LoadingSpinner";
+import ErrorPopup from "../common/ErrorPopup";
 import { useEffect, useState } from "react";
 
 import room1 from "../../assets/images/room-1.jpg";
@@ -10,12 +11,33 @@ function RoomList({ limit }) {
 
     const [apiRoomTypes, setApiRoomTypes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [errors, setErrors] = useState([]);
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/room-types")
-            .then((response) => response.json())
+        const params = new URLSearchParams({
+            page: 1,
+            size: 9
+        });
+
+        fetch(`http://localhost:8080/api/room-types?${params}`)
+            .then(async (response) => {
+                const data = await response.json();
+
+                 if (!response.ok) {
+                     const errorMessages = data.errors
+                         ? Object.values(data.errors)
+                         : [data.message || "Something went wrong"];
+
+                     setErrors(errorMessages);
+                     setShowErrorPopup(true);
+
+                     return;
+                 }
+
+                return data;
+            })
             .then((data) => {
-                console.log("Data room types: ", data);
                 setApiRoomTypes(data.data);
             })
             .catch((error) => {
@@ -33,6 +55,13 @@ function RoomList({ limit }) {
     return (
         <>
             <LoadingSpinner show={loading} />
+
+            <ErrorPopup
+                show={showErrorPopup}
+                title="Unable to load rooms"
+                errors={errors}
+                onClose={() => setShowErrorPopup(false)}
+            />
 
             <div className="container-xxl py-5">
                 <div className="container">
