@@ -2,6 +2,7 @@ import RoomCard from "./RoomCard";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ErrorPopup from "../common/ErrorPopup";
 import { getRoomTypes } from "../../services/roomService";
+import { getErrorMessages } from "../../utils/apiErrorUtils";
 import { useEffect, useRef, useState } from "react";
 
 function RoomList({ limit }) {
@@ -34,15 +35,10 @@ function RoomList({ limit }) {
                 setTotalPages(data.totalPages);
 
             } catch (error) {
-                console.error("Error fetching rooms:", error);
+                  console.error("Error fetching room types:", error);
 
-                const errorMessages = error.errors
-                    ? Object.values(error.errors)
-                    : [error.message || "Unable to connect to server"];
-
-                setErrors(errorMessages);
-                setShowErrorPopup(true);
-
+                  setErrors(getErrorMessages(error));
+                  setShowErrorPopup(true);
             } finally {
                 setLoading(false);
             }
