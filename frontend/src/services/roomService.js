@@ -17,8 +17,10 @@ export async function getRoomTypes({
         params.append("order", order);
     }
 
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
     const response = await fetch(
-        `http://localhost:8080/api/room-types?${params}`
+        `${API_BASE_URL}/api/room-types?${params}`
     );
 
     const data = await response.json();
