@@ -128,14 +128,17 @@ public class RestExceptionHandler {
 
         Class<?> requiredType = ex.getRequiredType();
 
-        // Sai format LocalDate
+        // Invalid LocalDate format
         if (requiredType == LocalDate.class) {
-            errors.put(
-                    ex.getName(),
-                    "Invalid date format. Expected yyyy-MM-dd"
-            );
+            String message = switch (ex.getName()) {
+                case "checkInDate" -> "Please enter a valid check-in date";
+                case "checkOutDate" -> "Please enter a valid check-out date";
+                default -> "Please enter a valid date";
+            };
 
-            // Sai giá trị Enum
+            errors.put(ex.getName(), message);
+
+            // Invalid Enum value
         } else if (requiredType != null && requiredType.isEnum()) {
             String allowedValues = Arrays.stream(requiredType.getEnumConstants())
                     .map(Object::toString)
@@ -150,7 +153,7 @@ public class RestExceptionHandler {
                     )
             );
 
-            // Các trường hợp sai kiểu dữ liệu khác
+            // Other invalid data types
         } else {
             errors.put(
                     ex.getName(),
