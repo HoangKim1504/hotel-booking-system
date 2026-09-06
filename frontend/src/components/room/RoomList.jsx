@@ -9,28 +9,23 @@ import { getErrorMessages } from "../../utils/apiErrorUtils";
 
 function RoomList({ limit }) {
 
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const [apiRoomTypes, setApiRoomTypes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState([]);
     const [showErrorPopup, setShowErrorPopup] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
+    const currentPage = Number(searchParams.get("page")) || 1;
     const [pageSize] = useState(9);
     const [totalPages, setTotalPages] = useState(1);
-    const [sortBy, setSortBy] = useState("");
-    const [order, setOrder] = useState("");
+    const sortBy = searchParams.get("sortBy") || "";
+    const order = searchParams.get("order") || "";
 
-    const [searchParams] = useSearchParams();
     const checkInDate = searchParams.get("checkInDate");
     const checkOutDate = searchParams.get("checkOutDate");
     const maximumPeople = searchParams.get("maximumPeople");
 
     const roomListRef = useRef(null);
-
-    useEffect(() => {
-            setSortBy("");
-            setOrder("");
-            setCurrentPage(1);
-    }, [checkInDate, checkOutDate, maximumPeople]);
 
     useEffect(() => {
         const loadRoomTypes = async () => {
@@ -108,7 +103,15 @@ function RoomList({ limit }) {
     const visiblePages = getVisiblePages();
 
     const handlePageChange = (page) => {
-        setCurrentPage(page);
+        const newParams = new URLSearchParams(searchParams);
+
+        if (page === 1) {
+            newParams.delete("page");
+        } else {
+            newParams.set("page", page);
+        }
+
+        setSearchParams(newParams);
 
         roomListRef.current?.scrollIntoView({
             behavior: "smooth",
@@ -119,21 +122,23 @@ function RoomList({ limit }) {
     const handleSortChange = (event) => {
         const value = event.target.value;
 
-        // Default - không sort
+        const newParams = new URLSearchParams(searchParams);
+
+        // Sort mới thì quay về page 1
+        newParams.delete("page");
+
         if (!value) {
-            setSortBy("");
-            setOrder("");
-            setCurrentPage(1);
-            return;
+            newParams.delete("sortBy");
+            newParams.delete("order");
+        } else {
+            const [selectedSortBy, selectedOrder] =
+                value.split("-");
+
+            newParams.set("sortBy", selectedSortBy);
+            newParams.set("order", selectedOrder);
         }
 
-        const [selectedSortBy, selectedOrder] = value.split("-");
-
-        setSortBy(selectedSortBy);
-        setOrder(selectedOrder);
-
-        // Khi đổi sort thì quay về page 1
-        setCurrentPage(1);
+        setSearchParams(newParams);
     };
 
     const isSearching = checkInDate && checkOutDate && maximumPeople;
