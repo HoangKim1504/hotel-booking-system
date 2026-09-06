@@ -1,13 +1,35 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 import { useAuth } from "../../context/AuthContext";
+
+import ConfirmPopup from "../common/ConfirmPopup";
 
 function Navbar() {
     const { isAuthenticated, logout } = useAuth();
     const navigate = useNavigate();
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     const handleLogout = () => {
+        setShowLogoutConfirm(true);
+    };
+
+    const handleConfirmLogout = () => {
         logout();
-        navigate("/login");
+
+        setShowLogoutConfirm(false);
+
+        navigate("/");
+
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "auto",
+        });
+    };
+
+    const handleCancelLogout = () => {
+        setShowLogoutConfirm(false);
     };
 
     return (
@@ -206,6 +228,15 @@ function Navbar() {
                     </nav>
                 </div>
             </div>
+            <ConfirmPopup
+                show={showLogoutConfirm}
+                title="Confirm Logout"
+                message="Are you sure you want to log out?"
+                confirmText="Logout"
+                cancelText="Cancel"
+                onConfirm={handleConfirmLogout}
+                onCancel={handleCancelLogout}
+            />
         </header>
     );
 }
