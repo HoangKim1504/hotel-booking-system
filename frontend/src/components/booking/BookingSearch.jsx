@@ -1,11 +1,35 @@
 import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { searchRoomTypes } from "../../services/roomService";
+
+const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
+
+const addDays = (date, days) => {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() + days);
+
+    return newDate;
+};
 
 function BookingSearch() {
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    const today = new Date();
+    const defaultCheckIn = formatDate(today);
+    const defaultCheckOut = formatDate(addDays(today, 1));
+
     const [formData, setFormData] = useState({
-        checkIn: "",
-        checkOut: "",
-        adults: "1",
-        children: "0",
+        checkIn: searchParams.get("checkInDate") || defaultCheckIn,
+        checkOut: searchParams.get("checkOutDate") || defaultCheckOut,
+        adults: searchParams.get("adults") || "1",
+        children: searchParams.get("children") || "0",
     });
 
     const handleChange = (event) => {
@@ -20,9 +44,17 @@ function BookingSearch() {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        console.log("Search room:", formData);
+        const maximumPeople = Number(formData.adults) + Number(formData.children);
 
-        // TODO: Call Spring Boot room search API
+        const params = new URLSearchParams({
+            checkInDate: formData.checkIn,
+            checkOutDate: formData.checkOut,
+            adults: formData.adults,
+            children: formData.children,
+            maximumPeople: maximumPeople,
+        });
+
+        navigate(`/rooms?${params}`);
     };
 
     return (

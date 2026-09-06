@@ -1,9 +1,11 @@
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+
 import RoomCard from "./RoomCard";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ErrorPopup from "../common/ErrorPopup";
-import { getRoomTypes } from "../../services/roomService";
+import { getRoomTypes, searchRoomTypes } from "../../services/roomService";
 import { getErrorMessages } from "../../utils/apiErrorUtils";
-import { useEffect, useRef, useState } from "react";
 
 function RoomList({ limit }) {
 
@@ -17,6 +19,11 @@ function RoomList({ limit }) {
     const [sortBy, setSortBy] = useState("");
     const [order, setOrder] = useState("");
 
+    const [searchParams] = useSearchParams();
+    const checkInDate = searchParams.get("checkInDate");
+    const checkOutDate = searchParams.get("checkOutDate");
+    const maximumPeople = searchParams.get("maximumPeople");
+
     const roomListRef = useRef(null);
 
     useEffect(() => {
@@ -24,21 +31,36 @@ function RoomList({ limit }) {
             setLoading(true);
 
             try {
-                const data = await getRoomTypes({
-                    page: currentPage,
-                    size: pageSize,
-                    sortBy: sortBy,
-                    order: order,
-                });
+                let data;
+
+                if (isSearching) {
+                    data = await searchRoomTypes({
+                        checkInDate,
+                        checkOutDate,
+                        maximumPeople: Number(maximumPeople),
+                        page: currentPage,
+                        size: pageSize,
+                        sortBy,
+                        order,
+                    });
+                } else {
+                    data = await getRoomTypes({
+                        page: currentPage,
+                        size: pageSize,
+                        sortBy,
+                        order,
+                    });
+                }
 
                 setApiRoomTypes(data.data);
                 setTotalPages(data.totalPages);
 
             } catch (error) {
-                  console.error("Error fetching room types:", error);
+                console.error("Error fetching rooms:", error);
 
-                  setErrors(getErrorMessages(error));
-                  setShowErrorPopup(true);
+                setErrors(getErrorMessages(error));
+                setShowErrorPopup(true);
+
             } finally {
                 setLoading(false);
             }
@@ -46,7 +68,7 @@ function RoomList({ limit }) {
 
         loadRoomTypes();
 
-    }, [currentPage, pageSize, sortBy, order]);
+    }, [currentPage, pageSize, sortBy, order, checkInDate, checkOutDate, maximumPeople]);
 
     const displayedRoomTypes = limit
         ? apiRoomTypes.slice(0, limit)
@@ -107,6 +129,8 @@ function RoomList({ limit }) {
         // Khi đổi sort thì quay về page 1
         setCurrentPage(1);
     };
+
+    const isSearching = checkInDate && checkOutDate && maximumPeople;
 
     return (
         <>
