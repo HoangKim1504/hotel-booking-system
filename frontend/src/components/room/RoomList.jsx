@@ -1,11 +1,8 @@
 import RoomCard from "./RoomCard";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ErrorPopup from "../common/ErrorPopup";
+import { getRoomTypes } from "../../services/roomService";
 import { useEffect, useRef, useState } from "react";
-
-import room1 from "../../assets/images/room-1.jpg";
-import room2 from "../../assets/images/room-2.jpg";
-import room3 from "../../assets/images/room-3.jpg";
 
 function RoomList({ limit }) {
 
@@ -22,55 +19,36 @@ function RoomList({ limit }) {
     const roomListRef = useRef(null);
 
     useEffect(() => {
-        setLoading(true);
+        const loadRoomTypes = async () => {
+            setLoading(true);
 
-        const params = new URLSearchParams({
-            page: currentPage,
-            size: pageSize,
-        });
-
-        if (sortBy) {
-            params.append("sortBy", sortBy);
-        }
-
-        if (order) {
-            params.append("order", order);
-        }
-
-        fetch(`http://localhost:8080/api/room-types?${params}`)
-            .then(async (response) => {
-                const data = await response.json();
-
-                if (!response.ok) {
-                    const errorMessages = data.errors
-                        ? Object.values(data.errors)
-                        : [data.message || "Something went wrong"];
-
-                    setErrors(errorMessages);
-                    setShowErrorPopup(true);
-
-                    return null;
-                }
-
-                return data;
-            })
-            .then((data) => {
-                if (!data) {
-                    return;
-                }
+            try {
+                const data = await getRoomTypes({
+                    page: currentPage,
+                    size: pageSize,
+                    sortBy: sortBy,
+                    order: order,
+                });
 
                 setApiRoomTypes(data.data);
                 setTotalPages(data.totalPages);
-            })
-            .catch((error) => {
-                console.error("Error fetching room types:", error);
 
-                setErrors(["Unable to connect to server"]);
+            } catch (error) {
+                console.error("Error fetching rooms:", error);
+
+                const errorMessages = error.errors
+                    ? Object.values(error.errors)
+                    : [error.message || "Unable to connect to server"];
+
+                setErrors(errorMessages);
                 setShowErrorPopup(true);
-            })
-            .finally(() => {
+
+            } finally {
                 setLoading(false);
-            });
+            }
+        };
+
+        loadRoomTypes();
 
     }, [currentPage, pageSize, sortBy, order]);
 
