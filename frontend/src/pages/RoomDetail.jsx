@@ -54,17 +54,33 @@ function RoomDetail() {
     if (!room) {
         return (
             <>
-                <PageHeader title="Room Detail" />
+                <PageHeader
+                    title="Room Detail"
+                    noBottomMargin
+                />
 
-                <div className="container py-5 text-center">
-                    <h2>Room not found</h2>
+                <div className="room-not-found-section">
+                    <div className="room-not-found">
 
-                    <Link
-                        to="/rooms"
-                        className="btn btn-primary mt-3"
-                    >
-                        Back to Rooms
-                    </Link>
+                        <div className="room-not-found-icon">
+                            ?
+                        </div>
+
+                        <h2>Room Not Found</h2>
+
+                        <p>
+                            The room you are looking for does not exist
+                            or is no longer available.
+                        </p>
+
+                        <Link
+                            to={backToRooms}
+                            className="btn btn-primary py-2 px-4"
+                        >
+                            Back to Rooms
+                        </Link>
+
+                    </div>
                 </div>
             </>
         );

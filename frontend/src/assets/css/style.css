@@ -702,3 +702,67 @@
     border-color: var(--primary);
     box-shadow: 0 3px 14px rgba(254, 161, 22, 0.15);
 }
+
+/*** Room Not Found ***/
+.room-not-found-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 70px 20px 180px;
+
+    /* nền nhẹ để card nổi hơn */
+    background: #f8f9fa;
+}
+
+.room-not-found {
+    width: 100%;
+    max-width: 540px;
+
+    text-align: center;
+
+    padding: 45px 35px;
+
+    background: #FFFFFF;
+    border-radius: 12px;
+
+    /* viền trên để nổi bật hơn */
+    border-top: 4px solid var(--primary);
+
+    /* shadow đậm hơn */
+    box-shadow: 0 15px 40px rgba(15, 23, 43, 0.12);
+}
+
+.room-not-found-icon {
+    width: 60px;
+    height: 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 18px;
+
+    border-radius: 50%;
+
+    background: rgba(254, 161, 22, 0.15);
+    color: var(--primary);
+
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.room-not-found h2 {
+    margin-bottom: 12px;
+    color: var(--dark);
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.room-not-found p {
+    max-width: 390px;
+    margin: 0 auto 24px;
+
+    color: #6c757d;
+    line-height: 1.7;
+}
