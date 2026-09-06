@@ -71,3 +71,19 @@ export async function searchRoomTypes({
 
     return data;
 }
+
+export async function getRoomTypeById(id) {
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+    const response = await fetch(
+        `${API_BASE_URL}/api/room-types/${id}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}

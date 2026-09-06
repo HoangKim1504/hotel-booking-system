@@ -1,61 +1,55 @@
-import { Link, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useParams } from "react-router-dom";
 
+import { getRoomTypeById } from "../services/roomService";
+import { getErrorMessages } from "../utils/apiErrorUtils";
+
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import ErrorPopup from "../components/common/ErrorPopup";
 import PageHeader from "../components/layout/PageHeader";
 import Newsletter from "../components/common/Newsletter";
 
-import room1 from "../assets/images/room-1.jpg";
-import room2 from "../assets/images/room-2.jpg";
-import room3 from "../assets/images/room-3.jpg";
+import defaultRoomImage from "../assets/images/room-1.jpg";
 
 function RoomDetail() {
 
     const { id } = useParams();
+    const location = useLocation();
 
-    // TODO: Replace mock room data with Spring Boot API
-    // GET /api/rooms/{id}
-    const rooms = [
-        {
-            id: 1,
-            name: "Junior Suite",
-            price: 100,
-            image: room1,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "Erat ipsum justo amet duo et elitr dolor, est duo duo eos lorem sed diam stet diam sed stet lorem.",
-        },
-        {
-            id: 2,
-            name: "Executive Suite",
-            price: 120,
-            image: room2,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "A comfortable executive suite with modern facilities and spacious accommodation.",
-        },
-        {
-            id: 3,
-            name: "Super Deluxe",
-            price: 150,
-            image: room3,
-            rating: 5,
-            beds: 3,
-            baths: 2,
-            wifi: true,
-            description:
-                "Our premium deluxe room provides a luxurious and relaxing hotel experience.",
-        },
-    ];
+    // Có URL trước đó → quay lại đúng URL search
+    const backToRooms = location.state?.from || "/rooms";
 
-    // TODO: Remove this mock lookup when data is loaded from Spring Boot
-    const room = rooms.find(
-        (item) => item.id === Number(id)
-    );
+    const [room, setRoom] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [errors, setErrors] = useState([]);
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
+
+    useEffect(() => {
+        const loadRoomType = async () => {
+            setLoading(true);
+
+            try {
+                const data = await getRoomTypeById(id);
+
+                console.log("Room type detail:", data);
+
+                setRoom(data);
+            } catch (error) {
+                console.error("Error fetching room type:", error);
+
+                setErrors(getErrorMessages(error));
+                setShowErrorPopup(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadRoomType();
+    }, [id]);
+
+    if (loading) {
+        return <LoadingSpinner />;
+    }
 
     if (!room) {
         return (
@@ -78,7 +72,7 @@ function RoomDetail() {
 
     return (
         <>
-            <PageHeader title={room.name} />
+            <PageHeader title={room.roomTypeName} />
 
             <div className="container-xxl py-5">
                 <div className="container">
@@ -89,8 +83,8 @@ function RoomDetail() {
                         <div className="col-lg-6">
 
                             <img
-                                src={room.image}
-                                alt={room.name}
+                                src={defaultRoomImage}
+                                alt={room.roomTypeName}
                                 className="img-fluid rounded w-100"
                             />
 
@@ -107,21 +101,6 @@ function RoomDetail() {
                                 {room.name}
                             </h1>
 
-                            {/* Rating */}
-                            <div className="mb-3">
-
-                                {Array.from(
-                                    { length: room.rating },
-                                    (_, index) => (
-                                        <i
-                                            key={index}
-                                            className="fa fa-star text-primary me-1"
-                                        />
-                                    )
-                                )}
-
-                            </div>
-
                             {/* Price */}
                             <h4 className="text-primary mb-4">
                                 ${room.price} / Night
@@ -131,46 +110,37 @@ function RoomDetail() {
                             <div className="d-flex mb-4">
 
                                 <span className="border-end me-3 pe-3">
-                                    <i className="fa fa-bed text-primary me-2" />
-
-                                    {room.beds} Bed
+                                    <i className="fa fa-expand text-primary me-2" />
+                                    {room.roomSize} m²
                                 </span>
 
-                                <span className="border-end me-3 pe-3">
-                                    <i className="fa fa-bath text-primary me-2" />
-
-                                    {room.baths} Bath
+                                <span>
+                                    <i className="fa fa-users text-primary me-2" />
+                                    {room.maximumPeople} People
                                 </span>
-
-                                {room.wifi && (
-                                    <span>
-                                        <i className="fa fa-wifi text-primary me-2" />
-                                        Wifi
-                                    </span>
-                                )}
 
                             </div>
 
                             {/* Description */}
                             <p className="mb-4">
-                                {room.description}
+                                {room.facility}
                             </p>
 
-                            {/* TODO: Add more room information from Spring Boot
-                                such as:
-                                - room type
-                                - capacity
-                                - status
-                                - amenities
-                                - available rooms
-                            */}
+                            <div className="d-flex gap-3">
+                                <Link
+                                    to={backToRooms}
+                                    className="btn btn-outline-secondary py-3 px-4"
+                                >
+                                    Back to Rooms
+                                </Link>
 
-                            <Link
-                                to={`/booking/${room.id}`}
-                                className="btn btn-primary py-3 px-5"
-                            >
-                                Book Now
-                            </Link>
+                                <Link
+                                    to={`/booking/${room.id}`}
+                                    className="btn btn-primary py-3 px-5"
+                                >
+                                    Book Now
+                                </Link>
+                            </div>
 
                         </div>
 
