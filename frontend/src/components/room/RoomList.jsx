@@ -235,8 +235,18 @@ function RoomList({ limit }) {
                     </div>
 
                     {displayedRoomTypes.length === 0 && (
-                        <div className="text-center">
-                            <p>No rooms available.</p>
+                        <div className="text-center py-5">
+                            <h5 className="mb-2">
+                                {isSearching
+                                    ? "No rooms match your search"
+                                    : "No rooms available"}
+                            </h5>
+
+                            {isSearching && (
+                                <p className="text-muted mb-0">
+                                    Try changing your check-in date, check-out date, or number of guests.
+                                </p>
+                            )}
                         </div>
                     )}
 
