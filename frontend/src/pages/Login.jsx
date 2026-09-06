@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import PageHeader from "../components/layout/PageHeader";
 import ErrorPopup from "../components/common/ErrorPopup";
 
-import { login } from "../services/authService";
+import { login as loginApi } from "../services/authService";
 import { getErrorMessages } from "../utils/apiErrorUtils";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
@@ -33,14 +35,20 @@ function Login() {
         setLoading(true);
 
         try {
-            const data = await login(
+            const data = await loginApi(
                 formData.username,
                 formData.password
             );
 
-            localStorage.setItem("authToken", data.token);
+           login(data.token);
 
             navigate("/");
+
+            window.scrollTo({
+                top: 0,
+                left: 0,
+                behavior: "auto",
+            });
         } catch (error) {
             setErrors(getErrorMessages(error));
             setShowErrorPopup(true);

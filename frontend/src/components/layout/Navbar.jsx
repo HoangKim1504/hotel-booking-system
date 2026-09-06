@@ -1,6 +1,15 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 function Navbar() {
+    const { isAuthenticated, logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    };
+
     return (
         <header className="container-fluid bg-dark px-0">
             <div className="row gx-0">
@@ -167,13 +176,31 @@ function Navbar() {
 
                             </div>
 
-                            {/* TODO: Booking page will use room.id to load room data from Spring Boot API */}
-                            <NavLink
-                                to={`/booking`}
-                                className="btn btn-sm btn-dark rounded py-2 px-4"
-                            >
-                                Book Now
-                            </NavLink>
+                            <div className="d-flex align-items-center gap-3 me-4">
+                                {isAuthenticated ? (
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-light rounded py-2 px-4"
+                                        onClick={handleLogout}
+                                    >
+                                        Logout
+                                    </button>
+                                ) : (
+                                    <NavLink
+                                        to="/login"
+                                        className="btn btn-sm btn-outline-light rounded py-2 px-4"
+                                    >
+                                        Login
+                                    </NavLink>
+                                )}
+
+                                <NavLink
+                                    to="/booking"
+                                    className="btn btn-sm btn-primary rounded py-2 px-4"
+                                >
+                                    Book Now
+                                </NavLink>
+                            </div>
 
                         </div>
                     </nav>
