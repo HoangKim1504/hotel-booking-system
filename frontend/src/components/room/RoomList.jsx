@@ -27,6 +27,12 @@ function RoomList({ limit }) {
     const roomListRef = useRef(null);
 
     useEffect(() => {
+            setSortBy("");
+            setOrder("");
+            setCurrentPage(1);
+    }, [checkInDate, checkOutDate, maximumPeople]);
+
+    useEffect(() => {
         const loadRoomTypes = async () => {
             setLoading(true);
 
@@ -178,7 +184,7 @@ function RoomList({ limit }) {
                              id="roomSort"
                              className="room-sort-select"
                              onChange={handleSortChange}
-                             defaultValue=""
+                             value={sortBy && order ? `${sortBy}-${order}` : ""}
                          >
                              <option value="">Default</option>
 
