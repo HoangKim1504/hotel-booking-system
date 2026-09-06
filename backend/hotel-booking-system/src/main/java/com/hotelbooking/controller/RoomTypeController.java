@@ -20,6 +20,7 @@ import java.time.LocalDate;
 @RequestMapping("/api/room-types")
 @RequiredArgsConstructor
 @Tag(name = "Room Types")
+@CrossOrigin(origins = "http://localhost:5173")
 public class RoomTypeController {
 
     private final RoomTypeService roomTypeService;
