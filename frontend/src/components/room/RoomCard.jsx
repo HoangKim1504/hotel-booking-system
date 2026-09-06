@@ -1,9 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
 
-import defaultRoomImage from "../../assets/images/room-1.jpg";
+import { getRoomImage } from "../../utils/roomImageUtils";
 
 function RoomCard({ room }) {
     const location = useLocation();
+
+    const roomImage = getRoomImage(room.id);
 
     return (
         <div className="col-lg-4 col-md-6 d-flex">
@@ -14,7 +16,7 @@ function RoomCard({ room }) {
 
                     <img
                         className="img-fluid room-card-image"
-                        src={defaultRoomImage}
+                        src={roomImage}
                         alt={room.roomTypeName}
                     />
 

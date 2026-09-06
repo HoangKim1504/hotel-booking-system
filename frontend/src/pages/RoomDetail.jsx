@@ -3,13 +3,12 @@ import { Link, useLocation, useParams } from "react-router-dom";
 
 import { getRoomTypeById } from "../services/roomService";
 import { getErrorMessages } from "../utils/apiErrorUtils";
+import { getRoomImage } from "../utils/roomImageUtils";
 
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorPopup from "../components/common/ErrorPopup";
 import PageHeader from "../components/layout/PageHeader";
 import Newsletter from "../components/common/Newsletter";
-
-import defaultRoomImage from "../assets/images/room-1.jpg";
 
 function RoomDetail() {
 
@@ -86,6 +85,8 @@ function RoomDetail() {
         );
     }
 
+    const roomImage = getRoomImage(room.id);
+
     return (
         <>
             <PageHeader title={room.roomTypeName} />
@@ -99,9 +100,9 @@ function RoomDetail() {
                         <div className="col-lg-6">
 
                             <img
-                                src={defaultRoomImage}
+                                src={roomImage}
                                 alt={room.roomTypeName}
-                                className="img-fluid rounded w-100"
+                                className="room-detail-image"
                             />
 
                         </div>
