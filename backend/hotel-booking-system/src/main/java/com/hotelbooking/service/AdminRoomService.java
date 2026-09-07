@@ -203,7 +203,7 @@ public class AdminRoomService {
         // Kiểm tra phòng có đang được dùng không
         checkOccupiedRoomId(id, true);
 
-        Room updateRoom = setUpdateRoom(request, existingRoom, id, username);
+        Room updateRoom = setUpdateRoom(request, existingRoom, existingRoomType.getId(), username);
 
         return buildRoomResponse(roomRepository.save(updateRoom), existingRoomType.getRoomTypeName());
     }
@@ -302,8 +302,8 @@ public class AdminRoomService {
         return room;
     }
 
-    private Room setUpdateRoom(UpdateRoomRequest request, Room existingRoom, String id, String username) {
-        existingRoom.setRoomTypeId(id);
+    private Room setUpdateRoom(UpdateRoomRequest request, Room existingRoom, String roomTypeId, String username) {
+        existingRoom.setRoomTypeId(roomTypeId);
         existingRoom.setRoomNumber(request.roomNumber());
         existingRoom.setFloorNumber(request.floorNumber());
         existingRoom.setStatus(request.status());
