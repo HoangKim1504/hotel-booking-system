@@ -38,3 +38,57 @@ export async function getAdminRooms({
 
     return data;
 }
+
+export async function searchAdminRooms({
+    roomTypeName,
+    roomStatus,
+    roomNumber,
+    page,
+    size,
+    sortBy,
+    order,
+    token,
+}) {
+    const params = new URLSearchParams({
+        page,
+        size
+    });
+
+    if (roomTypeName) {
+        params.append("roomTypeName", roomTypeName);
+    }
+
+    if (roomStatus) {
+        params.append("roomStatus", roomStatus);
+    }
+
+    if (roomNumber) {
+        params.append("roomNumber", roomNumber);
+    }
+
+    if (sortBy) {
+        params.append("sortBy", sortBy);
+    }
+
+    if (order) {
+        params.append("order", order);
+    }
+
+    const response = await fetch(
+        `${API_BASE_URL}/api/admin/rooms/search?${params}`,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}
