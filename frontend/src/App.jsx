@@ -16,6 +16,7 @@ import RoomDetail from "./pages/RoomDetail";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -45,6 +46,11 @@ function App() {
                 <Route
                     path="/"
                     element={<Home />}
+                />
+
+                <Route
+                    path="/admin"
+                    element={<AdminDashboard />}
                 />
 
                 <Route

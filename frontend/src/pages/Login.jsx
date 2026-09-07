@@ -42,7 +42,14 @@ function Login() {
 
            login(data.token, formData.username);
 
-            navigate("/");
+            if (
+                formData.username === "admin" ||
+                formData.username === "editor"
+            ) {
+                navigate("/admin");
+            } else {
+                navigate("/");
+            }
 
             window.scrollTo({
                 top: 0,

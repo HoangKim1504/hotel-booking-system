@@ -919,3 +919,158 @@
 
     box-shadow: 0 10px 35px rgba(15, 23, 43, 0.1);
 }
+
+/*** Admin Dashboard ***/
+.admin-dashboard {
+    min-height: 100vh;
+    padding: 40px 30px 180px;
+    background: #f5f6f8;
+}
+
+.admin-dashboard-content {
+    width: 100%;
+    max-width: 1350px;
+    margin: 0 auto;
+}
+
+.admin-dashboard-header {
+    margin-bottom: 25px;
+}
+
+.admin-dashboard-header h2 {
+    margin-bottom: 6px;
+    color: var(--dark);
+    font-weight: 700;
+}
+
+.admin-dashboard-header p {
+    margin: 0;
+    color: #6c757d;
+}
+
+
+/*** Admin Dashboard Card ***/
+.admin-dashboard-card {
+    padding: 28px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(15, 23, 43, 0.08);
+}
+
+.admin-dashboard-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+}
+
+.admin-dashboard-card-header h4 {
+    margin-bottom: 4px;
+    color: var(--dark);
+    font-weight: 700;
+}
+
+.admin-total-records {
+    color: #6c757d;
+    font-size: 16px;
+}
+
+/*** Admin Room Table ***/
+.admin-room-table {
+    width: 100%;
+    table-layout: fixed;
+    margin-bottom: 0;
+}
+
+.admin-col-room-number {
+    width: 16%;
+}
+
+.admin-col-room-type {
+    width: 30%;
+}
+
+.admin-col-floor {
+    width: 12%;
+}
+
+.admin-col-status {
+    width: 18%;
+}
+
+.admin-col-actions {
+    width: 24%;
+}
+
+.admin-room-table th {
+    padding: 14px 12px;
+    color: var(--dark);
+    font-size: 16px;
+    font-weight: 700;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.admin-room-table td {
+    padding: 13px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.admin-room-table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.admin-room-number {
+    color: var(--dark);
+    font-weight: 600;
+}
+
+/*** Admin Room Actions ***/
+.admin-room-actions {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+}
+
+.admin-room-actions .btn {
+    min-width: 58px;
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+
+/*** Admin Pagination ***/
+.admin-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.admin-pagination span {
+    color: var(--dark);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/*** Admin Room Status ***/
+.admin-status-badge {
+    display: inline-block;
+    min-width: 95px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.admin-status-active {
+    color: #198754;
+    background: rgba(25, 135, 84, 0.1);
+}
+
+.admin-status-maintenance {
+    color: #d98200;
+    background: rgba(254, 161, 22, 0.15);
+}
