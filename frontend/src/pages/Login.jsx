@@ -40,7 +40,7 @@ function Login() {
                 formData.password
             );
 
-           login(data.token);
+           login(data.token, formData.username);
 
             navigate("/");
 

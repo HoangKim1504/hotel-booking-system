@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import ConfirmPopup from "../common/ConfirmPopup";
 
 function Navbar() {
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, username, logout } = useAuth();
     const navigate = useNavigate();
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
@@ -199,6 +199,12 @@ function Navbar() {
                             </div>
 
                             <div className="d-flex align-items-center gap-3 me-4">
+                                {isAuthenticated && (
+                                   <span className="text-light navbar-welcome">
+                                       Welcome, <strong>{username}</strong>
+                                   </span>
+                                )}
+
                                 {isAuthenticated ? (
                                     <button
                                         type="button"
