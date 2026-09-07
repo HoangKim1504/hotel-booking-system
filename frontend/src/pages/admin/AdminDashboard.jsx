@@ -2,10 +2,16 @@ import { useEffect, useState } from "react";
 
 import { useAuth } from "../../context/AuthContext";
 import { getErrorMessages } from "../../utils/apiErrorUtils";
-import { getAdminRooms, searchAdminRooms } from "../../services/adminRoomService";
+import {
+    getAdminRooms,
+    searchAdminRooms,
+    getAdminRoomById,
+    updateAdminRoom,
+} from "../../services/adminRoomService";
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ErrorPopup from "../../components/common/ErrorPopup";
+import EditRoomPopup from "./EditRoomPopup";
 
 function AdminDashboard() {
     const { token } = useAuth();
@@ -37,6 +43,13 @@ function AdminDashboard() {
         roomNumber: "",
         roomStatus: "",
     });
+
+    const [editingRoom, setEditingRoom] = useState(null);
+    const [showEditPopup, setShowEditPopup] = useState(false);
+    const [editLoading, setEditLoading] = useState(false);
+    const [editErrors, setEditErrors] = useState([]);
+    const [refreshKey, setRefreshKey] = useState(0);
+
 
     useEffect(() => {
         const loadRooms = async () => {
@@ -83,7 +96,7 @@ function AdminDashboard() {
         };
 
         loadRooms();
-    }, [currentPage, pageSize, sortBy, order, token, searchCriteria]);
+    }, [currentPage, pageSize, sortBy, order, token, searchCriteria, refreshKey]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -145,6 +158,60 @@ function AdminDashboard() {
         setSortBy(selectedSortBy);
         setOrder(selectedOrder);
         setCurrentPage(1);
+    };
+
+    const handleEditRoom = async (id) => {
+        setEditLoading(true);
+        setEditErrors([]);
+
+        try {
+            const data = await getAdminRoomById({
+                id,
+                token,
+            });
+
+            setEditingRoom(data);
+            setShowEditPopup(true);
+        } catch (error) {
+            setErrors(getErrorMessages(error));
+            setShowErrorPopup(true);
+        } finally {
+            setEditLoading(false);
+        }
+    };
+
+   const handleUpdateRoom = async (roomData) => {
+       if (!editingRoom) {
+           return;
+       }
+
+       setEditLoading(true);
+       setEditErrors([]);
+
+       try {
+           await updateAdminRoom({
+               id: editingRoom.id,
+               roomData,
+               token,
+           });
+
+           setShowEditPopup(false);
+           setEditingRoom(null);
+           setEditErrors([]);
+
+           // Reload current table
+           setRefreshKey((prev) => prev + 1);
+       } catch (error) {
+           setEditErrors(getErrorMessages(error));
+       } finally {
+           setEditLoading(false);
+       }
+   };
+
+    const handleCancelEdit = () => {
+        setShowEditPopup(false);
+        setEditingRoom(null);
+        setEditErrors([]);
     };
 
     return (
@@ -306,7 +373,9 @@ function AdminDashboard() {
                                     <tr>
                                         <th>Room Number</th>
                                         <th>Room Type</th>
-                                        <th>Floor</th>
+                                        <th className="text-center">
+                                            Floor
+                                        </th>
                                         <th className="text-center">
                                             Status
                                         </th>
@@ -328,7 +397,7 @@ function AdminDashboard() {
                                                 {room.roomTypeName}
                                             </td>
 
-                                            <td>
+                                            <td className="text-center">
                                                 {room.floorNumber}
                                             </td>
 
@@ -349,14 +418,8 @@ function AdminDashboard() {
 
                                                     <button
                                                         type="button"
-                                                        className="btn btn-sm btn-outline-secondary"
-                                                    >
-                                                        View
-                                                    </button>
-
-                                                    <button
-                                                        type="button"
                                                         className="btn btn-sm btn-outline-primary"
+                                                        onClick={() => handleEditRoom(room.id)}
                                                     >
                                                         Edit
                                                     </button>
@@ -420,6 +483,20 @@ function AdminDashboard() {
             <ErrorPopup
                 show={showErrorPopup}
                 title="Unable to Load Rooms"
+                errors={errors}
+                onClose={() => setShowErrorPopup(false)}
+            />
+            <EditRoomPopup
+                show={showEditPopup}
+                room={editingRoom}
+                loading={editLoading}
+                errors={editErrors}
+                onUpdate={handleUpdateRoom}
+                onCancel={handleCancelEdit}
+            />
+            <ErrorPopup
+                show={showErrorPopup}
+                title="Unable to Process Room"
                 errors={errors}
                 onClose={() => setShowErrorPopup(false)}
             />

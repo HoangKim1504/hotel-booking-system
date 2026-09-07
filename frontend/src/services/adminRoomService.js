@@ -92,3 +92,53 @@ export async function searchAdminRooms({
 
     return data;
 }
+
+export async function getAdminRoomById({
+    id,
+    token,
+}) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/admin/rooms/${id}`,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}
+
+
+export async function updateAdminRoom({
+    id,
+    roomData,
+    token,
+}) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/admin/rooms/${id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(roomData),
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}

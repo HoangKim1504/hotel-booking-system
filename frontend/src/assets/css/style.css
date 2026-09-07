@@ -987,19 +987,19 @@
 }
 
 .admin-col-room-type {
-    width: 30%;
+    width: 34%;
 }
 
 .admin-col-floor {
-    width: 12%;
+    width: 14%;
 }
 
 .admin-col-status {
-    width: 18%;
+    width: 20%;
 }
 
 .admin-col-actions {
-    width: 24%;
+    width: 16%;
 }
 
 .admin-room-table th {
@@ -1025,17 +1025,39 @@
     font-weight: 600;
 }
 
+/*** Admin Room Table Columns ***/
+.admin-col-room-number {
+    width: 18%;
+}
+
+.admin-col-room-type {
+    width: 28%;
+}
+
+.admin-col-floor {
+    width: 16%;
+}
+
+.admin-col-status {
+    width: 18%;
+}
+
+.admin-col-actions {
+    width: 20%;
+}
+
 /*** Admin Room Actions ***/
 .admin-room-actions {
     display: flex;
     justify-content: center;
-    gap: 7px;
+    align-items: center;
+    gap: 8px;
 }
 
 .admin-room-actions .btn {
-    min-width: 58px;
+    min-width: 62px;
     padding: 5px 10px;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 
@@ -1198,4 +1220,142 @@
 .admin-room-status-search:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 0.15rem rgba(254, 161, 22, 0.12);
+}
+
+/*** Edit Room Popup ***/
+.edit-room-popup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(15, 23, 43, 0.45);
+}
+
+.edit-room-popup {
+    width: 100%;
+    max-width: 560px;
+
+    background: #FFFFFF;
+    border-radius: 12px;
+    overflow: hidden;
+
+    box-shadow: 0 18px 50px rgba(15, 23, 43, 0.2);
+}
+
+.edit-room-popup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 20px 24px;
+
+    border-bottom: 1px solid #eeeeee;
+}
+
+.edit-room-popup-header h4 {
+    margin-bottom: 3px;
+
+    color: var(--dark);
+    font-weight: 700;
+}
+
+.edit-room-popup-header span {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.edit-room-popup-close {
+    padding: 4px;
+
+    border: none;
+    background: transparent;
+
+    color: #98a0aa;
+
+    font-size: 26px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.edit-room-popup-close:hover {
+    color: var(--dark);
+}
+
+
+/*** Edit Room Popup Body ***/
+.edit-room-popup-body {
+    padding: 24px;
+}
+
+.edit-room-popup-body .form-label {
+    color: var(--dark);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.edit-room-popup-body .form-control,
+.edit-room-popup-body .form-select {
+    height: 46px;
+    border-radius: 6px;
+}
+
+.edit-room-popup-body .form-control:focus,
+.edit-room-popup-body .form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.15rem rgba(254, 161, 22, 0.12);
+}
+
+
+/*** Edit Room Popup Actions ***/
+.edit-room-popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin-top: 25px;
+}
+
+.edit-room-popup-actions .btn {
+    min-width: 90px;
+    padding: 7px 14px;
+    font-size: 13px;
+}
+
+/*** Edit Room Errors ***/
+.edit-room-errors {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+
+    background: rgba(220, 53, 69, 0.08);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    border-radius: 8px;
+}
+
+.edit-room-errors-title {
+    margin-bottom: 8px;
+
+    color: #dc3545;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.edit-room-errors ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.edit-room-errors li {
+    color: #6c5c5e;
+    font-size: 14px;
+}
+
+.edit-room-errors li:not(:last-child) {
+    margin-bottom: 5px;
 }
