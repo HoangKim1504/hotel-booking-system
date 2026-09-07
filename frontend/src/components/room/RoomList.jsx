@@ -177,55 +177,57 @@ function RoomList({ limit }) {
                     </div>
 
                     {/* Sort by */}
-                     <div className="room-sort-wrapper">
-                         <label
-                             htmlFor="roomSort"
-                             className="room-sort-label"
-                         >
-                             Sort by
-                         </label>
+                    {!limit && (
+                         <div className="room-sort-wrapper">
+                             <label
+                                 htmlFor="roomSort"
+                                 className="room-sort-label"
+                             >
+                                 Sort by
+                             </label>
 
-                         <select
-                             id="roomSort"
-                             className="room-sort-select"
-                             onChange={handleSortChange}
-                             value={sortBy && order ? `${sortBy}-${order}` : ""}
-                         >
-                             <option value="">Default</option>
+                             <select
+                                 id="roomSort"
+                                 className="room-sort-select"
+                                 onChange={handleSortChange}
+                                 value={sortBy && order ? `${sortBy}-${order}` : ""}
+                             >
+                                 <option value="">Default</option>
 
-                             <option value="roomTypeName-ASC">
-                                 Name: A - Z
-                             </option>
+                                 <option value="roomTypeName-ASC">
+                                     Name: A - Z
+                                 </option>
 
-                             <option value="roomTypeName-DESC">
-                                 Name: Z - A
-                             </option>
+                                 <option value="roomTypeName-DESC">
+                                     Name: Z - A
+                                 </option>
 
-                             <option value="price-ASC">
-                                 Price: Low to High
-                             </option>
+                                 <option value="price-ASC">
+                                     Price: Low to High
+                                 </option>
 
-                             <option value="price-DESC">
-                                 Price: High to Low
-                             </option>
+                                 <option value="price-DESC">
+                                     Price: High to Low
+                                 </option>
 
-                             <option value="roomSize-ASC">
-                                 Size: Small to Large
-                             </option>
+                                 <option value="roomSize-ASC">
+                                     Size: Small to Large
+                                 </option>
 
-                             <option value="roomSize-DESC">
-                                 Size: Large to Small
-                             </option>
+                                 <option value="roomSize-DESC">
+                                     Size: Large to Small
+                                 </option>
 
-                             <option value="maximumPeople-ASC">
-                                 Capacity: Low to High
-                             </option>
+                                 <option value="maximumPeople-ASC">
+                                     Capacity: Low to High
+                                 </option>
 
-                             <option value="maximumPeople-DESC">
-                                 Capacity: High to Low
-                             </option>
-                         </select>
-                     </div>
+                                 <option value="maximumPeople-DESC">
+                                     Capacity: High to Low
+                                 </option>
+                             </select>
+                         </div>
+                    )}
 
                     {/* Room List */}
                     <div className="row g-4">
