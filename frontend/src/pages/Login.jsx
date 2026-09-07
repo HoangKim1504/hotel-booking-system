@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import PageHeader from "../components/layout/PageHeader";
 import ErrorPopup from "../components/common/ErrorPopup";
@@ -127,6 +127,19 @@ function Login() {
                                 >
                                     {loading ? "LOGGING IN..." : "LOGIN"}
                                 </button>
+
+                                <div className="text-center mt-4">
+                                    <span className="text-muted">
+                                        Don't have an account?{" "}
+                                    </span>
+
+                                    <Link
+                                        to="/signup"
+                                        className="auth-link"
+                                    >
+                                        Sign Up
+                                    </Link>
+                                </div>
                             </form>
                         </div>
                     </div>

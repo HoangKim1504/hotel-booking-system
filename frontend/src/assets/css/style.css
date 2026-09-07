@@ -894,3 +894,28 @@
     padding: 7px 14px;
     font-size: 13px;
 }
+
+/*** Auth Link ***/
+.auth-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    color: var(--dark);
+    text-decoration: underline;
+}
+
+/*** Sign Up Card ***/
+.signup-card {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px;
+
+    background: #fff;
+    border-radius: 10px;
+    border-top: 4px solid var(--primary);
+
+    box-shadow: 0 10px 35px rgba(15, 23, 43, 0.1);
+}

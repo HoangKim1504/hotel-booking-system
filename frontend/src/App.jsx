@@ -15,6 +15,7 @@ import Rooms from "./pages/Rooms";
 import RoomDetail from "./pages/RoomDetail";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -49,6 +50,11 @@ function App() {
                 <Route
                     path="/login"
                     element={<Login />}
+                />
+
+                <Route
+                    path="/signup"
+                    element={<SignUp />}
                 />
 
                 <Route
