@@ -119,14 +119,16 @@ public class SecurityConfig {
                         // View bookings
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/bookings"
+                                "/api/bookings",
+                                "/api/bookings/*"
                         ).hasAuthority("USER_VIEW")
 
                         // Booking management for Admin
                         // View bookings
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/api/admin/bookings"
+                                "/api/admin/bookings",
+                                "/api/admin/bookings/*"
                         ).hasAuthority("ADMIN_VIEW")
 
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
