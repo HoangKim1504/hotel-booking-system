@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -936,14 +937,24 @@ public class DataSeeder implements ApplicationRunner {
     ) {
         Booking booking = new Booking();
 
+        Instant now = Instant.now();
+
         booking.setUserId(user.getId());
         booking.setStatus(status);
         booking.setCheckInDate(checkInDate);
         booking.setCheckOutDate(checkOutDate);
 
-        booking.setDeleteFlag(false);
+        // Chỉ PENDING mới có thời gian giữ phòng
+        if (BookingStatus.PENDING.equals(status)
+                || BookingStatus.EXPIRED.equals(status)) {
+            booking.setExpiresAt(
+                    LocalDateTime.now().plusMinutes(15)
+            );
+        } else {
+            booking.setExpiresAt(null);
+        }
 
-        Instant now = Instant.now();
+        booking.setDeleteFlag(false);
 
         booking.setCreatedBy("admin");
         booking.setCreatedAt(now);
