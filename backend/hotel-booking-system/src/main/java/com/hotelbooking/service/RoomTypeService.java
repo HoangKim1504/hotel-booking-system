@@ -29,6 +29,8 @@ public class RoomTypeService {
     private final BookingRepository bookingRepository;
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
+
+    private final PageableUtils pageableUtils;
     private final EntityValidator entityValidator;
 
     /**
@@ -117,7 +119,7 @@ public class RoomTypeService {
         List<SearchRoomTypeResponse> sortedResponses = sortSearchResults(results, sortBy, order);
 
         // 10. Pagination
-        return paginateSearchResults(sortedResponses, currentPage, pageSize);
+        return pageableUtils.addPagingAttributes(sortedResponses, currentPage, pageSize);
     }
 
     /**
@@ -280,33 +282,6 @@ public class RoomTypeService {
         return responses.stream()
                 .sorted(comparator)
                 .toList();
-    }
-
-    private PageResponse<SearchRoomTypeResponse> paginateSearchResults(List<SearchRoomTypeResponse> responses,
-                                                                       int currentPage, int pageSize) {
-
-        int totalRecords = responses.size();
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-        int fromIndex = (currentPage - 1) * pageSize;
-        if (fromIndex >= totalRecords) {
-            return new PageResponse<>(
-                    List.of(),
-                    currentPage,
-                    pageSize,
-                    totalRecords,
-                    totalPages
-            );
-        }
-        int toIndex = Math.min(fromIndex + pageSize, totalRecords);
-        List<SearchRoomTypeResponse> items = responses.subList(fromIndex, toIndex);
-
-        return new PageResponse<>(
-                items,
-                currentPage,
-                pageSize,
-                totalRecords,
-                totalPages
-        );
     }
 
 }
