@@ -115,6 +115,20 @@ public class SecurityConfig {
                                 "/api/admin/rooms/search"
                         ).hasAuthority("ADMIN_VIEW")
 
+                        // Booking management for User
+                        // View bookings
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/bookings"
+                        ).hasAuthority("USER_VIEW")
+
+                        // Booking management for Admin
+                        // View bookings
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/admin/bookings"
+                        ).hasAuthority("ADMIN_VIEW")
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",
