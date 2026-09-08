@@ -53,7 +53,7 @@ public class AdminBookingController {
             @RequestParam
             String userId
     ) {
-        return bookingService.getBookingDetail(id, userId);
+        return adminBookingService.getBookingDetailForAdmin(id, userId);
     }
 
 }
