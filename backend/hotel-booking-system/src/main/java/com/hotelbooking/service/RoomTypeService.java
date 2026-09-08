@@ -30,7 +30,6 @@ public class RoomTypeService {
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
 
-    private final PageableUtils pageableUtils;
     private final EntityValidator entityValidator;
 
     /**
@@ -119,7 +118,7 @@ public class RoomTypeService {
         List<SearchRoomTypeResponse> sortedResponses = sortSearchResults(results, sortBy, order);
 
         // 10. Pagination
-        return pageableUtils.addPagingAttributes(sortedResponses, currentPage, pageSize);
+        return PageableUtils.addPagingAttributes(sortedResponses, currentPage, pageSize);
     }
 
     /**
