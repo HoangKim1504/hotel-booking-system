@@ -944,7 +944,7 @@ public class DataSeeder implements ApplicationRunner {
         booking.setCheckInDate(checkInDate);
         booking.setCheckOutDate(checkOutDate);
 
-        // Chỉ PENDING mới có thời gian giữ phòng
+        // Chỉ PENDING và EXPIRED mới có thời gian giữ phòng
         if (BookingStatus.PENDING.equals(status)
                 || BookingStatus.EXPIRED.equals(status)) {
             booking.setExpiresAt(
