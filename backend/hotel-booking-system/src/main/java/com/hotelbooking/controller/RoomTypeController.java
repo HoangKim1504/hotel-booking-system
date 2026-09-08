@@ -20,7 +20,6 @@ import java.time.LocalDate;
 @RequestMapping("/api/room-types")
 @RequiredArgsConstructor
 @Tag(name = "Room Types")
-@CrossOrigin(origins = "http://localhost:5173")
 public class RoomTypeController {
 
     private final RoomTypeService roomTypeService;
@@ -40,7 +39,7 @@ public class RoomTypeController {
             @RequestParam(required = false)
             @Pattern(
                     regexp = "roomTypeName|price|roomSize|maximumPeople",
-                    message = "Sort by must be one of: roomTypeName, price, roomSize, maximumPeople"
+                    message = "Sort by must be one of: Room Type Name, Price, Room Size, Maximum People"
             )
             String sortBy,
 
@@ -90,7 +89,7 @@ public class RoomTypeController {
             @RequestParam(required = false)
             @Pattern(
                     regexp = "roomTypeName|price|roomSize|maximumPeople",
-                    message = "Sort by must be one of: roomTypeName, price, roomSize, maximumPeople"
+                    message = "Sort by must be one of: Room Type Name, Price, Room Size, Maximum People"
             )
             String sortBy,
 

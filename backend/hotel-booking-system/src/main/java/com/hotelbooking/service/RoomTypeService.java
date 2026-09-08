@@ -183,12 +183,7 @@ public class RoomTypeService {
     }
 
     private List<BookingItem> findOccupiedBookingItems(LocalDate checkInDate, LocalDate checkOutDate) {
-        // 1. Tìm BookingItem bị overlap với khoảng ngày search
-        List<BookingItem> overlappingBookingItems =
-                bookingItemRepository.findByDeleteFlagFalseAndCheckInDateLessThanAndCheckOutDateGreaterThan(
-                        checkOutDate, checkInDate);
-
-        // 2. Các BookingStatus vẫn đang giữ phòng
+        // 1. Các BookingStatus vẫn đang giữ phòng
         List<BookingStatus> activeStatuses = List.of(
                 BookingStatus.PENDING,
                 BookingStatus.PAID,
@@ -196,20 +191,21 @@ public class RoomTypeService {
                 BookingStatus.CHECKED_IN
         );
 
-        // 3. Lấy bookingId của các Booking còn hiệu lực
-        Set<String> validBookingIds = getValidBookingIds(activeStatuses);
+        // 2. Tìm Booking overlap với khoảng ngày search
+        List<Booking> overlappingBookings =
+                bookingRepository.findByDeleteFlagFalseAndCheckInDateLessThanAndCheckOutDateGreaterThan(
+                        checkOutDate, checkInDate);
 
-        // 4. Chỉ giữ BookingItem thuộc Booking còn hiệu lực
-        return overlappingBookingItems
-                .stream()
-                .filter(item -> validBookingIds.contains(item.getBookingId()))
-                .toList();
+        // 3. Lấy ID của Booking overlap và còn hiệu lực
+        Set<String> validBookingIds = getValidBookingIds(overlappingBookings, activeStatuses);
+
+        // 4. Lấy BookingItem thuộc các Booking còn hiệu lực
+        return bookingItemRepository.findByBookingIdInAndDeleteFlagFalse(validBookingIds);
     }
 
-    private Set<String> getValidBookingIds(Collection<BookingStatus> activeStatuses) {
-        return bookingRepository
-                .findByDeleteFlagFalseAndStatusIn(activeStatuses)
-                .stream()
+    private Set<String> getValidBookingIds(List<Booking> bookings, Collection<BookingStatus> activeStatuses) {
+        return bookings.stream()
+                .filter(booking -> activeStatuses.contains(booking.getStatus()))
                 .map(Booking::getId)
                 .collect(Collectors.toSet());
     }

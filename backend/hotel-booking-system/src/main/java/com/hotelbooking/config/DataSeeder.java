@@ -486,14 +486,17 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking1 =
-                saveBooking(alice, BookingStatus.CONFIRMED);
+                saveBooking(
+                        alice,
+                        BookingStatus.CONFIRMED,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 12)
+                );
 
         BookingItem bookingItem1 =
                 saveBookingItem(
                         booking1,
                         deluxeKing,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 12),
                         1
                 );
 
@@ -511,14 +514,17 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking2 =
-                saveBooking(peter, BookingStatus.PAID);
+                saveBooking(
+                        peter,
+                        BookingStatus.PAID,
+                        LocalDate.of(2026, 9, 11),
+                        LocalDate.of(2026, 9, 13)
+                );
 
         BookingItem bookingItem2 =
                 saveBookingItem(
                         booking2,
                         deluxeKing,
-                        LocalDate.of(2026, 9, 11),
-                        LocalDate.of(2026, 9, 13),
                         1
                 );
 
@@ -535,14 +541,17 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking3 =
-                saveBooking(alice, BookingStatus.CANCELLED);
+                saveBooking(
+                        alice,
+                        BookingStatus.CANCELLED,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 12)
+                );
 
         BookingItem bookingItem3 =
                 saveBookingItem(
                         booking3,
                         deluxeKing,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 12),
                         1
                 );
 
@@ -564,14 +573,17 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking4 =
-                saveBooking(peter, BookingStatus.CONFIRMED);
+                saveBooking(
+                        peter,
+                        BookingStatus.CONFIRMED,
+                        LocalDate.of(2026, 9, 8),
+                        LocalDate.of(2026, 9, 10)
+                );
 
         BookingItem bookingItem4 =
                 saveBookingItem(
                         booking4,
                         deluxeKing,
-                        LocalDate.of(2026, 9, 8),
-                        LocalDate.of(2026, 9, 10),
                         1
                 );
 
@@ -588,14 +600,17 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking5 =
-                saveBooking(alice, BookingStatus.PENDING);
+                saveBooking(
+                        alice,
+                        BookingStatus.PENDING,
+                        LocalDate.of(2026, 9, 9),
+                        LocalDate.of(2026, 9, 11)
+                );
 
         BookingItem bookingItem5 =
                 saveBookingItem(
                         booking5,
                         executiveSuite,
-                        LocalDate.of(2026, 9, 9),
-                        LocalDate.of(2026, 9, 11),
                         1
                 );
 
@@ -612,14 +627,17 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking6 =
-                saveBooking(peter, BookingStatus.EXPIRED);
+                saveBooking(
+                        peter,
+                        BookingStatus.EXPIRED,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 13)
+                );
 
         BookingItem bookingItem6 =
                 saveBookingItem(
                         booking6,
                         familyRoom,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 13),
                         1
                 );
 
@@ -906,12 +924,16 @@ public class DataSeeder implements ApplicationRunner {
 
     private Booking saveBooking(
             User user,
-            BookingStatus status
+            BookingStatus status,
+            LocalDate checkInDate,
+            LocalDate checkOutDate
     ) {
         Booking booking = new Booking();
 
         booking.setUserId(user.getId());
         booking.setStatus(status);
+        booking.setCheckInDate(checkInDate);
+        booking.setCheckOutDate(checkOutDate);
 
         booking.setDeleteFlag(false);
 
@@ -928,17 +950,12 @@ public class DataSeeder implements ApplicationRunner {
     private BookingItem saveBookingItem(
             Booking booking,
             RoomType roomType,
-            LocalDate checkInDate,
-            LocalDate checkOutDate,
             int quantity
     ) {
         BookingItem bookingItem = new BookingItem();
 
         bookingItem.setBookingId(booking.getId());
         bookingItem.setRoomTypeId(roomType.getId());
-
-        bookingItem.setCheckInDate(checkInDate);
-        bookingItem.setCheckOutDate(checkOutDate);
 
         bookingItem.setQuantity(quantity);
 

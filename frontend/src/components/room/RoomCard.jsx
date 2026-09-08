@@ -1,8 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-import defaultRoomImage from "../../assets/images/room-1.jpg";
+import { getRoomImage } from "../../utils/roomImageUtils";
 
 function RoomCard({ room }) {
+    const location = useLocation();
+
+    const roomImage = getRoomImage(room.id);
+
     return (
         <div className="col-lg-4 col-md-6 d-flex">
             <div className="room-item shadow rounded overflow-hidden d-flex flex-column w-100 h-100">
@@ -12,7 +16,7 @@ function RoomCard({ room }) {
 
                     <img
                         className="img-fluid room-card-image"
-                        src={defaultRoomImage}
+                        src={roomImage}
                         alt={room.roomTypeName}
                     />
 
@@ -58,6 +62,9 @@ function RoomCard({ room }) {
                         <Link
                             className="btn btn-sm btn-primary rounded py-2 px-4"
                             to={`/rooms/${room.id}`}
+                            state={{
+                                from: location.pathname + location.search,
+                            }}
                         >
                             View Detail
                         </Link>

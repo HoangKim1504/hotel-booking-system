@@ -7,5 +7,9 @@ export function getErrorMessages(error) {
         return [error.message];
     }
 
+    if (error?.error) {
+        return [error.error];
+    }
+
     return ["Unable to connect to server"];
 }

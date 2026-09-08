@@ -1,3 +1,5 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export async function getRoomTypes({
     page,
     size,
@@ -16,8 +18,6 @@ export async function getRoomTypes({
     if (order) {
         params.append("order", order);
     }
-
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     const response = await fetch(
         `${API_BASE_URL}/api/room-types?${params}`
@@ -57,10 +57,24 @@ export async function searchRoomTypes({
         params.append("order", order);
     }
 
+    const response = await fetch(
+        `${API_BASE_URL}/api/room-types/search?${params}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}
+
+export async function getRoomTypeById(id) {
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
     const response = await fetch(
-        `${API_BASE_URL}/api/room-types/search?${params}`
+        `${API_BASE_URL}/api/room-types/${id}`
     );
 
     const data = await response.json();

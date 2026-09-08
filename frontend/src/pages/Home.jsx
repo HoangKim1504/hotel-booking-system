@@ -19,7 +19,7 @@ function Home() {
 
             <AboutSection />
 
-            <RoomList />
+            <RoomList limit={6}/>
 
             <VideoSection />
 

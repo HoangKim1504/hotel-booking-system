@@ -14,6 +14,9 @@ import Testimonial from "./pages/Testimonial";
 import Rooms from "./pages/Rooms";
 import RoomDetail from "./pages/RoomDetail";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -45,7 +48,20 @@ function App() {
                     element={<Home />}
                 />
 
-                {/* TODO: Add routes when pages are created */}
+                <Route
+                    path="/admin"
+                    element={<AdminDashboard />}
+                />
+
+                <Route
+                    path="/login"
+                    element={<Login />}
+                />
+
+                <Route
+                    path="/signup"
+                    element={<SignUp />}
+                />
 
                 <Route
                     path="/rooms"
