@@ -497,7 +497,8 @@ public class DataSeeder implements ApplicationRunner {
                 saveBookingItem(
                         booking1,
                         deluxeKing,
-                        1
+                        1,
+                        BigDecimal.valueOf(150)
                 );
 
         saveRoomAssignment(
@@ -525,7 +526,8 @@ public class DataSeeder implements ApplicationRunner {
                 saveBookingItem(
                         booking2,
                         deluxeKing,
-                        1
+                        2,
+                        BigDecimal.valueOf(300)
                 );
 
         saveRoomAssignment(
@@ -552,7 +554,8 @@ public class DataSeeder implements ApplicationRunner {
                 saveBookingItem(
                         booking3,
                         deluxeKing,
-                        1
+                        3,
+                        BigDecimal.valueOf(500)
                 );
 
         saveRoomAssignment(
@@ -584,7 +587,8 @@ public class DataSeeder implements ApplicationRunner {
                 saveBookingItem(
                         booking4,
                         deluxeKing,
-                        1
+                        1,
+                        BigDecimal.valueOf(200)
                 );
 
         saveRoomAssignment(
@@ -611,7 +615,8 @@ public class DataSeeder implements ApplicationRunner {
                 saveBookingItem(
                         booking5,
                         executiveSuite,
-                        1
+                        4,
+                        BigDecimal.valueOf(600)
                 );
 
         saveRoomAssignment(
@@ -638,7 +643,8 @@ public class DataSeeder implements ApplicationRunner {
                 saveBookingItem(
                         booking6,
                         familyRoom,
-                        1
+                        1,
+                        BigDecimal.valueOf(300)
                 );
 
         saveRoomAssignment(
@@ -950,7 +956,8 @@ public class DataSeeder implements ApplicationRunner {
     private BookingItem saveBookingItem(
             Booking booking,
             RoomType roomType,
-            int quantity
+            int quantity,
+            BigDecimal price
     ) {
         BookingItem bookingItem = new BookingItem();
 
@@ -958,6 +965,7 @@ public class DataSeeder implements ApplicationRunner {
         bookingItem.setRoomTypeId(roomType.getId());
 
         bookingItem.setQuantity(quantity);
+        bookingItem.setPrice(price);
 
         bookingItem.setDeleteFlag(false);
 
