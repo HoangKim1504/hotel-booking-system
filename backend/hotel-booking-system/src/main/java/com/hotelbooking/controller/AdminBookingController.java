@@ -1,12 +1,15 @@
 package com.hotelbooking.controller;
 
+import com.hotelbooking.dto.BookingResponse;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.SimpleBookingResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.service.AdminBookingService;
+import com.hotelbooking.service.BookingService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminBookingController {
 
     private final AdminBookingService adminBookingService;
+    private final BookingService bookingService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -38,4 +42,18 @@ public class AdminBookingController {
     ) {
         return adminBookingService.getBookingsForAdmin(page, size, status);
     }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('ADMIN_VIEW')")
+    public BookingResponse getBookingDetail(
+            @PathVariable String id,
+
+            @NotBlank(message = "User ID must not be empty")
+            @RequestParam
+            String userId
+    ) {
+        return bookingService.getBookingDetail(id, userId);
+    }
+
 }
