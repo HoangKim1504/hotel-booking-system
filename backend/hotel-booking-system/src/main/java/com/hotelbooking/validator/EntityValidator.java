@@ -18,6 +18,7 @@ public class EntityValidator {
     private final CartItemRepository cartItemRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final RoomRepository roomRepository;
+    private final BookingRepository bookingRepository;
 
     // ========================
     // User
@@ -104,6 +105,16 @@ public class EntityValidator {
         return roomRepository.findByIdAndDeleteFlagFalse(id)
                 .orElseThrow(() ->
                         new NotFoundException("Room not found: " + id)
+                );
+    }
+
+    // ========================
+    // Booking
+    // ========================
+    public Booking requireBookingByUserId(String bookingId, String userId) {
+        return bookingRepository.findByDeleteFlagFalseAndId(bookingId, userId)
+                .orElseThrow(() ->
+                        new NotFoundException("Booking not found: " + bookingId)
                 );
     }
 

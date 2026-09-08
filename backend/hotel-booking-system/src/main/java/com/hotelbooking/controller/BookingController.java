@@ -1,5 +1,6 @@
 package com.hotelbooking.controller;
 
+import com.hotelbooking.dto.BookingResponse;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.SimpleBookingResponse;
 import com.hotelbooking.enums.BookingStatus;
@@ -44,4 +45,18 @@ public class BookingController {
 
         return bookingService.getBookingsForUser(page, size, status, userId);
     }
+
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('USER_VIEW')")
+    public BookingResponse getBookingDetail(
+            @PathVariable
+            String id
+    ) {
+        AuthUserPrincipal user = securityUtils.currentUser();
+        String userId = user.getId();
+
+        return bookingService.getBookingDetail(id, userId);
+    }
+
 }

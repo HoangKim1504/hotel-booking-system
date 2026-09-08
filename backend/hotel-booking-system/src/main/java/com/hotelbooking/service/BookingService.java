@@ -1,10 +1,14 @@
 package com.hotelbooking.service;
 
+import com.hotelbooking.dto.BookingItemResponse;
+import com.hotelbooking.dto.BookingResponse;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.SimpleBookingResponse;
 import com.hotelbooking.enums.BookingStatus;
+import com.hotelbooking.exception.ForbiddenException;
 import com.hotelbooking.model.Booking;
 import com.hotelbooking.model.BookingItem;
+import com.hotelbooking.model.RoomType;
 import com.hotelbooking.repository.BookingItemRepository;
 import com.hotelbooking.repository.BookingRepository;
 import com.hotelbooking.utils.PageableUtils;
@@ -47,6 +51,51 @@ public class BookingService {
                 bookingStatus,
                 userId
         );
+    }
+
+    /**
+     * Lấy thông tin Booking chi tiết của user đang đăng nhập
+     */
+    public BookingResponse getBookingDetail(String bookingId, String userId) {
+
+        List<BookingItemResponse> bookingItemResponseList = new ArrayList<>();
+
+        // Tìm Booking dựa theo bookingId và userId
+        Booking booking = findBookingByIdAndUserId(bookingId, userId);
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        LocalDate checkInDate = booking.getCheckInDate();
+        LocalDate checkOutDate = booking.getCheckOutDate();
+
+        List<BookingItem> bookingItemList = bookingItemRepository.
+                findByDeleteFlagFalseAndBookingId(booking.getId());
+        
+        for (BookingItem bookingItem : bookingItemList) {
+            Integer bookingItemRoomCnt = bookingItem.getQuantity();
+
+            RoomType roomType = entityValidator.requireAdminRoomType(bookingItem.getRoomTypeId());
+
+            totalAmount = totalAmount.add(calculateTotalBookingMoney(
+                    checkInDate,
+                    checkOutDate,
+                    bookingItem.getPrice(),
+                    bookingItemRoomCnt));
+
+            bookingItemResponseList.add(toBookingItemResponse(bookingItem,
+                    roomType.getRoomTypeName()));
+        }
+
+        LocalDateTime createdAtDate = LocalDateTime.ofInstant(booking.getCreatedAt(),
+                ZoneId.systemDefault());
+
+        return toBookingResponse(
+                booking,
+                bookingItemResponseList,
+                checkInDate,
+                checkOutDate,
+                totalAmount,
+                createdAtDate);
     }
 
     /**
@@ -136,5 +185,47 @@ public class BookingService {
         );
     }
 
+    /**
+     * Tìm booking dựa trên bookingId và userId
+     */
+    private Booking findBookingByIdAndUserId(String bookingId, String userId) {
+        // Kiểm tra sự tồn tại của userId trong DB
+        entityValidator.requireUserByUserId(userId);
+
+        // Tìm Booking dựa theo bookingId
+        Booking booking = entityValidator.requireBookingByUserId(bookingId, userId);
+
+        // TH userId tại booking và userId truyền vào là 2 userId khác nhau
+        if (!userId.equals(booking.getUserId())) {
+            throw new ForbiddenException("This booking does not belong to given user: " + userId);
+        }
+
+        return booking;
+    }
+
+    private BookingItemResponse toBookingItemResponse(BookingItem item, String roomTypeName) {
+        return new BookingItemResponse(
+                item.getId(),
+                item.getRoomTypeId(),
+                roomTypeName,
+                item.getQuantity(),
+                item.getPrice()
+        );
+    }
+
+    private BookingResponse toBookingResponse(Booking booking, List<BookingItemResponse> items,
+                                              LocalDate checkInDate, LocalDate checkOutDate,
+                                              BigDecimal totalAmount, LocalDateTime createdAtDateTime) {
+        return new BookingResponse(
+                booking.getId(),
+                booking.getStatus(),
+                items,
+                checkInDate,
+                checkOutDate,
+                totalAmount,
+                booking.getExpiresAt(),
+                createdAtDateTime
+        );
+    }
 
 }
