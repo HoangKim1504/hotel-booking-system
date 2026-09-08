@@ -10,4 +10,6 @@ public interface BookingItemRepository extends MongoRepository<BookingItem, Stri
 
     List<BookingItem> findByBookingIdInAndDeleteFlagFalse(Collection<String> bookingIds);
 
+    List<BookingItem> findByDeleteFlagFalseAndBookingId(String bookingId);
+
 }

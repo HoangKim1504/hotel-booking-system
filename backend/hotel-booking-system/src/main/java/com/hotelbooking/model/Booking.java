@@ -27,13 +27,13 @@ public class Booking extends BaseModel {
     @Builder.Default
     private BookingStatus status = BookingStatus.PENDING;
 
-    @Field("expires_at")
-    private LocalDateTime expiresAt;
-
     @Field("check_in_date")
     private LocalDate checkInDate;
 
     @Field("check_out_date")
     private LocalDate checkOutDate;
+
+    @Field("expires_at")
+    private LocalDateTime expiresAt;
 
 }
