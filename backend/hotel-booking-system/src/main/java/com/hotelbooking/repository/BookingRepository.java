@@ -24,7 +24,7 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
 
     Optional<Booking> findByDeleteFlagFalseAndId(String bookingId, String userId);
 
-    List<Booking> findByDeleteFlagFalseAndStatusInAndCheckInTimeLessThanAndCheckOutTimeGreaterThan(
+    List<Booking> findByDeleteFlagFalseAndStatusInAndCheckInDateLessThanAndCheckOutDateGreaterThan(
             Collection<BookingStatus> statuses,
             LocalDate checkInDate,
             LocalDate checkOutDate);

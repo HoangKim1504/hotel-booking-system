@@ -5,7 +5,6 @@ import com.hotelbooking.model.Room;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -29,8 +28,9 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
     List<Room> findByDeleteFlagFalseAndStatusAndRoomTypeIdAndIdNotIn(
             RoomStatus roomStatus,
-            String eligibleRoomTypeId,
-            Set<String> occupiedRoomIds,
-            Sort sort);
-    
+            String roomTypeId,
+            Set<String> occupiedRoomIds);
+
+    List<Room> findByDeleteFlagFalseAndStatusAndRoomTypeId(RoomStatus roomStatus, String roomTypeI);
+
 }
