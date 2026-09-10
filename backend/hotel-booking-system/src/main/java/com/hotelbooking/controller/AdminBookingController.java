@@ -1,18 +1,21 @@
 package com.hotelbooking.controller;
 
 import com.hotelbooking.dto.BookingResponse;
+import com.hotelbooking.dto.CreateBookingRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.SimpleBookingResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.service.AdminBookingService;
 import com.hotelbooking.service.BookingService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -54,6 +57,22 @@ public class AdminBookingController {
             String userId
     ) {
         return adminBookingService.getBookingDetailForAdmin(id, userId);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('USER_CREATE')")
+    public BookingResponse createBooking(
+            @Valid @RequestBody
+            CreateBookingRequest request,
+
+            @RequestParam
+            String userId,
+
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        return adminBookingService.createNewBookingForAdmin(request, userId, username);
     }
 
 }

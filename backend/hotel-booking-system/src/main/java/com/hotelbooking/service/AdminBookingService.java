@@ -1,6 +1,7 @@
 package com.hotelbooking.service;
 
 import com.hotelbooking.dto.BookingResponse;
+import com.hotelbooking.dto.CreateBookingRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.SimpleBookingResponse;
 import com.hotelbooking.enums.BookingStatus;
@@ -32,8 +33,26 @@ public class AdminBookingService {
         );
     }
 
-    public BookingResponse getBookingDetailForAdmin(String id, String userId) {
-        return bookingService.getBookingDetail(id, userId);
+    public BookingResponse getBookingDetailForAdmin(
+            String id,
+            String userId
+    ) {
+        return bookingService.getBookingDetail(
+                id,
+                userId
+        );
+    }
+
+    public BookingResponse createNewBookingForAdmin(
+            CreateBookingRequest request,
+            String userId,
+            String username
+    ) {
+        return bookingService.createNewBooking(
+                request,
+                userId,
+                username
+        );
     }
 
 }
