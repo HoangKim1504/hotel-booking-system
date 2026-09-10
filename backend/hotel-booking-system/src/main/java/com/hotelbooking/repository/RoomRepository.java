@@ -5,6 +5,7 @@ import com.hotelbooking.model.Room;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -25,4 +26,11 @@ public interface RoomRepository extends MongoRepository<Room, String> {
     boolean existsByRoomNumberAndDeleteFlagFalse(int roomNumber);
 
     boolean existsByRoomNumberAndIdNotAndDeleteFlagFalse(int roomNumber, String id);
+
+    List<Room> findByDeleteFlagFalseAndStatusAndRoomTypeIdAndIdNotIn(
+            RoomStatus roomStatus,
+            String eligibleRoomTypeId,
+            Set<String> occupiedRoomIds,
+            Sort sort);
+    
 }

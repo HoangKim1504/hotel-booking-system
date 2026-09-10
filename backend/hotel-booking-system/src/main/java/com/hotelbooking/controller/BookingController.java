@@ -1,6 +1,7 @@
 package com.hotelbooking.controller;
 
 import com.hotelbooking.dto.BookingResponse;
+import com.hotelbooking.dto.CreateBookingRequest;
 import com.hotelbooking.dto.PageResponse;
 import com.hotelbooking.dto.SimpleBookingResponse;
 import com.hotelbooking.enums.BookingStatus;
@@ -8,6 +9,7 @@ import com.hotelbooking.security.AuthUserPrincipal;
 import com.hotelbooking.service.BookingService;
 import com.hotelbooking.service.SecurityUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -49,14 +51,21 @@ public class BookingController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('USER_VIEW')")
-    public BookingResponse getBookingDetail(
-            @PathVariable
-            String id
-    ) {
+    public BookingResponse getBookingDetail(@PathVariable String id) {
         AuthUserPrincipal user = securityUtils.currentUser();
         String userId = user.getId();
 
         return bookingService.getBookingDetail(id, userId);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookingResponse createBooking(@Valid @RequestBody CreateBookingRequest request) {
+        AuthUserPrincipal user = securityUtils.currentUser();
+        String userId = user.getId();
+        String userName = user.getUsername();
+
+        return bookingService.createNewBooking(request, userId, userName);
     }
 
 }
