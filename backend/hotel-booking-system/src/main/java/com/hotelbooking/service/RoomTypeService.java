@@ -10,6 +10,7 @@ import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
 import com.hotelbooking.utils.PageableUtils;
+import com.hotelbooking.validator.DateValidator;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ public class RoomTypeService {
     private final RoomAssignmentRepository roomAssignmentRepository;
 
     private final EntityValidator entityValidator;
+    private final DateValidator dateValidator;
 
     /**
      * Search toàn bộ Room Type, có phân trang và max record mỗi trang
@@ -68,7 +70,7 @@ public class RoomTypeService {
         List<String> eligibleRoomTypeIds;
 
         // 1. Validate input
-        validateCheckInOutDate(checkInDate, checkOutDate);
+        dateValidator.validateCheckInOutDate(checkInDate, checkOutDate);
 
         // 2. Lấy RoomType phù hợp: deleteFlag = false, status = ACTIVE, maximumPeople >= people
         List<RoomType> eligibleRoomTypes = findEligibleRoomTypes(maximumPeople);
