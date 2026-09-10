@@ -122,6 +122,11 @@ public class SecurityConfig {
                                 "/api/bookings",
                                 "/api/bookings/*"
                         ).hasAuthority("USER_VIEW")
+                        // Create a Booking
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/bookings"
+                        ).authenticated()
 
                         // Booking management for Admin
                         // View bookings
@@ -130,6 +135,10 @@ public class SecurityConfig {
                                 "/api/admin/bookings",
                                 "/api/admin/bookings/*"
                         ).hasAuthority("ADMIN_VIEW")
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/admin/bookings"
+                        ).hasAuthority("USER_CREATE")
 
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
