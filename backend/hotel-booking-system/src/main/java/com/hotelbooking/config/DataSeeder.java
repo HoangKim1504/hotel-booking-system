@@ -41,6 +41,7 @@ public class DataSeeder implements ApplicationRunner {
     private final BookingRepository bookingRepository;
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
+    private final RoomBookingSlotRepository roomBookingSlotRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -65,6 +66,9 @@ public class DataSeeder implements ApplicationRunner {
 
         // 5. CART + CART ITEMS
         seedCartData();
+
+        // 6. ROOM BOOKING SLOTS
+        seedRoomBookingSlots();
     }
 
     // =========================================================
@@ -775,6 +779,51 @@ public class DataSeeder implements ApplicationRunner {
         );
     }
 
+    private void seedRoomBookingSlots() {
+
+        if (roomBookingSlotRepository.count() > 0) {
+            System.out.println("RoomBookingSlot already exists. Skip seeding.");
+            return;
+        }
+
+        List<BookingStatus> holdingStatuses = List.of(
+                BookingStatus.PENDING,
+                BookingStatus.PAID,
+                BookingStatus.CONFIRMED,
+                BookingStatus.CHECKED_IN
+        );
+
+        List<Booking> bookings =
+                bookingRepository.findByDeleteFlagFalseAndStatusIn(holdingStatuses);
+
+        for (Booking booking : bookings) {
+            // PENDING đã hết hạn thì không tạo slot
+            if (BookingStatus.PENDING.equals(booking.getStatus())
+                    && booking.getExpiresAt() != null
+                    && booking.getExpiresAt().isBefore(LocalDateTime.now())) {
+                continue;
+            }
+
+            // Lấy BookingItem của Booking
+            List<BookingItem> bookingItems =
+                    bookingItemRepository.findByDeleteFlagFalseAndBookingId(booking.getId());
+
+            for (BookingItem bookingItem : bookingItems) {
+
+                // Lấy RoomAssignment của BookingItem
+                List<RoomAssignment> assignments =
+                        roomAssignmentRepository.findByBookingItemIdAndDeleteFlagFalse(bookingItem.getId());
+
+                for (RoomAssignment assignment : assignments) {
+                    createRoomBookingSlots(
+                            booking,
+                            assignment.getRoomId()
+                    );
+                }
+            }
+        }
+    }
+
     private void saveCartItem(
             Cart cart,
             RoomType roomType,
@@ -1041,6 +1090,31 @@ public class DataSeeder implements ApplicationRunner {
                                 "Seeder room not found: " + roomNumber
                         )
                 );
+    }
+
+    private void createRoomBookingSlots(
+            Booking booking,
+            String roomId
+    ) {
+        LocalDate stayDate =
+                booking.getCheckInDate();
+
+        while (stayDate.isBefore(
+                booking.getCheckOutDate()
+        )) {
+
+            RoomBookingSlot slot =
+                    RoomBookingSlot.builder()
+                            .roomId(roomId)
+                            .bookingId(booking.getId())
+                            .stayDate(stayDate)
+                            .createdAt(Instant.now())
+                            .build();
+
+            roomBookingSlotRepository.save(slot);
+
+            stayDate = stayDate.plusDays(1);
+        }
     }
 
 }
