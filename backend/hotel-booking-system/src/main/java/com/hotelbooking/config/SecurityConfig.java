@@ -155,12 +155,16 @@ public class SecurityConfig {
                                 HttpMethod.PUT,
                                 "/api/admin/bookings/{id}/cancel"
                         ).hasAuthority("USER_UPDATE")
-
                         // Payment
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/admin/bookings/{id}/payments"
                         ).hasAuthority("USER_CREATE")
+                        // Delete a Booking
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/admin/bookings/*"
+                        ).hasAuthority("USER_DELETE")
 
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
