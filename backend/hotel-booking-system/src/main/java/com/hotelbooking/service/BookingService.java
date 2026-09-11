@@ -56,6 +56,15 @@ public class BookingService {
             BookingStatus.CHECKED_IN
     );
 
+    // List các trạng thái Booking không thể bị Cancel
+    private static final List<BookingStatus> CANNOT_BE_CANCEL_STATUSES = List.of(
+            BookingStatus.CHECKED_IN,
+            BookingStatus.COMPLETED,
+            BookingStatus.CANCELLED,
+            BookingStatus.EXPIRED,
+            BookingStatus.REFUNDED
+    );
+
     public PageResponse<SimpleBookingResponse> getBookingsForUser(
             int page,
             int size,
@@ -253,6 +262,37 @@ public class BookingService {
                 totalAmount,
                 createdAt
         );
+    }
+
+    /*
+     * Cancel Booking dựa theo bookingId
+     */
+    @Transactional
+    public UpdateBookingResponse cancelBooking(String bookingId, String userId, String username) {
+        // 1. Tìm Booking của user hiện tại
+        Booking booking = findBookingByIdAndUserId(bookingId, userId);
+
+        // 2. Validate status có được cancel hay không
+        validateBookingCanBeCancelled(booking);
+
+        Instant now = Instant.now();
+
+        // 3. Chuyển Booking sang CANCELLED
+        booking.setStatus(BookingStatus.CANCELLED);
+        booking.setUpdatedBy(username);
+        booking.setUpdatedAt(now);
+
+        Booking updatedBooking =
+                bookingRepository.save(booking);
+
+        // 4. Release RoomBookingSlot
+        roomBookingSlotRepository.deleteByBookingId(bookingId);
+
+        // 5. Release RoomAssignment
+        releaseRoomAssignments(bookingId, username, now);
+
+        // 6. Return response
+        return toUpdateBookingResponse(updatedBooking);
     }
 
     /**
@@ -675,6 +715,45 @@ public class BookingService {
         assignment.setUpdatedAt(null);
 
         return assignment;
+    }
+
+    private void validateBookingCanBeCancelled(Booking booking) {
+        BookingStatus currentStatus = booking.getStatus();
+
+        if (CANNOT_BE_CANCEL_STATUSES.contains(currentStatus)) {
+            throw new ConflictException("Booking with status " + currentStatus + " cannot be cancelled");
+        }
+    }
+
+    private void releaseRoomAssignments(String bookingId, String username, Instant now) {
+        List<String> bookingItemIds =
+                bookingItemRepository
+                        .findByDeleteFlagFalseAndBookingId(bookingId)
+                        .stream()
+                        .map(BookingItem::getId)
+                        .toList();
+
+        if (bookingItemIds.isEmpty()) {
+            return;
+        }
+
+        List<RoomAssignment> assignments =
+                roomAssignmentRepository.findByDeleteFlagFalseAndBookingItemIdIn(bookingItemIds);
+
+        for (RoomAssignment assignment : assignments) {
+            assignment.setDeleteFlag(true);
+            assignment.setUpdatedBy(username);
+            assignment.setUpdatedAt(now);
+        }
+
+        roomAssignmentRepository.saveAll(assignments);
+    }
+
+    private UpdateBookingResponse toUpdateBookingResponse(Booking booking) {
+        return new UpdateBookingResponse(
+                booking.getId(),
+                booking.getStatus()
+        );
     }
 
 }

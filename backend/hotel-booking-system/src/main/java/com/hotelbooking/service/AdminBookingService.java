@@ -1,9 +1,6 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.BookingResponse;
-import com.hotelbooking.dto.CreateBookingRequest;
-import com.hotelbooking.dto.PageResponse;
-import com.hotelbooking.dto.SimpleBookingResponse;
+import com.hotelbooking.dto.*;
 import com.hotelbooking.enums.BookingStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,6 +47,18 @@ public class AdminBookingService {
     ) {
         return bookingService.createNewBooking(
                 request,
+                userId,
+                username
+        );
+    }
+
+    public UpdateBookingResponse cancelBooking(
+            String bookingId,
+            String userId,
+            String username
+    ) {
+        return bookingService.cancelBooking(
+                bookingId,
                 userId,
                 username
         );

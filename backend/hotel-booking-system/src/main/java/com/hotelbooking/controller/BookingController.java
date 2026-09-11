@@ -81,4 +81,14 @@ public class BookingController {
         return paymentService.createPayment(id, request, userId, username);
     }
 
+    @PutMapping("/{id}/cancel")
+    @ResponseStatus(HttpStatus.OK)
+    public UpdateBookingResponse cancelBooking(@PathVariable String id) {
+        AuthUserPrincipal user = securityUtils.currentUser();
+        String userId = user.getId();
+        String username = user.getUsername();
+
+        return bookingService.cancelBooking(id, userId, username);
+    }
+
 }
