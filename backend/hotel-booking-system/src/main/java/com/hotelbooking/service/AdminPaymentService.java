@@ -13,7 +13,7 @@ public class AdminPaymentService {
     private final PaymentService paymentService;
 
     @Transactional
-    public PaymentResponse createPayment(
+    public PaymentResponse createPaymentForAdmin(
             String bookingId,
             CreatePaymentRequest request,
             String userId,

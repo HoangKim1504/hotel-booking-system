@@ -57,7 +57,7 @@ public class BookingService {
     );
 
     // List các trạng thái Booking không thể bị Cancel
-    private static final List<BookingStatus> CANNOT_BE_CANCEL_STATUSES = List.of(
+    private static final List<BookingStatus> CANNOT_BE_CANCELLED_STATUSES = List.of(
             BookingStatus.CHECKED_IN,
             BookingStatus.COMPLETED,
             BookingStatus.CANCELLED,
@@ -330,7 +330,7 @@ public class BookingService {
     /**
      * Tìm booking dựa trên bookingId và userId
      */
-    private Booking findBookingByIdAndUserId(String bookingId, String userId) {
+    public Booking findBookingByIdAndUserId(String bookingId, String userId) {
         // Kiểm tra sự tồn tại của userId trong DB
         entityValidator.requireUserByUserId(userId);
 
@@ -720,7 +720,7 @@ public class BookingService {
     private void validateBookingCanBeCancelled(Booking booking) {
         BookingStatus currentStatus = booking.getStatus();
 
-        if (CANNOT_BE_CANCEL_STATUSES.contains(currentStatus)) {
+        if (CANNOT_BE_CANCELLED_STATUSES.contains(currentStatus)) {
             throw new ConflictException("Booking with status " + currentStatus + " cannot be cancelled");
         }
     }

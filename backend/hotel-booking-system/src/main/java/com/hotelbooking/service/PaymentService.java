@@ -39,14 +39,7 @@ public class PaymentService {
 
     /**
      * Tạo payment cho Booking.
-     * <p>
-     * CASH:
-     * Payment = PENDING -> Booking = CONFIRMED
-     * <p>
-     * ONLINE:
-     * Payment = SUCCESS -> Booking = PAID
      */
-
     @Transactional
     public PaymentResponse createPayment(
             String bookingId,
@@ -58,7 +51,7 @@ public class PaymentService {
         // 1. Kiểm tra booking tồn tại không
         Booking booking = entityValidator.requireBooking(bookingId);
 
-        // 2. Check booking thuộc user đang login
+        // 2. Check booking thuộc user đang login (chức năng cho user)
         if (!booking.getUserId().equals(userId) && !adminFlag) {
             throw new ForbiddenException("You cannot pay for this booking");
         }
