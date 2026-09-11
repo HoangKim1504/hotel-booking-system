@@ -295,7 +295,7 @@ public class BookingService {
         entityValidator.requireUserByUserId(userId);
 
         // Tìm Booking dựa theo bookingId
-        Booking booking = entityValidator.requireBookingByUserId(bookingId, userId);
+        Booking booking = entityValidator.requireBooking(bookingId);
 
         // TH userId tại booking và userId truyền vào là 2 userId khác nhau
         if (!userId.equals(booking.getUserId())) {

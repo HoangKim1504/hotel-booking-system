@@ -111,8 +111,8 @@ public class EntityValidator {
     // ========================
     // Booking
     // ========================
-    public Booking requireBookingByUserId(String bookingId, String userId) {
-        return bookingRepository.findByDeleteFlagFalseAndId(bookingId, userId)
+    public Booking requireBooking(String bookingId) {
+        return bookingRepository.findByDeleteFlagFalseAndId(bookingId)
                 .orElseThrow(() ->
                         new NotFoundException("Booking not found: " + bookingId)
                 );
