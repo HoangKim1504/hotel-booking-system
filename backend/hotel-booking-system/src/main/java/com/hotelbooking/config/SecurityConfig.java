@@ -127,6 +127,11 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/api/bookings"
                         ).authenticated()
+                        // Update a Booking
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/bookings/{id}/cancel"
+                        ).authenticated()
 
                         // Booking management for Admin
                         // View bookings
@@ -135,10 +140,16 @@ public class SecurityConfig {
                                 "/api/admin/bookings",
                                 "/api/admin/bookings/*"
                         ).hasAuthority("ADMIN_VIEW")
+                        // Create a Booking
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/admin/bookings"
                         ).hasAuthority("USER_CREATE")
+                        // Update a Booking
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/admin/bookings/{id}/cancel"
+                        ).hasAuthority("USER_UPDATE")
 
                         // Payment
                         .requestMatchers(
