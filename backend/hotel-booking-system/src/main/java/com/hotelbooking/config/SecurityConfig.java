@@ -140,6 +140,12 @@ public class SecurityConfig {
                                 "/api/admin/bookings"
                         ).hasAuthority("USER_CREATE")
 
+                        // Payment
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/bookings/{id}/payments"
+                        ).authenticated()
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",
