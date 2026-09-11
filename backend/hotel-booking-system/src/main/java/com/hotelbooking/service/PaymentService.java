@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -158,7 +159,12 @@ public class PaymentService {
          * Hiện tại đang MOCK online payment thành công.
          */
         payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setPaymentDate(LocalDateTime.from(paymentDate));
+        payment.setPaymentDate(
+                LocalDateTime.ofInstant(
+                        paymentDate,
+                        ZoneId.systemDefault()
+                )
+        );
         payment.setTransactionId(UUID.randomUUID().toString());
         payment.setDeleteFlag(false);
         payment.setCreatedBy(username);
