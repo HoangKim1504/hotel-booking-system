@@ -12,8 +12,7 @@ import java.util.List;
 public record CreateBookingRequest(
 
         @NotEmpty(message = "Booking Items must not be empty")
-        @Valid
-        List<CreateBookingItemRequest> items,
+        List<@Valid CreateBookingItemRequest> items,
 
         @NotNull(message = "Check-in date is required")
         @FutureOrPresent(message = "Check-in date must be today or in the future")
