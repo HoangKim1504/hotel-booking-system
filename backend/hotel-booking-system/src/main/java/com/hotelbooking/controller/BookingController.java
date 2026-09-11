@@ -1,12 +1,10 @@
 package com.hotelbooking.controller;
 
-import com.hotelbooking.dto.BookingResponse;
-import com.hotelbooking.dto.CreateBookingRequest;
-import com.hotelbooking.dto.PageResponse;
-import com.hotelbooking.dto.SimpleBookingResponse;
+import com.hotelbooking.dto.*;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.security.AuthUserPrincipal;
 import com.hotelbooking.service.BookingService;
+import com.hotelbooking.service.PaymentService;
 import com.hotelbooking.service.SecurityUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,6 +22,8 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final PaymentService paymentService;
+
     private final SecurityUtils securityUtils;
 
     @GetMapping
@@ -63,9 +63,22 @@ public class BookingController {
     public BookingResponse createBooking(@Valid @RequestBody CreateBookingRequest request) {
         AuthUserPrincipal user = securityUtils.currentUser();
         String userId = user.getId();
-        String userName = user.getUsername();
+        String username = user.getUsername();
 
-        return bookingService.createNewBooking(request, userId, userName);
+        return bookingService.createNewBooking(request, userId, username);
+    }
+
+    @PostMapping("/{id}/payments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public PaymentResponse createPayment(
+            @PathVariable String id,
+            @Valid @RequestBody CreatePaymentRequest request
+    ) {
+        AuthUserPrincipal user = securityUtils.currentUser();
+        String userId = user.getId();
+        String username = user.getUsername();
+
+        return paymentService.createPayment(id, request, userId, username);
     }
 
 }
