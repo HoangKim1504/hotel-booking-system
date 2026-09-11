@@ -87,7 +87,7 @@ public class AdminBookingController {
         String userId = user.getId();
         String username = user.getUsername();
 
-        return adminPaymentService.createPayment(id, request, userId, username, true);
+        return adminPaymentService.createPaymentForAdmin(id, request, userId, username, true);
     }
 
     @PutMapping("/{id}/cancel")
@@ -105,7 +105,25 @@ public class AdminBookingController {
     ) {
         String username = authentication.getName();
 
-        return adminBookingService.cancelBooking(id, userId, username);
+        return adminBookingService.cancelBookingForAdmin(id, userId, username);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasAuthority('USER_DELETE')")
+    public void deleteBooking(
+            @PathVariable
+            String id,
+
+            @NotBlank(message = "User ID is required")
+            @RequestParam
+            String userId,
+
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+
+        adminBookingService.deleteBooking(id, userId, username);
     }
 
 }
