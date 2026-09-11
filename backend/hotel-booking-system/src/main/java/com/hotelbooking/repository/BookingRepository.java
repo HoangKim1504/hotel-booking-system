@@ -29,4 +29,6 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
             LocalDate checkInDate,
             LocalDate checkOutDate);
 
+    List<Booking> findByDeleteFlagFalseAndStatusIn(List<BookingStatus> statuses);
+
 }

@@ -8,13 +8,11 @@ import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.exception.ForbiddenException;
 import com.hotelbooking.model.*;
-import com.hotelbooking.repository.BookingItemRepository;
-import com.hotelbooking.repository.BookingRepository;
-import com.hotelbooking.repository.RoomAssignmentRepository;
-import com.hotelbooking.repository.RoomRepository;
+import com.hotelbooking.repository.*;
 import com.hotelbooking.utils.PageableUtils;
 import com.hotelbooking.validator.DateValidator;
 import com.hotelbooking.validator.EntityValidator;
+import com.mongodb.DuplicateKeyException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +43,7 @@ public class BookingService {
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
     private final RoomRepository roomRepository;
+    private final RoomBookingSlotRepository roomBookingSlotRepository;
 
     private final EntityValidator entityValidator;
     private final DateValidator dateValidator;
@@ -229,7 +228,15 @@ public class BookingService {
                 now
         );
 
-        // 9. Insert booking item + room assignment
+        // 9. Giữ Room theo từng ngày (tránh double-booking)
+        reserveRoomSlots(
+                insertedBooking.getId(),
+                preparedItems,
+                checkInDate,
+                checkOutDate
+        );
+
+        // 10. Insert booking item + room assignment
         List<BookingItemResponse> bookingItemResponses =
                 saveBookingItemsAndAssignments(
                         insertedBooking,
@@ -237,7 +244,7 @@ public class BookingService {
                         username
                 );
 
-        // 10. Return response
+        // 11. Return response
         return toBookingResponse(
                 insertedBooking,
                 bookingItemResponses,
@@ -578,6 +585,43 @@ public class BookingService {
         newBooking.setUpdatedAt(null);
 
         return bookingRepository.save(newBooking);
+    }
+
+    private void reserveRoomSlots(
+            String bookingId,
+            List<PreparedBookingItem> preparedItems,
+            LocalDate checkInDate,
+            LocalDate checkOutDate
+    ) {
+        List<RoomBookingSlot> slots = new ArrayList<>();
+
+        for (PreparedBookingItem preparedItem : preparedItems) {
+            for (String roomId : preparedItem.roomIds()) {
+                LocalDate stayDate = checkInDate;
+
+                while (stayDate.isBefore(checkOutDate)) {
+                    slots.add(
+                            RoomBookingSlot.builder()
+                                    .roomId(roomId)
+                                    .bookingId(bookingId)
+                                    .stayDate(stayDate)
+                                    .createdAt(Instant.now())
+                                    .build()
+                    );
+
+                    stayDate = stayDate.plusDays(1);
+                }
+            }
+        }
+
+        try {
+            roomBookingSlotRepository.saveAll(slots);
+        } catch (DuplicateKeyException ex) {
+            throw new ConflictException(
+                    "One or more rooms have just been booked by another user. " +
+                            "Please refresh and try again."
+            );
+        }
     }
 
     private List<BookingItemResponse> saveBookingItemsAndAssignments(
