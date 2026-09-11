@@ -78,7 +78,7 @@ public class BookingController {
         String userId = user.getId();
         String username = user.getUsername();
 
-        return paymentService.createPayment(id, request, userId, username);
+        return paymentService.createPayment(id, request, userId, username, false);
     }
 
     @PutMapping("/{id}/cancel")

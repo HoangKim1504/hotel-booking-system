@@ -2,7 +2,10 @@ package com.hotelbooking.controller;
 
 import com.hotelbooking.dto.*;
 import com.hotelbooking.enums.BookingStatus;
+import com.hotelbooking.security.AuthUserPrincipal;
 import com.hotelbooking.service.AdminBookingService;
+import com.hotelbooking.service.AdminPaymentService;
+import com.hotelbooking.service.SecurityUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -21,6 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class AdminBookingController {
 
     private final AdminBookingService adminBookingService;
+    private final AdminPaymentService adminPaymentService;
+
+    private final SecurityUtils securityUtils;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -68,6 +74,20 @@ public class AdminBookingController {
     ) {
         String username = authentication.getName();
         return adminBookingService.createNewBookingForAdmin(request, userId, username);
+    }
+
+    @PostMapping("/{id}/payments")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('USER_CREATE')")
+    public PaymentResponse createPayment(
+            @PathVariable String id,
+            @Valid @RequestBody CreatePaymentRequest request
+    ) {
+        AuthUserPrincipal user = securityUtils.currentUser();
+        String userId = user.getId();
+        String username = user.getUsername();
+
+        return adminPaymentService.createPayment(id, request, userId, username, true);
     }
 
     @PutMapping("/{id}/cancel")

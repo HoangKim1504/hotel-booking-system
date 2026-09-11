@@ -12,6 +12,7 @@ import com.hotelbooking.model.Payment;
 import com.hotelbooking.repository.BookingItemRepository;
 import com.hotelbooking.repository.BookingRepository;
 import com.hotelbooking.repository.PaymentRepository;
+import com.hotelbooking.utils.DateUtils;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -52,13 +52,14 @@ public class PaymentService {
             String bookingId,
             CreatePaymentRequest request,
             String userId,
-            String username
+            String username,
+            boolean adminFlag
     ) {
         // 1. Kiểm tra booking tồn tại không
         Booking booking = entityValidator.requireBooking(bookingId);
 
         // 2. Check booking thuộc user đang login
-        if (!booking.getUserId().equals(userId)) {
+        if (!booking.getUserId().equals(userId) && !adminFlag) {
             throw new ForbiddenException("You cannot pay for this booking");
         }
 
@@ -91,8 +92,10 @@ public class PaymentService {
                         .build();
 
         // 8. Xử lý theo payment method
-        if (CASH_PAYMENT.equals(request.paymentMethod())) {
-            handleCashPayment(payment, booking, username, currentInstant);
+        if (CASH_PAYMENT.equals(request.paymentMethod()) && adminFlag) {
+            handleAdminCashPayment(payment, booking, username, currentInstant);
+        } else if (CASH_PAYMENT.equals(request.paymentMethod())) {
+            handleUserCashPayment(payment, booking, username, currentInstant);
         } else {
             handleOnlinePayment(payment, booking, username, currentInstant);
         }
@@ -132,7 +135,28 @@ public class PaymentService {
         return totalAmount;
     }
 
-    private void handleCashPayment(Payment payment, Booking booking, String username, Instant currentInstant) {
+    private void handleAdminCashPayment(Payment payment, Booking booking, String username, Instant currentInstant) {
+        /*
+         * Khách hàng luôn trả tiền tại khách sạn khi check-in.
+         */
+        payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setPaymentDate(DateUtils.toLocalDateTime(currentInstant));
+        payment.setTransactionId(null);
+        payment.setDeleteFlag(false);
+        payment.setCreatedBy(username);
+        payment.setCreatedAt(currentInstant);
+        payment.setUpdatedBy(null);
+        payment.setUpdatedAt(null);
+
+        // Booking đã được xác nhận giữ phòng.
+        booking.setStatus(BookingStatus.PAID);
+        // Đã thanh toán thành công nên không còn expire
+        booking.setExpiresAt(null);
+        booking.setUpdatedBy(username);
+        booking.setUpdatedAt(currentInstant);
+    }
+
+    private void handleUserCashPayment(Payment payment, Booking booking, String username, Instant currentInstant) {
         /*
          * User chọn trả tiền tại khách sạn.
          * Chưa nhận được tiền -> Payment vẫn PENDING.
@@ -159,12 +183,7 @@ public class PaymentService {
          * Hiện tại đang MOCK online payment thành công.
          */
         payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setPaymentDate(
-                LocalDateTime.ofInstant(
-                        paymentDate,
-                        ZoneId.systemDefault()
-                )
-        );
+        payment.setPaymentDate(DateUtils.toLocalDateTime(paymentDate));
         payment.setTransactionId(UUID.randomUUID().toString());
         payment.setDeleteFlag(false);
         payment.setCreatedBy(username);
