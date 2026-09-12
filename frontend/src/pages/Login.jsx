@@ -90,7 +90,7 @@ function Login() {
                                 <div className="mb-3">
                                     <label
                                         htmlFor="username"
-                                        className="form-label"
+                                        className="form-label required-label"
                                     >
                                         Username
                                     </label>
@@ -110,7 +110,7 @@ function Login() {
                                 <div className="mb-4">
                                     <label
                                         htmlFor="password"
-                                        className="form-label"
+                                        className="form-label required-label"
                                     >
                                         Password
                                     </label>

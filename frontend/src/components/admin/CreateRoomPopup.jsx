@@ -90,7 +90,7 @@ function CreateRoomPopup({
                     <div className="mb-3">
                         <label
                             htmlFor="createRoomTypeName"
-                            className="form-label"
+                            className="form-label required-label"
                         >
                             Room Type
                         </label>
@@ -111,7 +111,7 @@ function CreateRoomPopup({
                         <div className="col-md-6">
                             <label
                                 htmlFor="createRoomNumber"
-                                className="form-label"
+                                className="form-label required-label"
                             >
                                 Room Number
                             </label>
@@ -133,7 +133,7 @@ function CreateRoomPopup({
                         <div className="col-md-6">
                             <label
                                 htmlFor="createFloorNumber"
-                                className="form-label"
+                                className="form-label required-label"
                             >
                                 Floor Number
                             </label>

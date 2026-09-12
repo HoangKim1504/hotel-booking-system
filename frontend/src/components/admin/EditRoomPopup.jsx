@@ -115,7 +115,7 @@ function EditRoomPopup({
                     <div className="mb-3">
                         <label
                             htmlFor="editRoomTypeName"
-                            className="form-label"
+                            className="form-label required-label"
                         >
                             Room Type
                         </label>
@@ -135,7 +135,7 @@ function EditRoomPopup({
                         <div className="col-md-6">
                             <label
                                 htmlFor="editRoomNumber"
-                                className="form-label"
+                                className="form-label required-label"
                             >
                                 Room Number
                             </label>
@@ -156,7 +156,7 @@ function EditRoomPopup({
                         <div className="col-md-6">
                             <label
                                 htmlFor="editFloorNumber"
-                                className="form-label"
+                                className="form-label required-label"
                             >
                                 Floor Number
                             </label>
@@ -178,7 +178,7 @@ function EditRoomPopup({
                     <div className="mt-3">
                         <label
                             htmlFor="editRoomStatus"
-                            className="form-label"
+                            className="form-label required-label"
                         >
                             Status
                         </label>

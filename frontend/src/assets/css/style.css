@@ -1567,3 +1567,10 @@
 
     margin-bottom: 22px;
 }
+
+/*** Required Field Label ***/
+.required-label::after {
+    content: " *";
+    color: #dc3545;
+    font-weight: 700;
+}
