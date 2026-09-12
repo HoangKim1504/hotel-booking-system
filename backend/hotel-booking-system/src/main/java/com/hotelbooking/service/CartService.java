@@ -1,9 +1,9 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.AddCartItemRequest;
-import com.hotelbooking.dto.CartItemResponse;
-import com.hotelbooking.dto.CartResponse;
-import com.hotelbooking.dto.UpdateCartItemRequest;
+import com.hotelbooking.dto.cart.AddCartItemRequest;
+import com.hotelbooking.dto.cart.CartItemResponse;
+import com.hotelbooking.dto.cart.CartResponse;
+import com.hotelbooking.dto.cart.UpdateCartItemRequest;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.model.Cart;
 import com.hotelbooking.model.CartItem;

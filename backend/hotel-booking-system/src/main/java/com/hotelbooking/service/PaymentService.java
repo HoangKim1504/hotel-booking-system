@@ -1,7 +1,7 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.CreatePaymentRequest;
-import com.hotelbooking.dto.PaymentResponse;
+import com.hotelbooking.dto.payment.CreatePaymentRequest;
+import com.hotelbooking.dto.payment.PaymentResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.enums.PaymentStatus;
 import com.hotelbooking.exception.ConflictException;

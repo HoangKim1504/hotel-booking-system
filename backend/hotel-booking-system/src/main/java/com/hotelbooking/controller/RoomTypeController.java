@@ -1,8 +1,8 @@
 package com.hotelbooking.controller;
 
-import com.hotelbooking.dto.PageResponse;
-import com.hotelbooking.dto.RoomTypeResponse;
-import com.hotelbooking.dto.SearchRoomTypeResponse;
+import com.hotelbooking.dto.common.PageResponse;
+import com.hotelbooking.dto.roomtype.RoomTypeResponse;
+import com.hotelbooking.dto.roomtype.SearchRoomTypeResponse;
 import com.hotelbooking.service.RoomTypeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;

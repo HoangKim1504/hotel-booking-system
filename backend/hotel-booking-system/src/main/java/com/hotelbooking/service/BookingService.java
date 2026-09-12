@@ -1,6 +1,7 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.*;
+import com.hotelbooking.dto.booking.*;
+import com.hotelbooking.dto.common.PageResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.enums.PaymentStatus;
 import com.hotelbooking.enums.RoomStatus;
@@ -348,7 +349,7 @@ public class BookingService {
                                               BigDecimal totalAmount, LocalDateTime createdAtDateTime) {
         PaymentStatus paymentStatus = getPaymentStatus(booking.getId());
         String paymentMethod = getPaymentMethod(booking.getId());
-        
+
         return new BookingResponse(
                 booking.getId(),
                 booking.getStatus(),
