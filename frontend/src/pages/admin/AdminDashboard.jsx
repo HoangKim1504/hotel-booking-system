@@ -175,7 +175,7 @@ function AdminDashboard() {
             roomStatus: searchForm.roomStatus,
         });
 
-        setSortBy("");
+        setSortBy("roomNumber");
         setOrder("ASC");
         setCurrentPage(1);
     };
@@ -193,7 +193,7 @@ function AdminDashboard() {
             roomStatus: ""
         });
 
-        setSortBy("");
+        setSortBy("roomNumber");
         setOrder("ASC");
         setCurrentPage(1);
     };
@@ -202,7 +202,7 @@ function AdminDashboard() {
         const value = event.target.value;
 
         if (!value) {
-            setSortBy("");
+            setSortBy("roomNumber");
             setOrder("ASC");
             setCurrentPage(1);
             return;
