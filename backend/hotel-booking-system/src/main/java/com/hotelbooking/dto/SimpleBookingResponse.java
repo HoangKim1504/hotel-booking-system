@@ -1,6 +1,7 @@
 package com.hotelbooking.dto;
 
 import com.hotelbooking.enums.BookingStatus;
+import com.hotelbooking.enums.PaymentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,8 +11,10 @@ import java.time.LocalDateTime;
  */
 public record SimpleBookingResponse(
         String id,
-        BookingStatus status,
+        BookingStatus bookingStatus,
         BigDecimal totalAmount,
+        PaymentStatus paymentStatus,
+        String paymentMethod,
         LocalDateTime expiredAt,
         LocalDateTime createdAt) {
 }

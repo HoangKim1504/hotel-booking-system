@@ -2,6 +2,7 @@ package com.hotelbooking.service;
 
 import com.hotelbooking.dto.*;
 import com.hotelbooking.enums.BookingStatus;
+import com.hotelbooking.enums.PaymentStatus;
 import com.hotelbooking.enums.RoomStatus;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.exception.BadRequestException;
@@ -43,6 +44,7 @@ public class BookingService {
     private final RoomAssignmentRepository roomAssignmentRepository;
     private final RoomRepository roomRepository;
     private final RoomBookingSlotRepository roomBookingSlotRepository;
+    private final PaymentRepository paymentRepository;
 
     private final EntityValidator entityValidator;
     private final DateValidator dateValidator;
@@ -317,10 +319,15 @@ public class BookingService {
 
     private SimpleBookingResponse toSimpleBookingResponse(Booking booking, BigDecimal totalAmount,
                                                           LocalDateTime createdAtDateTime) {
+        PaymentStatus paymentStatus = getPaymentStatus(booking.getId());
+        String paymentMethod = getPaymentMethod(booking.getId());
+
         return new SimpleBookingResponse(
                 booking.getId(),
                 booking.getStatus(),
                 totalAmount,
+                paymentStatus,
+                paymentMethod,
                 booking.getExpiresAt(),
                 createdAtDateTime
         );
@@ -339,6 +346,9 @@ public class BookingService {
     private BookingResponse toBookingResponse(Booking booking, List<BookingItemResponse> items,
                                               LocalDate checkInDate, LocalDate checkOutDate,
                                               BigDecimal totalAmount, LocalDateTime createdAtDateTime) {
+        PaymentStatus paymentStatus = getPaymentStatus(booking.getId());
+        String paymentMethod = getPaymentMethod(booking.getId());
+        
         return new BookingResponse(
                 booking.getId(),
                 booking.getStatus(),
@@ -346,6 +356,8 @@ public class BookingService {
                 checkInDate,
                 checkOutDate,
                 totalAmount,
+                paymentStatus,
+                paymentMethod,
                 booking.getExpiresAt(),
                 createdAtDateTime
         );
@@ -735,6 +747,28 @@ public class BookingService {
                 booking.getId(),
                 booking.getStatus()
         );
+    }
+
+    private PaymentStatus getPaymentStatus(String bookingId) {
+        PaymentStatus paymentStatus = null;
+
+        Payment payment = paymentRepository.findByBookingIdAndDeleteFlagFalse(bookingId);
+        if (payment != null) {
+            paymentStatus = payment.getStatus();
+        }
+
+        return paymentStatus;
+    }
+
+    private String getPaymentMethod(String bookingId) {
+        String paymentMethod = "";
+
+        Payment payment = paymentRepository.findByBookingIdAndDeleteFlagFalse(bookingId);
+        if (payment != null) {
+            paymentMethod = payment.getPaymentMethod();
+        }
+
+        return paymentMethod;
     }
 
 }
