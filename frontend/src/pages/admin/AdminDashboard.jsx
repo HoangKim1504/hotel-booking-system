@@ -61,6 +61,22 @@ function AdminDashboard() {
     const [createLoading, setCreateLoading] = useState(false);
     const [createErrors, setCreateErrors] = useState([]);
 
+    const getStatusClass = (status) => {
+        switch (status) {
+            case "ACTIVE":
+                return "admin-status-active";
+
+            case "MAINTENANCE":
+                return "admin-status-maintenance";
+
+            case "OUT_OF_SERVICE":
+                return "admin-status-out-of-service";
+
+            default:
+                return "";
+        }
+    };
+
     useEffect(() => {
         const loadRooms = async () => {
             setLoading(true);
@@ -490,11 +506,7 @@ function AdminDashboard() {
 
                                             <td className="text-center">
                                                 <span
-                                                    className={`admin-status-badge ${
-                                                        room.status === "ACTIVE"
-                                                            ? "admin-status-active"
-                                                            : "admin-status-maintenance"
-                                                    }`}
+                                                    className={`admin-status-badge ${getStatusClass(room.status)}`}
                                                 >
                                                     {room.status}
                                                 </span>

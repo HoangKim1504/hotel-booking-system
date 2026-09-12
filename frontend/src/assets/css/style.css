@@ -1085,20 +1085,28 @@
     display: inline-block;
     min-width: 95px;
     padding: 5px 10px;
+
     border-radius: 20px;
+
     text-align: center;
+
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .admin-status-active {
-    color: #198754;
-    background: rgba(25, 135, 84, 0.1);
+    color: #146c43;
+    background: rgba(25, 135, 84, 0.16);
 }
 
 .admin-status-maintenance {
-    color: #d98200;
-    background: rgba(254, 161, 22, 0.15);
+    color: #b86b00;
+    background: rgba(254, 161, 22, 0.22);
+}
+
+.admin-status-out-of-service {
+    color: #b02a37;
+    background: rgba(220, 53, 69, 0.16);
 }
 
 /*** Admin Room Toolbar ***/
