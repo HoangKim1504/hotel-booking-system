@@ -17,6 +17,7 @@ import ErrorPopup from "../../components/common/ErrorPopup";
 import EditRoomPopup from "../../components/admin/EditRoomPopup";
 import ConfirmPopup from "../../components/common/ConfirmPopup";
 import CreateRoomPopup from "../../components/admin/CreateRoomPopup";
+import SuccessPopup from "../../components/common/SuccessPopup";
 
 function AdminDashboard() {
     const { token } = useAuth();
@@ -64,6 +65,8 @@ function AdminDashboard() {
 
     const [roomTypes, setRoomTypes] = useState([]);
     const [roomTypesLoading, setRoomTypesLoading] = useState(false);
+
+    const [successMessage, setSuccessMessage] = useState("");
 
     const getStatusClass = (status) => {
         switch (status) {
@@ -254,6 +257,8 @@ function AdminDashboard() {
            setEditingRoom(null);
            setEditErrors([]);
 
+           setSuccessMessage(`Room ${roomData.roomNumber} updated successfully.`);
+
            // Reload current table
            setRefreshKey((prev) => prev + 1);
        } catch (error) {
@@ -280,6 +285,8 @@ function AdminDashboard() {
 
         setDeleteLoading(true);
 
+        const deletedRoomNumber = roomToDelete.roomNumber;
+
         try {
             await deleteAdminRoom({
                 id: roomToDelete.id,
@@ -287,6 +294,8 @@ function AdminDashboard() {
             });
 
             setRoomToDelete(null);
+
+            setSuccessMessage(`Room ${deletedRoomNumber} deleted successfully.`);
 
             /*
              * Nếu xóa record cuối cùng của page hiện tại,
@@ -321,6 +330,8 @@ function AdminDashboard() {
 
             setShowCreatePopup(false);
             setCreateErrors([]);
+
+            setSuccessMessage(`Room ${roomData.roomNumber} created successfully.`);
 
             setRefreshKey((prev) => prev + 1);
         } catch (error) {
@@ -651,6 +662,12 @@ function AdminDashboard() {
                 loading={deleteLoading}
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setRoomToDelete(null)}
+            />
+            <SuccessPopup
+                show={Boolean(successMessage)}
+                title="Success"
+                message={successMessage}
+                onClose={() => setSuccessMessage("")}
             />
             <ErrorPopup
                 show={showErrorPopup}
