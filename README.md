@@ -1,2 +1,2 @@
 # hotel-booking-system
-A full-stack hotel booking system built with Spring Boot, React, MySQL, and Docker.
+A full-stack hotel booking system built with Spring Boot, React, MongoDB, and Docker.

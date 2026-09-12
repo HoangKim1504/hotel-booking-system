@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,5 +25,7 @@ public class BookingItem extends BaseModel {
     private String roomTypeId;
 
     private Integer quantity;
+
+    private BigDecimal price;
 
 }

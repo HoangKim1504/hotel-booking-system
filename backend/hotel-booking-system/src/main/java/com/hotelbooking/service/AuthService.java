@@ -1,7 +1,7 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.LoginRequest;
-import com.hotelbooking.dto.LoginResponse;
+import com.hotelbooking.dto.auth.LoginRequest;
+import com.hotelbooking.dto.auth.LoginResponse;
 import com.hotelbooking.exception.UnauthorizedException;
 import com.hotelbooking.model.User;
 import com.hotelbooking.security.JwtService;
@@ -29,12 +29,12 @@ public class AuthService {
 
         // Tài khoản bị khóa
         if (!user.isEnabled()) {
-            throw new UnauthorizedException("User disabled" );
+            throw new UnauthorizedException("User disabled");
         }
 
         // So khớp mật khẩu plain với BCrypt hash
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new UnauthorizedException("Invalid username or password" );
+            throw new UnauthorizedException("Invalid username or password");
         }
 
         // Phát hành JWT (sub=id, username) — không nhét permissions

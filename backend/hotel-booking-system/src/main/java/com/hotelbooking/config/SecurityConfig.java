@@ -115,6 +115,58 @@ public class SecurityConfig {
                                 "/api/admin/rooms/search"
                         ).hasAuthority("ADMIN_VIEW")
 
+                        // Booking management for User
+                        // View bookings
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/bookings",
+                                "/api/bookings/*"
+                        ).hasAuthority("USER_VIEW")
+                        // Create a Booking
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/bookings"
+                        ).authenticated()
+                        // Update a Booking
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/bookings/{id}/cancel"
+                        ).authenticated()
+                        // Payment
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/bookings/{id}/payments"
+                        ).authenticated()
+
+                        // Booking management for Admin
+                        // View bookings
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/admin/bookings",
+                                "/api/admin/bookings/*"
+                        ).hasAuthority("ADMIN_VIEW")
+                        // Create a Booking
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/admin/bookings"
+                        ).hasAuthority("USER_CREATE")
+                        // Update a Booking
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/admin/bookings/{id}/cancel",
+                                "/api/admin/bookings/{id}/status"
+                        ).hasAuthority("USER_UPDATE")
+                        // Payment
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/admin/bookings/{id}/payments"
+                        ).hasAuthority("USER_CREATE")
+                        // Delete a Booking
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/admin/bookings/*"
+                        ).hasAuthority("USER_DELETE")
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",

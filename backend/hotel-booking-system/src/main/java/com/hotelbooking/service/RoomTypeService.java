@@ -1,8 +1,8 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.PageResponse;
-import com.hotelbooking.dto.RoomTypeResponse;
-import com.hotelbooking.dto.SearchRoomTypeResponse;
+import com.hotelbooking.dto.common.PageResponse;
+import com.hotelbooking.dto.roomtype.RoomTypeResponse;
+import com.hotelbooking.dto.roomtype.SearchRoomTypeResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.enums.RoomStatus;
 import com.hotelbooking.enums.RoomTypeStatus;
@@ -10,6 +10,7 @@ import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
 import com.hotelbooking.utils.PageableUtils;
+import com.hotelbooking.validator.DateValidator;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,9 @@ public class RoomTypeService {
     private final BookingRepository bookingRepository;
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
+
     private final EntityValidator entityValidator;
+    private final DateValidator dateValidator;
 
     /**
      * Search toàn bộ Room Type, có phân trang và max record mỗi trang
@@ -67,7 +70,7 @@ public class RoomTypeService {
         List<String> eligibleRoomTypeIds;
 
         // 1. Validate input
-        validateCheckInOutDate(checkInDate, checkOutDate);
+        dateValidator.validateCheckInOutDate(checkInDate, checkOutDate);
 
         // 2. Lấy RoomType phù hợp: deleteFlag = false, status = ACTIVE, maximumPeople >= people
         List<RoomType> eligibleRoomTypes = findEligibleRoomTypes(maximumPeople);
@@ -117,7 +120,7 @@ public class RoomTypeService {
         List<SearchRoomTypeResponse> sortedResponses = sortSearchResults(results, sortBy, order);
 
         // 10. Pagination
-        return paginateSearchResults(sortedResponses, currentPage, pageSize);
+        return PageableUtils.addPagingAttributes(sortedResponses, currentPage, pageSize);
     }
 
     /**
@@ -280,33 +283,6 @@ public class RoomTypeService {
         return responses.stream()
                 .sorted(comparator)
                 .toList();
-    }
-
-    private PageResponse<SearchRoomTypeResponse> paginateSearchResults(List<SearchRoomTypeResponse> responses,
-                                                                       int currentPage, int pageSize) {
-
-        int totalRecords = responses.size();
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-        int fromIndex = (currentPage - 1) * pageSize;
-        if (fromIndex >= totalRecords) {
-            return new PageResponse<>(
-                    List.of(),
-                    currentPage,
-                    pageSize,
-                    totalRecords,
-                    totalPages
-            );
-        }
-        int toIndex = Math.min(fromIndex + pageSize, totalRecords);
-        List<SearchRoomTypeResponse> items = responses.subList(fromIndex, toIndex);
-
-        return new PageResponse<>(
-                items,
-                currentPage,
-                pageSize,
-                totalRecords,
-                totalPages
-        );
     }
 
 }

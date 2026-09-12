@@ -1,12 +1,13 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.CreateUserRequest;
-import com.hotelbooking.dto.UpdateUserRequest;
-import com.hotelbooking.dto.UserResponse;
+import com.hotelbooking.dto.user.CreateUserRequest;
+import com.hotelbooking.dto.user.UpdateUserRequest;
+import com.hotelbooking.dto.user.UserResponse;
 import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.Role;
 import com.hotelbooking.model.User;
 import com.hotelbooking.repository.UserRepository;
+import com.hotelbooking.security.PermissionLoader;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,15 +47,15 @@ public class UserService {
     public UserResponse create(CreateUserRequest request) {
         // Trùng username / email → 409
         if (userRepository.existsByUsername(request.username())) {
-            throw new ConflictException("Username already exists" );
+            throw new ConflictException("Username already exists");
         }
         if (userRepository.existsByEmail(request.email())) {
-            throw new ConflictException("Email already exists" );
+            throw new ConflictException("Email already exists");
         }
 
         // Resolve role codes (mặc định USER)
         List<String> roleCodes = (request.roleCodes() == null || request.roleCodes().isEmpty())
-                ? List.of("USER" )
+                ? List.of("USER")
                 : request.roleCodes();
         List<String> roleIds = resolveRoleIds(roleCodes);
 
@@ -72,9 +73,8 @@ public class UserService {
         user.setEnabled(true);
         user.setDeleteFlag(false);
         user.setRoleIds(roleIds);
-        Instant now = Instant.now();
         user.setCreatedBy(request.username());
-        user.setCreatedAt(now);
+        user.setCreatedAt(Instant.now());
         user.setUpdatedBy(null);
         user.setUpdatedAt(null);
 
@@ -100,7 +100,7 @@ public class UserService {
 
         if (request.email() != null) {
             if (userRepository.existsByEmail(request.email())) {
-                throw new ConflictException("Email already exists" );
+                throw new ConflictException("Email already exists");
             }
             user.setEmail(request.email());
         }
@@ -159,7 +159,7 @@ public class UserService {
 
         // Đã có role thì không thêm lại
         if (roleIds.contains(role.getId())) {
-            throw new ConflictException("Role already exists" );
+            throw new ConflictException("Role already exists");
         } else {
             // Add role
             roleIds.add(role.getId());

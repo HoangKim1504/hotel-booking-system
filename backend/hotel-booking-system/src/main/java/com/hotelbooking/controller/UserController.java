@@ -1,9 +1,9 @@
 package com.hotelbooking.controller;
 
-import com.hotelbooking.dto.AssignRoleRequest;
-import com.hotelbooking.dto.CreateUserRequest;
-import com.hotelbooking.dto.UpdateUserRequest;
-import com.hotelbooking.dto.UserResponse;
+import com.hotelbooking.dto.user.AssignRoleRequest;
+import com.hotelbooking.dto.user.CreateUserRequest;
+import com.hotelbooking.dto.user.UpdateUserRequest;
+import com.hotelbooking.dto.user.UserResponse;
 import com.hotelbooking.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
