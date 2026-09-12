@@ -87,8 +87,8 @@ public class AdminRoomController {
 
             @RequestParam(required = false)
             @Pattern(
-                    regexp = "roomNumber|floorNumber|status",
-                    message = "Sort by must be one of: roomNumber, floorNumber, status"
+                    regexp = "roomTypeName|roomNumber|floorNumber",
+                    message = "Sort by must be one of: Room Type Name, Room Number, Floor Number"
             )
             String sortBy,
 

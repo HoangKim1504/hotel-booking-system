@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -26,10 +26,6 @@ public class BookingItem extends BaseModel {
 
     private Integer quantity;
 
-    @Field("check_in_date")
-    private LocalDate checkInDate;
-
-    @Field("check_out_date")
-    private LocalDate checkOutDate;
+    private BigDecimal price;
 
 }

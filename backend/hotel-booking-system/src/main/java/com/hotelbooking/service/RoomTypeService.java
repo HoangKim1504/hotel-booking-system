@@ -10,6 +10,7 @@ import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
 import com.hotelbooking.utils.PageableUtils;
+import com.hotelbooking.validator.DateValidator;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,9 @@ public class RoomTypeService {
     private final BookingRepository bookingRepository;
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
+
     private final EntityValidator entityValidator;
+    private final DateValidator dateValidator;
 
     /**
      * Search toàn bộ Room Type, có phân trang và max record mỗi trang
@@ -67,7 +70,7 @@ public class RoomTypeService {
         List<String> eligibleRoomTypeIds;
 
         // 1. Validate input
-        validateCheckInOutDate(checkInDate, checkOutDate);
+        dateValidator.validateCheckInOutDate(checkInDate, checkOutDate);
 
         // 2. Lấy RoomType phù hợp: deleteFlag = false, status = ACTIVE, maximumPeople >= people
         List<RoomType> eligibleRoomTypes = findEligibleRoomTypes(maximumPeople);
@@ -117,7 +120,7 @@ public class RoomTypeService {
         List<SearchRoomTypeResponse> sortedResponses = sortSearchResults(results, sortBy, order);
 
         // 10. Pagination
-        return paginateSearchResults(sortedResponses, currentPage, pageSize);
+        return PageableUtils.addPagingAttributes(sortedResponses, currentPage, pageSize);
     }
 
     /**
@@ -183,12 +186,7 @@ public class RoomTypeService {
     }
 
     private List<BookingItem> findOccupiedBookingItems(LocalDate checkInDate, LocalDate checkOutDate) {
-        // 1. Tìm BookingItem bị overlap với khoảng ngày search
-        List<BookingItem> overlappingBookingItems =
-                bookingItemRepository.findByDeleteFlagFalseAndCheckInDateLessThanAndCheckOutDateGreaterThan(
-                        checkOutDate, checkInDate);
-
-        // 2. Các BookingStatus vẫn đang giữ phòng
+        // 1. Các BookingStatus vẫn đang giữ phòng
         List<BookingStatus> activeStatuses = List.of(
                 BookingStatus.PENDING,
                 BookingStatus.PAID,
@@ -196,20 +194,21 @@ public class RoomTypeService {
                 BookingStatus.CHECKED_IN
         );
 
-        // 3. Lấy bookingId của các Booking còn hiệu lực
-        Set<String> validBookingIds = getValidBookingIds(activeStatuses);
+        // 2. Tìm Booking overlap với khoảng ngày search
+        List<Booking> overlappingBookings =
+                bookingRepository.findByDeleteFlagFalseAndCheckInDateLessThanAndCheckOutDateGreaterThan(
+                        checkOutDate, checkInDate);
 
-        // 4. Chỉ giữ BookingItem thuộc Booking còn hiệu lực
-        return overlappingBookingItems
-                .stream()
-                .filter(item -> validBookingIds.contains(item.getBookingId()))
-                .toList();
+        // 3. Lấy ID của Booking overlap và còn hiệu lực
+        Set<String> validBookingIds = getValidBookingIds(overlappingBookings, activeStatuses);
+
+        // 4. Lấy BookingItem thuộc các Booking còn hiệu lực
+        return bookingItemRepository.findByBookingIdInAndDeleteFlagFalse(validBookingIds);
     }
 
-    private Set<String> getValidBookingIds(Collection<BookingStatus> activeStatuses) {
-        return bookingRepository
-                .findByDeleteFlagFalseAndStatusIn(activeStatuses)
-                .stream()
+    private Set<String> getValidBookingIds(List<Booking> bookings, Collection<BookingStatus> activeStatuses) {
+        return bookings.stream()
+                .filter(booking -> activeStatuses.contains(booking.getStatus()))
                 .map(Booking::getId)
                 .collect(Collectors.toSet());
     }
@@ -284,33 +283,6 @@ public class RoomTypeService {
         return responses.stream()
                 .sorted(comparator)
                 .toList();
-    }
-
-    private PageResponse<SearchRoomTypeResponse> paginateSearchResults(List<SearchRoomTypeResponse> responses,
-                                                                       int currentPage, int pageSize) {
-
-        int totalRecords = responses.size();
-        int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
-        int fromIndex = (currentPage - 1) * pageSize;
-        if (fromIndex >= totalRecords) {
-            return new PageResponse<>(
-                    List.of(),
-                    currentPage,
-                    pageSize,
-                    totalRecords,
-                    totalPages
-            );
-        }
-        int toIndex = Math.min(fromIndex + pageSize, totalRecords);
-        List<SearchRoomTypeResponse> items = responses.subList(fromIndex, toIndex);
-
-        return new PageResponse<>(
-                items,
-                currentPage,
-                pageSize,
-                totalRecords,
-                totalPages
-        );
     }
 
 }

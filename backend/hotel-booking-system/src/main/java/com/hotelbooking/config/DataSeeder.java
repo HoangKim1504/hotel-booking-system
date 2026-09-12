@@ -1,9 +1,6 @@
 package com.hotelbooking.config;
 
-import com.hotelbooking.enums.BookingStatus;
-import com.hotelbooking.enums.Gender;
-import com.hotelbooking.enums.RoomStatus;
-import com.hotelbooking.enums.RoomTypeStatus;
+import com.hotelbooking.enums.*;
 import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +14,10 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -40,6 +37,9 @@ public class DataSeeder implements ApplicationRunner {
     private final BookingRepository bookingRepository;
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
+    private final RoomBookingSlotRepository roomBookingSlotRepository;
+
+    private final PaymentRepository paymentRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -64,6 +64,12 @@ public class DataSeeder implements ApplicationRunner {
 
         // 5. CART + CART ITEMS
         seedCartData();
+
+        // 6. ROOM BOOKING SLOTS
+        seedRoomBookingSlots();
+
+        // 7. PAYMENT
+        seedPayments();
     }
 
     // =========================================================
@@ -486,15 +492,19 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking1 =
-                saveBooking(alice, BookingStatus.CONFIRMED);
+                saveBooking(
+                        alice,
+                        BookingStatus.CONFIRMED,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 12)
+                );
 
         BookingItem bookingItem1 =
                 saveBookingItem(
                         booking1,
                         deluxeKing,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 12),
-                        1
+                        1,
+                        BigDecimal.valueOf(150)
                 );
 
         saveRoomAssignment(
@@ -511,15 +521,19 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking2 =
-                saveBooking(peter, BookingStatus.PAID);
+                saveBooking(
+                        peter,
+                        BookingStatus.PAID,
+                        LocalDate.of(2026, 9, 11),
+                        LocalDate.of(2026, 9, 13)
+                );
 
         BookingItem bookingItem2 =
                 saveBookingItem(
                         booking2,
                         deluxeKing,
-                        LocalDate.of(2026, 9, 11),
-                        LocalDate.of(2026, 9, 13),
-                        1
+                        2,
+                        BigDecimal.valueOf(300)
                 );
 
         saveRoomAssignment(
@@ -535,15 +549,19 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking3 =
-                saveBooking(alice, BookingStatus.CANCELLED);
+                saveBooking(
+                        alice,
+                        BookingStatus.CANCELLED,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 12)
+                );
 
         BookingItem bookingItem3 =
                 saveBookingItem(
                         booking3,
                         deluxeKing,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 12),
-                        1
+                        3,
+                        BigDecimal.valueOf(500)
                 );
 
         saveRoomAssignment(
@@ -564,15 +582,19 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking4 =
-                saveBooking(peter, BookingStatus.CONFIRMED);
+                saveBooking(
+                        peter,
+                        BookingStatus.CONFIRMED,
+                        LocalDate.of(2026, 9, 8),
+                        LocalDate.of(2026, 9, 10)
+                );
 
         BookingItem bookingItem4 =
                 saveBookingItem(
                         booking4,
                         deluxeKing,
-                        LocalDate.of(2026, 9, 8),
-                        LocalDate.of(2026, 9, 10),
-                        1
+                        1,
+                        BigDecimal.valueOf(200)
                 );
 
         saveRoomAssignment(
@@ -588,15 +610,19 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking5 =
-                saveBooking(alice, BookingStatus.PENDING);
+                saveBooking(
+                        alice,
+                        BookingStatus.PENDING,
+                        LocalDate.of(2026, 9, 9),
+                        LocalDate.of(2026, 9, 11)
+                );
 
         BookingItem bookingItem5 =
                 saveBookingItem(
                         booking5,
                         executiveSuite,
-                        LocalDate.of(2026, 9, 9),
-                        LocalDate.of(2026, 9, 11),
-                        1
+                        4,
+                        BigDecimal.valueOf(600)
                 );
 
         saveRoomAssignment(
@@ -612,15 +638,19 @@ public class DataSeeder implements ApplicationRunner {
         // =====================================================
 
         Booking booking6 =
-                saveBooking(peter, BookingStatus.EXPIRED);
+                saveBooking(
+                        peter,
+                        BookingStatus.EXPIRED,
+                        LocalDate.of(2026, 9, 10),
+                        LocalDate.of(2026, 9, 13)
+                );
 
         BookingItem bookingItem6 =
                 saveBookingItem(
                         booking6,
                         familyRoom,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 13),
-                        1
+                        1,
+                        BigDecimal.valueOf(300)
                 );
 
         saveRoomAssignment(
@@ -748,6 +778,100 @@ public class DataSeeder implements ApplicationRunner {
                 username,
                 itemCount
         );
+    }
+
+    private void seedRoomBookingSlots() {
+
+        if (roomBookingSlotRepository.count() > 0) {
+            System.out.println("RoomBookingSlot already exists. Skip seeding.");
+            return;
+        }
+
+        List<BookingStatus> holdingStatuses = List.of(
+                BookingStatus.PENDING,
+                BookingStatus.PAID,
+                BookingStatus.CONFIRMED,
+                BookingStatus.CHECKED_IN
+        );
+
+        List<Booking> bookings =
+                bookingRepository.findByDeleteFlagFalseAndStatusIn(holdingStatuses);
+
+        for (Booking booking : bookings) {
+            // PENDING đã hết hạn thì không tạo slot
+            if (BookingStatus.PENDING.equals(booking.getStatus())
+                    && booking.getExpiresAt() != null
+                    && booking.getExpiresAt().isBefore(LocalDateTime.now())) {
+                continue;
+            }
+
+            // Lấy BookingItem của Booking
+            List<BookingItem> bookingItems =
+                    bookingItemRepository.findByDeleteFlagFalseAndBookingId(booking.getId());
+
+            for (BookingItem bookingItem : bookingItems) {
+
+                // Lấy RoomAssignment của BookingItem
+                List<RoomAssignment> assignments =
+                        roomAssignmentRepository.findByBookingItemIdAndDeleteFlagFalse(bookingItem.getId());
+
+                for (RoomAssignment assignment : assignments) {
+                    createRoomBookingSlots(
+                            booking,
+                            assignment.getRoomId()
+                    );
+                }
+            }
+        }
+    }
+
+    private void seedPayments() {
+
+        List<Booking> bookings =
+                bookingRepository.findByDeleteFlagFalse();
+
+        if (bookings.isEmpty()) {
+            log.info("PaymentDataSeeder: No booking found — skip");
+            return;
+        }
+
+        for (Booking booking : bookings) {
+
+            // Booking này đã có Payment thì skip
+            if (paymentRepository
+                    .existsByBookingIdAndDeleteFlagFalse(
+                            booking.getId()
+                    )) {
+                continue;
+            }
+
+            switch (booking.getStatus()) {
+
+                // Booking vừa tạo, chưa thanh toán
+                case PENDING -> seedPendingPayment(booking);
+
+                // User chọn CASH, booking đã được xác nhận
+                case CONFIRMED -> seedCashPayment(booking);
+
+                // Thanh toán online thành công
+                case PAID -> seedOnlineSuccessPayment(booking);
+
+                // Đã check-in, payment trước đó đã thành công
+                case CHECKED_IN -> seedOnlineSuccessPayment(booking);
+
+                // Booking đã hoàn tất
+                case COMPLETED -> seedOnlineSuccessPayment(booking);
+
+                // Booking hết hạn do không thanh toán
+                case EXPIRED -> seedFailedPayment(booking);
+
+                default -> {
+                    // CANCELLED hoặc status khác
+                }
+            }
+        }
+
+        log.info("PaymentDataSeeder: Payment data seeded successfully");
     }
 
     private void saveCartItem(
@@ -906,16 +1030,30 @@ public class DataSeeder implements ApplicationRunner {
 
     private Booking saveBooking(
             User user,
-            BookingStatus status
+            BookingStatus status,
+            LocalDate checkInDate,
+            LocalDate checkOutDate
     ) {
         Booking booking = new Booking();
 
+        Instant now = Instant.now();
+
         booking.setUserId(user.getId());
         booking.setStatus(status);
+        booking.setCheckInDate(checkInDate);
+        booking.setCheckOutDate(checkOutDate);
+
+        // Chỉ PENDING và EXPIRED mới có thời gian giữ phòng
+        if (BookingStatus.PENDING.equals(status)
+                || BookingStatus.EXPIRED.equals(status)) {
+            booking.setExpiresAt(
+                    LocalDateTime.now().plusMinutes(15)
+            );
+        } else {
+            booking.setExpiresAt(null);
+        }
 
         booking.setDeleteFlag(false);
-
-        Instant now = Instant.now();
 
         booking.setCreatedBy("admin");
         booking.setCreatedAt(now);
@@ -928,19 +1066,16 @@ public class DataSeeder implements ApplicationRunner {
     private BookingItem saveBookingItem(
             Booking booking,
             RoomType roomType,
-            LocalDate checkInDate,
-            LocalDate checkOutDate,
-            int quantity
+            int quantity,
+            BigDecimal price
     ) {
         BookingItem bookingItem = new BookingItem();
 
         bookingItem.setBookingId(booking.getId());
         bookingItem.setRoomTypeId(roomType.getId());
 
-        bookingItem.setCheckInDate(checkInDate);
-        bookingItem.setCheckOutDate(checkOutDate);
-
         bookingItem.setQuantity(quantity);
+        bookingItem.setPrice(price);
 
         bookingItem.setDeleteFlag(false);
 
@@ -975,6 +1110,78 @@ public class DataSeeder implements ApplicationRunner {
         roomAssignmentRepository.save(assignment);
     }
 
+    private void seedCashPayment(Booking booking) {
+
+        Instant now = Instant.now();
+
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("CASH")
+                .status(PaymentStatus.PENDING)
+                .paymentDate(null)
+                .transactionId(null)
+                .build();
+
+        setPaymentAudit(payment, now);
+
+        paymentRepository.save(payment);
+    }
+
+    private void seedOnlineSuccessPayment(Booking booking) {
+
+        Instant now = Instant.now();
+
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("ONLINE")
+                .status(PaymentStatus.SUCCESS)
+                .paymentDate(getSeedPaymentDate(booking))
+                .transactionId(UUID.randomUUID().toString())
+                .build();
+
+        setPaymentAudit(payment, now);
+
+        paymentRepository.save(payment);
+    }
+
+    private void seedPendingPayment(Booking booking) {
+
+        Instant now = Instant.now();
+
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("ONLINE")
+                .status(PaymentStatus.PENDING)
+                .paymentDate(null)
+                .transactionId(null)
+                .build();
+
+        setPaymentAudit(payment, now);
+
+        paymentRepository.save(payment);
+    }
+
+    private void seedFailedPayment(Booking booking) {
+
+        Instant now = Instant.now();
+
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("ONLINE")
+                .status(PaymentStatus.FAILED)
+                .paymentDate(null)
+                .transactionId(UUID.randomUUID().toString())
+                .build();
+
+        setPaymentAudit(payment, now);
+
+        paymentRepository.save(payment);
+    }
+
     private RoomType requireSeedRoomType(
             List<RoomType> roomTypes,
             String roomTypeName
@@ -1005,6 +1212,81 @@ public class DataSeeder implements ApplicationRunner {
                                 "Seeder room not found: " + roomNumber
                         )
                 );
+    }
+
+    private void createRoomBookingSlots(
+            Booking booking,
+            String roomId
+    ) {
+        LocalDate stayDate =
+                booking.getCheckInDate();
+
+        while (stayDate.isBefore(
+                booking.getCheckOutDate()
+        )) {
+
+            RoomBookingSlot slot =
+                    RoomBookingSlot.builder()
+                            .roomId(roomId)
+                            .bookingId(booking.getId())
+                            .stayDate(stayDate)
+                            .createdAt(Instant.now())
+                            .build();
+
+            roomBookingSlotRepository.save(slot);
+
+            stayDate = stayDate.plusDays(1);
+        }
+    }
+
+    private LocalDateTime getSeedPaymentDate(
+            Booking booking
+    ) {
+        if (booking.getCreatedAt() == null) {
+            return LocalDateTime.now();
+        }
+
+        return LocalDateTime.ofInstant(
+                        booking.getCreatedAt(),
+                        ZoneId.systemDefault()
+                )
+                .plusMinutes(5);
+    }
+
+    private BigDecimal calculateBookingTotal(
+            Booking booking
+    ) {
+        List<BookingItem> bookingItems =
+                bookingItemRepository.findByDeleteFlagFalseAndBookingId(booking.getId());
+
+        long numberOfNights =
+                ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for (BookingItem bookingItem : bookingItems) {
+            BigDecimal itemAmount =
+                    bookingItem.getPrice().multiply(
+                                    BigDecimal.valueOf(numberOfNights))
+                            .multiply(BigDecimal.valueOf(bookingItem.getQuantity()));
+
+            totalAmount = totalAmount.add(itemAmount);
+        }
+
+        return totalAmount;
+    }
+
+    private void setPaymentAudit(
+            Payment payment,
+            Instant now
+    ) {
+        payment.setDeleteFlag(false);
+
+        payment.setCreatedBy("admin");
+        payment.setCreatedAt(now);
+
+        payment.setUpdatedBy("admin");
+        payment.setUpdatedAt(now);
     }
 
 }

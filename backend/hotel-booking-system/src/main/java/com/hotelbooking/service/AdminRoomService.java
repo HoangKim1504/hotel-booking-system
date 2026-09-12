@@ -38,8 +38,6 @@ public class AdminRoomService {
     private final EntityValidator entityValidator;
     private final MongoTemplate mongoTemplate;
 
-    Instant now = Instant.now();
-
     /**
      * Search toàn bộ Room, có phân trang và max record mỗi trang
      */
@@ -203,7 +201,7 @@ public class AdminRoomService {
         // Kiểm tra phòng có đang được dùng không
         checkOccupiedRoomId(id, true);
 
-        Room updateRoom = setUpdateRoom(request, existingRoom, id, username);
+        Room updateRoom = setUpdateRoom(request, existingRoom, existingRoomType.getId(), username);
 
         return buildRoomResponse(roomRepository.save(updateRoom), existingRoomType.getRoomTypeName());
     }
@@ -295,20 +293,20 @@ public class AdminRoomService {
         room.setStatus(RoomStatus.ACTIVE);
         room.setDeleteFlag(false);
         room.setCreatedBy(username);
-        room.setCreatedAt(now);
+        room.setCreatedAt(Instant.now());
         room.setUpdatedBy(null);
         room.setUpdatedAt(null);
 
         return room;
     }
 
-    private Room setUpdateRoom(UpdateRoomRequest request, Room existingRoom, String id, String username) {
-        existingRoom.setRoomTypeId(id);
+    private Room setUpdateRoom(UpdateRoomRequest request, Room existingRoom, String roomTypeId, String username) {
+        existingRoom.setRoomTypeId(roomTypeId);
         existingRoom.setRoomNumber(request.roomNumber());
         existingRoom.setFloorNumber(request.floorNumber());
         existingRoom.setStatus(request.status());
         existingRoom.setUpdatedBy(username);
-        existingRoom.setUpdatedAt(now);
+        existingRoom.setUpdatedAt(Instant.now());
 
         return existingRoom;
     }
@@ -328,7 +326,7 @@ public class AdminRoomService {
         room.setStatus(RoomStatus.OUT_OF_SERVICE);
         room.setDeleteFlag(true);
         room.setUpdatedBy(username);
-        room.setUpdatedAt(now);
+        room.setUpdatedAt(Instant.now());
         return room;
     }
 
