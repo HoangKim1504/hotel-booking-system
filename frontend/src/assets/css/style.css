@@ -1016,8 +1016,13 @@
     border-bottom: 1px solid #e9ecef;
 }
 
-.admin-room-table tbody tr:hover {
-    background: #f8f9fa;
+/*** Admin Room Table Row Hover ***/
+.admin-room-table tbody tr > td {
+    transition: background-color 0.2s ease;
+}
+
+.admin-room-table tbody tr:hover > td {
+    background-color: rgba(254, 161, 22, 0.12);
 }
 
 .admin-room-number {
@@ -1059,7 +1064,6 @@
     padding: 5px 10px;
     font-size: 12px;
 }
-
 
 /*** Admin Pagination ***/
 .admin-pagination {
