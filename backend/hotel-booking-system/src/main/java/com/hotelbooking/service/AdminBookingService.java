@@ -10,6 +10,7 @@ import com.hotelbooking.repository.BookingItemRepository;
 import com.hotelbooking.repository.BookingRepository;
 import com.hotelbooking.repository.RoomAssignmentRepository;
 import com.hotelbooking.repository.RoomBookingSlotRepository;
+import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,8 @@ public class AdminBookingService {
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
     private final RoomBookingSlotRepository roomBookingSlotRepository;
+
+    private final EntityValidator entityValidator;
 
     // List các trạng thái Booking không thể bị Delete
     private static final List<BookingStatus> CANNOT_BE_DELETED_STATUSES = List.of(
@@ -116,7 +119,7 @@ public class AdminBookingService {
     public UpdateBookingResponse updateBookingStatus(String bookingId, String userId,
                                                      BookingStatus newStatus, String username) {
         // 1. Tìm Booking của user hiện tại
-        Booking booking = bookingService.findBookingByIdAndUserId(bookingId, userId);
+        Booking booking = entityValidator.requireBookingOwnedByUser(bookingId, userId);
 
         // 2. Validate status có được đổi hay không
         validateBookingCanBeChangedStatus(booking);
@@ -155,7 +158,7 @@ public class AdminBookingService {
     @Transactional
     public void deleteBooking(String bookingId, String userId, String username) {
         // 1. Tìm Booking của user hiện tại
-        Booking booking = bookingService.findBookingByIdAndUserId(bookingId, userId);
+        Booking booking = entityValidator.requireBookingOwnedByUser(bookingId, userId);
 
         // 2. Validate status có được delete hay không
         validateBookingCanBeDeleted(booking);

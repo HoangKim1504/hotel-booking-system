@@ -118,4 +118,24 @@ public class EntityValidator {
                 );
     }
 
+    /**
+     * Tìm Booking và kiểm tra Booking có thuộc user hay không.
+     */
+    public Booking requireBookingOwnedByUser(String bookingId, String userId) {
+        // 1. Kiểm tra User tồn tại
+        requireUserByUserId(userId);
+
+        // 2. Kiểm tra Booking tồn tại
+        Booking booking = requireBooking(bookingId);
+
+        // 3. Kiểm tra Booking thuộc User
+        if (!userId.equals(booking.getUserId())) {
+            throw new ForbiddenException(
+                    "This booking does not belong to given user: " + userId
+            );
+        }
+
+        return booking;
+    }
+
 }

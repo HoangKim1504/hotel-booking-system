@@ -6,7 +6,6 @@ import com.hotelbooking.enums.RoomStatus;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.exception.BadRequestException;
 import com.hotelbooking.exception.ConflictException;
-import com.hotelbooking.exception.ForbiddenException;
 import com.hotelbooking.model.*;
 import com.hotelbooking.repository.*;
 import com.hotelbooking.utils.PageableUtils;
@@ -142,7 +141,7 @@ public class BookingService {
         List<BookingItemResponse> bookingItemResponseList = new ArrayList<>();
 
         // Tìm Booking dựa theo bookingId và userId
-        Booking booking = findBookingByIdAndUserId(bookingId, userId);
+        Booking booking = entityValidator.requireBookingOwnedByUser(bookingId, userId);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -270,7 +269,7 @@ public class BookingService {
     @Transactional
     public UpdateBookingResponse cancelBooking(String bookingId, String userId, String username) {
         // 1. Tìm Booking của user hiện tại
-        Booking booking = findBookingByIdAndUserId(bookingId, userId);
+        Booking booking = entityValidator.requireBookingOwnedByUser(bookingId, userId);
 
         // 2. Validate status có được cancel hay không
         validateBookingCanBeCancelled(booking);
@@ -325,24 +324,6 @@ public class BookingService {
                 booking.getExpiresAt(),
                 createdAtDateTime
         );
-    }
-
-    /**
-     * Tìm booking dựa trên bookingId và userId
-     */
-    public Booking findBookingByIdAndUserId(String bookingId, String userId) {
-        // Kiểm tra sự tồn tại của userId trong DB
-        entityValidator.requireUserByUserId(userId);
-
-        // Tìm Booking dựa theo bookingId
-        Booking booking = entityValidator.requireBooking(bookingId);
-
-        // TH userId tại booking và userId truyền vào là 2 userId khác nhau
-        if (!userId.equals(booking.getUserId())) {
-            throw new ForbiddenException("This booking does not belong to given user: " + userId);
-        }
-
-        return booking;
     }
 
     private BookingItemResponse toBookingItemResponse(BookingItem item, String roomTypeName) {
