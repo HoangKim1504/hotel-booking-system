@@ -1,8 +1,8 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.PageResponse;
-import com.hotelbooking.dto.RoomTypeResponse;
-import com.hotelbooking.dto.SearchRoomTypeResponse;
+import com.hotelbooking.dto.common.PageResponse;
+import com.hotelbooking.dto.roomtype.RoomTypeResponse;
+import com.hotelbooking.dto.roomtype.SearchRoomTypeResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.enums.RoomStatus;
 import com.hotelbooking.enums.RoomTypeStatus;

@@ -1,12 +1,13 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.CreateUserRequest;
-import com.hotelbooking.dto.UpdateUserRequest;
-import com.hotelbooking.dto.UserResponse;
+import com.hotelbooking.dto.user.CreateUserRequest;
+import com.hotelbooking.dto.user.UpdateUserRequest;
+import com.hotelbooking.dto.user.UserResponse;
 import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.Role;
 import com.hotelbooking.model.User;
 import com.hotelbooking.repository.UserRepository;
+import com.hotelbooking.security.PermissionLoader;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

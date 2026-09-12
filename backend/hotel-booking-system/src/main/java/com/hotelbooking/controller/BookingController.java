@@ -1,11 +1,17 @@
 package com.hotelbooking.controller;
 
-import com.hotelbooking.dto.*;
+import com.hotelbooking.dto.booking.BookingResponse;
+import com.hotelbooking.dto.booking.CreateBookingRequest;
+import com.hotelbooking.dto.booking.SimpleBookingResponse;
+import com.hotelbooking.dto.booking.UpdateBookingResponse;
+import com.hotelbooking.dto.common.PageResponse;
+import com.hotelbooking.dto.payment.CreatePaymentRequest;
+import com.hotelbooking.dto.payment.PaymentResponse;
 import com.hotelbooking.enums.BookingStatus;
 import com.hotelbooking.security.AuthUserPrincipal;
+import com.hotelbooking.security.SecurityUtils;
 import com.hotelbooking.service.BookingService;
 import com.hotelbooking.service.PaymentService;
-import com.hotelbooking.service.SecurityUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;

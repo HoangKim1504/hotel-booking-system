@@ -1,9 +1,13 @@
 package com.hotelbooking.controller;
 
-import com.hotelbooking.dto.*;
+import com.hotelbooking.dto.auth.LoginRequest;
+import com.hotelbooking.dto.auth.LoginResponse;
+import com.hotelbooking.dto.user.CreateUserRequest;
+import com.hotelbooking.dto.user.MeResponse;
+import com.hotelbooking.dto.user.UserResponse;
 import com.hotelbooking.security.AuthUserPrincipal;
+import com.hotelbooking.security.SecurityUtils;
 import com.hotelbooking.service.AuthService;
-import com.hotelbooking.service.SecurityUtils;
 import com.hotelbooking.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;

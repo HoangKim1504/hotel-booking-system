@@ -1,6 +1,6 @@
 package com.hotelbooking.utils;
 
-import com.hotelbooking.dto.PageResponse;
+import com.hotelbooking.dto.common.PageResponse;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

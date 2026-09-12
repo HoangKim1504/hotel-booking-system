@@ -2,7 +2,6 @@ package com.hotelbooking.security;
 
 import com.hotelbooking.model.User;
 import com.hotelbooking.repository.UserRepository;
-import com.hotelbooking.service.PermissionLoader;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
