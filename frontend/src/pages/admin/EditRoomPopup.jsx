@@ -15,17 +15,22 @@ function EditRoomPopup({
         status: "",
     });
 
+    const [initialData, setInitialData] = useState(null);
+
     useEffect(() => {
         if (!room) {
             return;
         }
 
-        setFormData({
+        const roomData = {
             roomTypeName: room.roomTypeName || "",
             roomNumber: room.roomNumber || "",
             floorNumber: room.floorNumber || "",
             status: room.status || "",
-        });
+        };
+
+        setFormData(roomData);
+        setInitialData(roomData);
     }, [room]);
 
     if (!show || !room) {
@@ -51,6 +56,15 @@ function EditRoomPopup({
             status: formData.status,
         });
     };
+
+    const hasChanges =
+        initialData &&
+        (
+            formData.roomTypeName !== initialData.roomTypeName ||
+            String(formData.roomNumber) !== String(initialData.roomNumber) ||
+            String(formData.floorNumber) !== String(initialData.floorNumber) ||
+            formData.status !== initialData.status
+        );
 
     return (
         <div
@@ -203,8 +217,8 @@ function EditRoomPopup({
 
                         <button
                             type="submit"
-                            className="btn btn-primary"
-                            disabled={loading}
+                            className="btn btn-primary edit-room-update-btn"
+                            disabled={loading || !hasChanges}
                         >
                             {loading ? "UPDATING..." : "UPDATE"}
                         </button>
