@@ -153,7 +153,8 @@ public class SecurityConfig {
                         // Update a Booking
                         .requestMatchers(
                                 HttpMethod.PUT,
-                                "/api/admin/bookings/{id}/cancel"
+                                "/api/admin/bookings/{id}/cancel",
+                                "/api/admin/bookings/{id}/status"
                         ).hasAuthority("USER_UPDATE")
                         // Payment
                         .requestMatchers(
