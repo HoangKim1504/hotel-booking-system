@@ -8,12 +8,14 @@ import {
     getAdminRoomById,
     updateAdminRoom,
     deleteAdminRoom,
+    createAdminRoom,
 } from "../../services/adminRoomService";
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ErrorPopup from "../../components/common/ErrorPopup";
-import EditRoomPopup from "./EditRoomPopup";
+import EditRoomPopup from "../../components/admin/EditRoomPopup";
 import ConfirmPopup from "../../components/common/ConfirmPopup";
+import CreateRoomPopup from "../../components/admin/CreateRoomPopup";
 
 function AdminDashboard() {
     const { token } = useAuth();
@@ -54,6 +56,10 @@ function AdminDashboard() {
 
     const [roomToDelete, setRoomToDelete] = useState(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
+
+    const [showCreatePopup, setShowCreatePopup] = useState(false);
+    const [createLoading, setCreateLoading] = useState(false);
+    const [createErrors, setCreateErrors] = useState([]);
 
     useEffect(() => {
         const loadRooms = async () => {
@@ -258,6 +264,32 @@ function AdminDashboard() {
         }
     };
 
+    const handleCreateRoom = async (roomData) => {
+        setCreateLoading(true);
+        setCreateErrors([]);
+
+        try {
+            await createAdminRoom({
+                roomData,
+                token,
+            });
+
+            setShowCreatePopup(false);
+            setCreateErrors([]);
+
+            setRefreshKey((prev) => prev + 1);
+        } catch (error) {
+            setCreateErrors(getErrorMessages(error));
+        } finally {
+            setCreateLoading(false);
+        }
+    };
+
+    const handleCancelCreate = () => {
+        setShowCreatePopup(false);
+        setCreateErrors([]);
+    };
+
     return (
         <>
             <LoadingSpinner show={loading} />
@@ -283,6 +315,17 @@ function AdminDashboard() {
                                     Total: {totalRecords} rooms
                                 </span>
                             </div>
+
+                            <button
+                                type="button"
+                                className="btn btn-primary admin-create-room-btn"
+                                onClick={() => {
+                                    setCreateErrors([]);
+                                    setShowCreatePopup(true);
+                                }}
+                            >
+                                Create Room
+                            </button>
                         </div>
 
                         {/* Search and Sort */}
@@ -530,6 +573,13 @@ function AdminDashboard() {
                 title="Unable to Load Rooms"
                 errors={errors}
                 onClose={() => setShowErrorPopup(false)}
+            />
+            <CreateRoomPopup
+                show={showCreatePopup}
+                loading={createLoading}
+                errors={createErrors}
+                onCreate={handleCreateRoom}
+                onCancel={handleCancelCreate}
             />
             <EditRoomPopup
                 show={showEditPopup}
