@@ -31,7 +31,7 @@ function AdminDashboard() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
 
-    const [sortBy, setSortBy] = useState("");
+    const [sortBy, setSortBy] = useState("roomNumber");
     const [order, setOrder] = useState("ASC");
 
     const [searchKeyword, setSearchKeyword] = useState("");
@@ -428,7 +428,7 @@ function AdminDashboard() {
                                     }
                                     onChange={handleSortChange}
                                 >
-                                    <option value="">
+                                    <option value="roomNumber-ASC">
                                         Default
                                     </option>
 
