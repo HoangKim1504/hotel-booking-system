@@ -1,4 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const initialFormData = {
+    roomTypeName: "",
+    roomNumber: "",
+    floorNumber: "",
+};
 
 function CreateRoomPopup({
     show,
@@ -9,11 +15,13 @@ function CreateRoomPopup({
     onCreate,
     onCancel,
 }) {
-    const [formData, setFormData] = useState({
-        roomTypeName: "",
-        roomNumber: "",
-        floorNumber: "",
-    });
+    const [formData, setFormData] = useState(initialFormData);
+
+    useEffect(() => {
+        if (!show) {
+            setFormData(initialFormData);
+        }
+    }, [show]);
 
     if (!show) {
         return null;
