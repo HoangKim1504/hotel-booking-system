@@ -725,7 +725,7 @@ public class BookingService {
         }
     }
 
-    private void releaseRoomAssignments(String bookingId, String username, Instant now) {
+    public void releaseRoomAssignments(String bookingId, String username, Instant now) {
         List<String> bookingItemIds =
                 bookingItemRepository
                         .findByDeleteFlagFalseAndBookingId(bookingId)
@@ -749,7 +749,7 @@ public class BookingService {
         roomAssignmentRepository.saveAll(assignments);
     }
 
-    private UpdateBookingResponse toUpdateBookingResponse(Booking booking) {
+    public UpdateBookingResponse toUpdateBookingResponse(Booking booking) {
         return new UpdateBookingResponse(
                 booking.getId(),
                 booking.getStatus()

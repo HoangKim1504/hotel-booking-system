@@ -12,9 +12,12 @@ import com.hotelbooking.repository.RoomAssignmentRepository;
 import com.hotelbooking.repository.RoomBookingSlotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * SERVICE — CRUD Booking.
@@ -39,6 +42,38 @@ public class AdminBookingService {
             BookingStatus.CHECKED_IN,
             BookingStatus.CONFIRMED,
             BookingStatus.COMPLETED,
+            BookingStatus.REFUNDED
+    );
+
+    // List các trạng thái Booking không thể bị đổi status
+    private static final List<BookingStatus> CANNOT_BE_CHANGED_STATUSES = List.of(
+            BookingStatus.COMPLETED,
+            BookingStatus.CANCELLED,
+            BookingStatus.EXPIRED,
+            BookingStatus.REFUNDED
+    );
+
+    // List các trường hợp Booking có thể đổi status
+    private static final Map<BookingStatus, Set<BookingStatus>>
+            ALLOWED_STATUS_TRANSITIONS = Map.of(
+            // Flow: PENDING -> PAID -> CONFIRMED
+            BookingStatus.PENDING,
+            Set.of(BookingStatus.PAID, BookingStatus.CONFIRMED),
+            // Flow: PAID -> CONFIRMED
+            BookingStatus.PAID,
+            Set.of(BookingStatus.CONFIRMED),
+            // Flow: CONFIRMED -> CHECKED_IN
+            BookingStatus.CONFIRMED,
+            Set.of(BookingStatus.CHECKED_IN),
+            // Flow: CHECKED_IN -> COMPLETED
+            BookingStatus.CHECKED_IN,
+            Set.of(BookingStatus.COMPLETED)
+    );
+
+    private static final Set<BookingStatus> RELEASE_ROOM_STATUSES = Set.of(
+            BookingStatus.COMPLETED,
+            BookingStatus.CANCELLED,
+            BookingStatus.EXPIRED,
             BookingStatus.REFUNDED
     );
 
@@ -77,6 +112,34 @@ public class AdminBookingService {
         );
     }
 
+    @Transactional
+    public UpdateBookingResponse updateBookingStatus(String bookingId, String userId,
+                                                     BookingStatus newStatus, String username) {
+        // 1. Tìm Booking của user hiện tại
+        Booking booking = bookingService.findBookingByIdAndUserId(bookingId, userId);
+
+        // 2. Validate status có được đổi hay không
+        validateBookingCanBeChangedStatus(booking);
+
+        // 3. Check flow currentStatus -> newStatus
+        validateBookingStatusFlowCanBeChanged(booking, newStatus);
+
+        // 4. Update status
+        Instant now = Instant.now();
+
+        booking.setStatus(newStatus);
+        booking.setUpdatedBy(username);
+        booking.setUpdatedAt(now);
+
+        Booking updatedBooking = bookingRepository.save(booking);
+
+        // 5. Nếu Booking không còn giữ phòng thì release RoomBookingSlot
+        releaseRoomsIfNeeded(newStatus, bookingId, username, now);
+
+        // 5. Return response
+        return bookingService.toUpdateBookingResponse(updatedBooking);
+    }
+
     public UpdateBookingResponse cancelBookingForAdmin(
             String bookingId,
             String userId,
@@ -89,6 +152,7 @@ public class AdminBookingService {
         );
     }
 
+    @Transactional
     public void deleteBooking(String bookingId, String userId, String username) {
         // 1. Tìm Booking của user hiện tại
         Booking booking = bookingService.findBookingByIdAndUserId(bookingId, userId);
@@ -146,5 +210,47 @@ public class AdminBookingService {
             throw new ConflictException("Booking with status " + currentStatus + " cannot be deleted");
         }
     }
+
+    private void validateBookingCanBeChangedStatus(Booking booking) {
+        BookingStatus currentStatus = booking.getStatus();
+
+        if (CANNOT_BE_CHANGED_STATUSES.contains(currentStatus)) {
+            throw new ConflictException(
+                    "Booking with status " + currentStatus + " cannot be changed"
+            );
+        }
+    }
+
+    private void validateBookingStatusFlowCanBeChanged(Booking booking, BookingStatus newStatus) {
+        BookingStatus currentStatus = booking.getStatus();
+
+        // Không cần update nếu status giống hiện tại
+        if (currentStatus == newStatus) {
+            throw new ConflictException("Booking is already in status: " + currentStatus);
+        }
+
+        Set<BookingStatus> allowedStatuses =
+                ALLOWED_STATUS_TRANSITIONS.getOrDefault(
+                        currentStatus,
+                        Set.of()
+                );
+
+        if (!allowedStatuses.contains(newStatus)) {
+            throw new ConflictException(
+                    "Booking status cannot be changed from " + currentStatus + " to " + newStatus
+            );
+        }
+    }
+
+    private void releaseRoomsIfNeeded(BookingStatus newStatus, String bookingId, String username, Instant now) {
+        if (!RELEASE_ROOM_STATUSES.contains(newStatus)) {
+            return;
+        }
+
+        roomBookingSlotRepository.deleteByBookingId(bookingId);
+
+        bookingService.releaseRoomAssignments(bookingId, username, now);
+    }
+
 
 }
