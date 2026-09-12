@@ -1,17 +1,23 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+
+import { getRoomImage } from "../../utils/roomImageUtils";
 
 function RoomCard({ room }) {
+    const location = useLocation();
+
+    const roomImage = getRoomImage(room.id);
+
     return (
-        <div className="col-lg-4 col-md-6">
-            <div className="room-item shadow rounded overflow-hidden">
+        <div className="col-lg-4 col-md-6 d-flex">
+            <div className="room-item shadow rounded overflow-hidden d-flex flex-column w-100 h-100">
 
                 {/* Room Image */}
                 <div className="position-relative">
 
                     <img
-                        className="img-fluid"
-                        src={room.image}
-                        alt={room.name}
+                        className="img-fluid room-card-image"
+                        src={roomImage}
+                        alt={room.roomTypeName}
                     />
 
                     <small className="position-absolute start-0 top-100 translate-middle-y bg-primary text-white rounded py-1 px-3 ms-4">
@@ -21,63 +27,44 @@ function RoomCard({ room }) {
                 </div>
 
                 {/* Room Information */}
-                <div className="p-4 mt-2">
+                <div className="p-4 mt-2 d-flex flex-column flex-grow-1">
 
                     <div className="d-flex justify-content-between mb-3">
 
                         <h5 className="mb-0">
-                            {room.name}
+                            {room.roomTypeName}
                         </h5>
-
-                        <div className="ps-2">
-
-                            {Array.from(
-                                { length: room.rating },
-                                (_, index) => (
-                                    <small
-                                        key={index}
-                                        className="fa fa-star text-primary"
-                                    />
-                                )
-                            )}
-
-                        </div>
 
                     </div>
 
                     {/* Facilities */}
-                    <div className="d-flex mb-3">
+                     <div className="d-flex mb-3">
 
-                        <small className="border-end me-3 pe-3">
-                            <i className="fa fa-bed text-primary me-2" />
-                            {room.beds} Bed
-                        </small>
+                         <small className="border-end me-3 pe-3">
+                             <i className="fa fa-expand text-primary me-2" />
+                             {room.roomSize} m²
+                         </small>
 
-                        <small className="border-end me-3 pe-3">
-                            <i className="fa fa-bath text-primary me-2" />
-                            {room.baths} Bath
-                        </small>
+                         <small>
+                             <i className="fa fa-users text-primary me-2" />
+                             {room.maximumPeople} People
+                         </small>
 
-                        {room.wifi && (
-                            <small>
-                                <i className="fa fa-wifi text-primary me-2" />
-                                Wifi
-                            </small>
-                        )}
+                     </div>
 
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-body mb-3">
-                        {room.description}
+                    {/* Facility */}
+                    <p className="text-body mb-3 room-facility">
+                        {room.facility}
                     </p>
 
                     {/* Buttons */}
-                    <div className="d-flex justify-content-between">
-
+                    <div className="d-flex justify-content-between mt-auto">
                         <Link
                             className="btn btn-sm btn-primary rounded py-2 px-4"
                             to={`/rooms/${room.id}`}
+                            state={{
+                                from: location.pathname + location.search,
+                            }}
                         >
                             View Detail
                         </Link>
@@ -88,7 +75,6 @@ function RoomCard({ room }) {
                         >
                             Book Now
                         </Link>
-
                     </div>
 
                 </div>

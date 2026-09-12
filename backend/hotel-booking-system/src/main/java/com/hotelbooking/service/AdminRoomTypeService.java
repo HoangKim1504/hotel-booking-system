@@ -34,8 +34,6 @@ public class AdminRoomTypeService {
     private final RoomAssignmentRepository roomAssignmentRepository;
     private final EntityValidator entityValidator;
 
-    Instant now = Instant.now();
-
     /**
      * Search toàn bộ Room Type, có phân trang và max record mỗi trang
      */
@@ -206,7 +204,7 @@ public class AdminRoomTypeService {
         roomType.setStatus(RoomTypeStatus.ACTIVE);
         roomType.setDeleteFlag(false);
         roomType.setCreatedBy(username);
-        roomType.setCreatedAt(now);
+        roomType.setCreatedAt(Instant.now());
         roomType.setUpdatedBy(null);
         roomType.setUpdatedAt(null);
 
@@ -255,7 +253,7 @@ public class AdminRoomTypeService {
         existingRoomType.setPrice(request.price());
         existingRoomType.setStatus(request.status());
         existingRoomType.setUpdatedBy(username);
-        existingRoomType.setUpdatedAt(now);
+        existingRoomType.setUpdatedAt(Instant.now());
 
         return existingRoomType;
     }
@@ -264,7 +262,7 @@ public class AdminRoomTypeService {
         currentRoom.setStatus(RoomStatus.OUT_OF_SERVICE);
         currentRoom.setDeleteFlag(false);
         currentRoom.setUpdatedBy(username);
-        currentRoom.setUpdatedAt(now);
+        currentRoom.setUpdatedAt(Instant.now());
 
         return currentRoom;
     }
@@ -273,7 +271,7 @@ public class AdminRoomTypeService {
         existingRoomType.setStatus(RoomTypeStatus.INACTIVE);
         existingRoomType.setDeleteFlag(true);
         existingRoomType.setUpdatedBy(username);
-        existingRoomType.setUpdatedAt(now);
+        existingRoomType.setUpdatedAt(Instant.now());
 
         return existingRoomType;
     }

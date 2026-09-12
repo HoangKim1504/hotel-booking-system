@@ -39,7 +39,7 @@ public class AdminRoomTypeController {
             @RequestParam(required = false)
             @Pattern(
                     regexp = "roomTypeName|price|roomSize|maximumPeople|status",
-                    message = "Sort by must be one of: roomTypeName, price, roomSize, maximumPeople, status"
+                    message = "Sort by must be one of: Room Type Name, Price, Room Size, Maximum People, Status"
             )
             String sortBy,
 
@@ -79,7 +79,7 @@ public class AdminRoomTypeController {
             @RequestParam(defaultValue = "roomTypeName")
             @Pattern(
                     regexp = "roomTypeName|price|roomSize|maximumPeople|status",
-                    message = "Sort by must be one of: roomTypeName, price, roomSize, maximumPeople, status"
+                    message = "Sort by must be one of: Room Type Name, Price, Room Size, Maximum People, Status"
             )
             String sortBy,
 
@@ -123,5 +123,5 @@ public class AdminRoomTypeController {
         String username = authentication.getName();
         adminRoomTypeService.delete(id, username);
     }
-    
+
 }

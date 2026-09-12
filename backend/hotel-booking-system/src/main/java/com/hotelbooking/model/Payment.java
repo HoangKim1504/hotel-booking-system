@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = "payment")
+@Document(collection = "payments")
 public class Payment extends BaseModel {
 
     @Id

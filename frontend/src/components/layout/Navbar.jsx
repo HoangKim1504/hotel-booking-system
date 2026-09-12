@@ -1,6 +1,37 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+import { useAuth } from "../../context/AuthContext";
+
+import ConfirmPopup from "../common/ConfirmPopup";
 
 function Navbar() {
+    const { isAuthenticated, username, logout } = useAuth();
+    const navigate = useNavigate();
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+    const handleLogout = () => {
+        setShowLogoutConfirm(true);
+    };
+
+    const handleConfirmLogout = () => {
+        logout();
+
+        setShowLogoutConfirm(false);
+
+        navigate("/");
+
+        window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: "auto",
+        });
+    };
+
+    const handleCancelLogout = () => {
+        setShowLogoutConfirm(false);
+    };
+
     return (
         <header className="container-fluid bg-dark px-0">
             <div className="row gx-0">
@@ -167,18 +198,51 @@ function Navbar() {
 
                             </div>
 
-                            {/* TODO: Booking page will use room.id to load room data from Spring Boot API */}
-                            <NavLink
-                                to={`/booking`}
-                                className="btn btn-sm btn-dark rounded py-2 px-4"
-                            >
-                                Book Now
-                            </NavLink>
+                            <div className="d-flex align-items-center gap-3 me-4">
+                                {isAuthenticated && (
+                                   <span className="text-light navbar-welcome">
+                                       Welcome, <strong>{username}</strong>
+                                   </span>
+                                )}
+
+                                {isAuthenticated ? (
+                                    <button
+                                        type="button"
+                                        className="btn btn-sm btn-outline-light rounded py-2 px-4"
+                                        onClick={handleLogout}
+                                    >
+                                        Logout
+                                    </button>
+                                ) : (
+                                    <NavLink
+                                        to="/login"
+                                        className="btn btn-sm btn-outline-light rounded py-2 px-4"
+                                    >
+                                        Login
+                                    </NavLink>
+                                )}
+
+                                <NavLink
+                                    to="/booking"
+                                    className="btn btn-sm btn-primary rounded py-2 px-4"
+                                >
+                                    Book Now
+                                </NavLink>
+                            </div>
 
                         </div>
                     </nav>
                 </div>
             </div>
+            <ConfirmPopup
+                show={showLogoutConfirm}
+                title="Confirm Logout"
+                message="Are you sure you want to log out?"
+                confirmText="Logout"
+                cancelText="Cancel"
+                onConfirm={handleConfirmLogout}
+                onCancel={handleCancelLogout}
+            />
         </header>
     );
 }

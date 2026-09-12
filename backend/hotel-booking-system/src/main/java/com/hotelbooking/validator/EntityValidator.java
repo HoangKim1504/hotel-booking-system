@@ -18,6 +18,7 @@ public class EntityValidator {
     private final CartItemRepository cartItemRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final RoomRepository roomRepository;
+    private final BookingRepository bookingRepository;
 
     // ========================
     // User
@@ -105,6 +106,36 @@ public class EntityValidator {
                 .orElseThrow(() ->
                         new NotFoundException("Room not found: " + id)
                 );
+    }
+
+    // ========================
+    // Booking
+    // ========================
+    public Booking requireBooking(String bookingId) {
+        return bookingRepository.findByDeleteFlagFalseAndId(bookingId)
+                .orElseThrow(() ->
+                        new NotFoundException("Booking not found: " + bookingId)
+                );
+    }
+
+    /**
+     * Tìm Booking và kiểm tra Booking có thuộc user hay không.
+     */
+    public Booking requireBookingOwnedByUser(String bookingId, String userId) {
+        // 1. Kiểm tra User tồn tại
+        requireUserByUserId(userId);
+
+        // 2. Kiểm tra Booking tồn tại
+        Booking booking = requireBooking(bookingId);
+
+        // 3. Kiểm tra Booking thuộc User
+        if (!userId.equals(booking.getUserId())) {
+            throw new ForbiddenException(
+                    "This booking does not belong to given user: " + userId
+            );
+        }
+
+        return booking;
     }
 
 }

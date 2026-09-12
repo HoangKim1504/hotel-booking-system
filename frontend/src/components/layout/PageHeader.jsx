@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import carouselImage from "../../assets/images/carousel-1.jpg";
 
-function PageHeader({ title }) {
+function PageHeader({ title, noBottomMargin = false }) {
     return (
         <div
-            className="container-fluid page-header mb-5 p-0"
+            className={`container-fluid page-header p-0 ${
+                noBottomMargin ? "" : "mb-5"
+            }`}
             style={{
                 backgroundImage: `url(${carouselImage})`,
             }}
