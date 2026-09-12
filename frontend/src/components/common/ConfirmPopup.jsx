@@ -4,6 +4,7 @@ function ConfirmPopup({
     message,
     confirmText = "Confirm",
     cancelText = "Cancel",
+    loading = false,
     onConfirm,
     onCancel,
 }) {
@@ -36,6 +37,7 @@ function ConfirmPopup({
                             type="button"
                             className="btn btn-outline-secondary"
                             onClick={onCancel}
+                            disabled={loading}
                         >
                             {cancelText}
                         </button>
@@ -44,6 +46,7 @@ function ConfirmPopup({
                             type="button"
                             className="btn btn-primary"
                             onClick={onConfirm}
+                            disabled={loading}
                         >
                             {confirmText}
                         </button>

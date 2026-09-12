@@ -7,11 +7,13 @@ import {
     searchAdminRooms,
     getAdminRoomById,
     updateAdminRoom,
+    deleteAdminRoom,
 } from "../../services/adminRoomService";
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ErrorPopup from "../../components/common/ErrorPopup";
 import EditRoomPopup from "./EditRoomPopup";
+import ConfirmPopup from "../../components/common/ConfirmPopup";
 
 function AdminDashboard() {
     const { token } = useAuth();
@@ -50,6 +52,8 @@ function AdminDashboard() {
     const [editErrors, setEditErrors] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
 
+    const [roomToDelete, setRoomToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     useEffect(() => {
         const loadRooms = async () => {
@@ -212,6 +216,46 @@ function AdminDashboard() {
         setShowEditPopup(false);
         setEditingRoom(null);
         setEditErrors([]);
+    };
+
+    const handleDeleteClick = (room) => {
+        setRoomToDelete(room);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!roomToDelete) {
+            return;
+        }
+
+        setDeleteLoading(true);
+
+        try {
+            await deleteAdminRoom({
+                id: roomToDelete.id,
+                token,
+            });
+
+            setRoomToDelete(null);
+
+            /*
+             * Nếu xóa record cuối cùng của page hiện tại,
+             * quay về page trước.
+             */
+            if (rooms.length === 1 && currentPage > 1) {
+                setCurrentPage((prev) => prev - 1);
+            } else {
+                // Reload lại page hiện tại
+                setRefreshKey((prev) => prev + 1);
+            }
+        } catch (error) {
+            // Đóng confirm trước để ErrorPopup không bị che
+            setRoomToDelete(null);
+
+            setErrors(getErrorMessages(error));
+            setShowErrorPopup(true);
+        } finally {
+            setDeleteLoading(false);
+        }
     };
 
     return (
@@ -424,12 +468,13 @@ function AdminDashboard() {
                                                         Edit
                                                     </button>
 
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-sm btn-outline-danger"
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                     <button
+                                                         type="button"
+                                                         className="btn btn-sm btn-outline-danger"
+                                                         onClick={() => handleDeleteClick(room)}
+                                                     >
+                                                         Delete
+                                                     </button>
 
                                                 </div>
                                             </td>
@@ -493,6 +538,24 @@ function AdminDashboard() {
                 errors={editErrors}
                 onUpdate={handleUpdateRoom}
                 onCancel={handleCancelEdit}
+            />
+            <ConfirmPopup
+                show={roomToDelete !== null}
+                title="Confirm Delete"
+                message={
+                    roomToDelete
+                        ? `Are you sure you want to delete room ${roomToDelete.roomNumber}?`
+                        : ""
+                }
+                confirmText={
+                    deleteLoading
+                        ? "Deleting..."
+                        : "Delete"
+                }
+                cancelText="Cancel"
+                loading={deleteLoading}
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setRoomToDelete(null)}
             />
             <ErrorPopup
                 show={showErrorPopup}
