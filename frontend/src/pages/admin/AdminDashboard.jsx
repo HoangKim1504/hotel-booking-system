@@ -10,6 +10,7 @@ import {
     deleteAdminRoom,
     createAdminRoom,
 } from "../../services/adminRoomService";
+import { getAdminRoomTypes } from "../../services/admin/adminRoomTypeService";
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ErrorPopup from "../../components/common/ErrorPopup";
@@ -60,6 +61,9 @@ function AdminDashboard() {
     const [showCreatePopup, setShowCreatePopup] = useState(false);
     const [createLoading, setCreateLoading] = useState(false);
     const [createErrors, setCreateErrors] = useState([]);
+
+    const [roomTypes, setRoomTypes] = useState([]);
+    const [roomTypesLoading, setRoomTypesLoading] = useState(false);
 
     const getStatusClass = (status) => {
         switch (status) {
@@ -123,6 +127,31 @@ function AdminDashboard() {
 
         loadRooms();
     }, [currentPage, pageSize, sortBy, order, token, searchCriteria, refreshKey]);
+
+    useEffect(() => {
+        const loadRoomTypes = async () => {
+            setRoomTypesLoading(true);
+
+            try {
+                const data = await getAdminRoomTypes({
+                    page: 1,
+                    size: 100,
+                    sortBy: "roomTypeName",
+                    order: "ASC",
+                    token,
+                });
+
+                setRoomTypes(data.data);
+            } catch (error) {
+                setErrors(getErrorMessages(error));
+                setShowErrorPopup(true);
+            } finally {
+                setRoomTypesLoading(false);
+            }
+        };
+
+        loadRoomTypes();
+    }, [token]);
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -588,6 +617,8 @@ function AdminDashboard() {
             />
             <CreateRoomPopup
                 show={showCreatePopup}
+                roomTypes={roomTypes}
+                roomTypesLoading={roomTypesLoading}
                 loading={createLoading}
                 errors={createErrors}
                 onCreate={handleCreateRoom}
@@ -596,6 +627,8 @@ function AdminDashboard() {
             <EditRoomPopup
                 show={showEditPopup}
                 room={editingRoom}
+                roomTypes={roomTypes}
+                roomTypesLoading={roomTypesLoading}
                 loading={editLoading}
                 errors={editErrors}
                 onUpdate={handleUpdateRoom}

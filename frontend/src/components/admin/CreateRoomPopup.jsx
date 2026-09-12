@@ -2,6 +2,8 @@ import { useState } from "react";
 
 function CreateRoomPopup({
     show,
+    roomTypes = [],
+    roomTypesLoading,
     loading,
     errors = [],
     onCreate,
@@ -95,16 +97,30 @@ function CreateRoomPopup({
                             Room Type
                         </label>
 
-                        <input
-                            type="text"
+                        <select
                             id="createRoomTypeName"
                             name="roomTypeName"
-                            className="form-control"
-                            placeholder="Enter room type name"
+                            className="form-select"
                             value={formData.roomTypeName}
                             onChange={handleChange}
+                            disabled={roomTypesLoading}
                             required
-                        />
+                        >
+                            <option value="">
+                                {roomTypesLoading
+                                    ? "Loading room types..."
+                                    : "Select room type"}
+                            </option>
+
+                            {roomTypes.map((roomType) => (
+                                <option
+                                    key={roomType.id}
+                                    value={roomType.roomTypeName}
+                                >
+                                    {roomType.roomTypeName}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="row g-3">

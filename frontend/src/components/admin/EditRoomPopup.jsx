@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 function EditRoomPopup({
     show,
     room,
+    roomTypes = [],
+    roomTypesLoading,
     loading,
     errors = [],
     onUpdate,
@@ -120,15 +122,30 @@ function EditRoomPopup({
                             Room Type
                         </label>
 
-                        <input
-                            type="text"
+                        <select
                             id="editRoomTypeName"
                             name="roomTypeName"
-                            className="form-control"
+                            className="form-select"
                             value={formData.roomTypeName}
                             onChange={handleChange}
+                            disabled={roomTypesLoading}
                             required
-                        />
+                        >
+                            <option value="">
+                                {roomTypesLoading
+                                    ? "Loading room types..."
+                                    : "Select room type"}
+                            </option>
+
+                            {roomTypes.map((roomType) => (
+                                <option
+                                    key={roomType.id}
+                                    value={roomType.roomTypeName}
+                                >
+                                    {roomType.roomTypeName}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="row g-3">
