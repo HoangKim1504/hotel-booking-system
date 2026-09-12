@@ -59,7 +59,7 @@ public class AdminBookingService {
     // List các trường hợp Booking có thể đổi status
     private static final Map<BookingStatus, Set<BookingStatus>>
             ALLOWED_STATUS_TRANSITIONS = Map.of(
-            // Flow: PENDING -> PAID -> CONFIRMED
+            // Flow: PENDING -> PAID; PENDING -> CONFIRMED
             BookingStatus.PENDING,
             Set.of(BookingStatus.PAID, BookingStatus.CONFIRMED),
             // Flow: PAID -> CONFIRMED
@@ -115,6 +115,18 @@ public class AdminBookingService {
         );
     }
 
+    public UpdateBookingResponse cancelBookingForAdmin(
+            String bookingId,
+            String userId,
+            String username
+    ) {
+        return bookingService.cancelBooking(
+                bookingId,
+                userId,
+                username
+        );
+    }
+
     @Transactional
     public UpdateBookingResponse updateBookingStatus(String bookingId, String userId,
                                                      BookingStatus newStatus, String username) {
@@ -141,18 +153,6 @@ public class AdminBookingService {
 
         // 5. Return response
         return bookingService.toUpdateBookingResponse(updatedBooking);
-    }
-
-    public UpdateBookingResponse cancelBookingForAdmin(
-            String bookingId,
-            String userId,
-            String username
-    ) {
-        return bookingService.cancelBooking(
-                bookingId,
-                userId,
-                username
-        );
     }
 
     @Transactional

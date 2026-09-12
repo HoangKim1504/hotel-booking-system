@@ -90,26 +90,6 @@ public class AdminBookingController {
         return adminPaymentService.createPaymentForAdmin(id, request, userId, username, true);
     }
 
-    @PutMapping("/{id}/status")
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('USER_UPDATE')")
-    public UpdateBookingResponse updateBookingStatus(
-            @PathVariable
-            String id,
-
-            @NotBlank(message = "User ID is required")
-            @RequestParam
-            String userId,
-
-            @RequestParam
-            BookingStatus bookingStatus,
-
-            Authentication authentication
-    ) {
-        String username = authentication.getName();
-        return adminBookingService.updateBookingStatus(id, userId, bookingStatus, username);
-    }
-
     @PutMapping("/{id}/cancel")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('USER_UPDATE')")
@@ -126,6 +106,26 @@ public class AdminBookingController {
         String username = authentication.getName();
 
         return adminBookingService.cancelBookingForAdmin(id, userId, username);
+    }
+
+    @PutMapping("/{id}/status")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
+    public UpdateBookingResponse updateBookingStatus(
+            @PathVariable
+            String id,
+
+            @NotBlank(message = "User ID is required")
+            @RequestParam
+            String userId,
+
+            @Valid @RequestBody
+            UpdateBookingRequest request,
+
+            Authentication authentication
+    ) {
+        String username = authentication.getName();
+        return adminBookingService.updateBookingStatus(id, userId, request.bookingStatus(), username);
     }
 
     @DeleteMapping("/{id}")
