@@ -9,7 +9,7 @@ import {
     updateAdminRoom,
     deleteAdminRoom,
     createAdminRoom,
-} from "../../services/adminRoomService";
+} from "../../services/admin/adminRoomService";
 import { getAdminRoomTypes } from "../../services/admin/adminRoomTypeService";
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
