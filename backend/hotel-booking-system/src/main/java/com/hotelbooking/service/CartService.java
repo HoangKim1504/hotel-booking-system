@@ -54,8 +54,11 @@ public class CartService {
         return toCartResponse(cart, cartItemList, totalAmount, null);
     }
 
-    public CartResponse addCartItems(AddCartRequest request, String username) {
-        // 1. Lấy User + Cart
+    public CartResponse addCartItems(
+            AddCartRequest request,
+            String username) {
+
+        // 1. Get User + Cart
         String userId = getUserId(username);
 
         Cart cart = getOrCreateCart(
@@ -65,19 +68,17 @@ public class CartService {
 
         Instant now = Instant.now();
 
-        List<CartItemResponse> cartItemResponseList = new ArrayList<>();
-
-        // 2. Duyệt từng item FE gửi lên
+        // 2. Process each item sent from FE
         for (AddCartItemRequest requestItem : request.items()) {
 
-            // 3. Check RoomType tồn tại + ACTIVE
+            // 3. Check RoomType exists and is ACTIVE
             RoomType roomType =
                     entityValidator.requireRoomType(
                             requestItem.roomTypeId(),
                             RoomTypeStatus.ACTIVE
                     );
 
-            // 4. Check RoomType này đã có trong Cart chưa
+            // 4. Check whether RoomType already exists in Cart
             Optional<CartItem> existingItem =
                     cartItemRepository
                             .findByCartIdAndRoomTypeIdAndDeleteFlagFalse(
@@ -89,8 +90,8 @@ public class CartService {
 
             if (existingItem.isPresent()) {
 
-                // Đã có trong Cart
-                // → cộng thêm quantity
+                // Already exists
+                // -> increase quantity
                 cartItem = existingItem.get();
 
                 cartItem.setQuantity(
@@ -98,7 +99,7 @@ public class CartService {
                                 + requestItem.quantity()
                 );
 
-                // Refresh lại giá RoomType hiện tại
+                // Refresh current RoomType price
                 cartItem.setPrice(
                         roomType.getPrice()
                 );
@@ -108,8 +109,8 @@ public class CartService {
 
             } else {
 
-                // Chưa có trong Cart
-                // → tạo mới
+                // Does not exist
+                // -> create new CartItem
                 cartItem = new CartItem();
 
                 cartItem.setCartId(
@@ -124,7 +125,6 @@ public class CartService {
                         requestItem.quantity()
                 );
 
-                // Cart luôn lấy giá hiện tại từ DB
                 cartItem.setPrice(
                         roomType.getPrice()
                 );
@@ -139,36 +139,11 @@ public class CartService {
             }
 
             // 5. Save CartItem
-            CartItem savedItem =
-                    cartItemRepository.save(cartItem);
-
-            // 6. Tính subtotal
-            BigDecimal subTotal =
-                    savedItem.getPrice()
-                            .multiply(
-                                    BigDecimal.valueOf(
-                                            savedItem.getQuantity()
-                                    )
-                            );
-
-            // 7. Tạo response
-            CartItemResponse response =
-                    toCartItemResponse(
-                            savedItem,
-                            roomType.getRoomTypeName(),
-                            subTotal
-                    );
-
-            cartItemResponseList.add(response);
+            cartItemRepository.save(cartItem);
         }
 
-        // 8. Return Cart
-        return toCartResponse(
-                cart,
-                cartItemResponseList,
-                null,
-                null
-        );
+        // 6. Reload full cart and recalculate total amount
+        return findByUsername(username);
     }
 
     public CartResponse updateQuantity(String itemId, UpdateCartItemRequest request, String username) {
@@ -204,15 +179,18 @@ public class CartService {
     }
 
     public CartResponse deleteCartItem(String itemId, String username) {
-        List<CartItemResponse> cartItemList = new ArrayList<>();
 
         String userId = getUserId(username);
+
         Cart cart = getOrCreateCart(userId, username);
+
         CartItem cartItem = entityValidator.requireCartItem(cart.getId(), itemId);
 
+        // Delete selected cart item
         cartItemRepository.delete(cartItem);
 
-        return toCartResponse(cart, cartItemList, BigDecimal.valueOf(0), null);
+        // Reload remaining cart items and recalculate total amount
+        return findByUsername(username);
     }
 
     private Cart getOrCreateCart(String userId, String username) {
