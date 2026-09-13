@@ -17,7 +17,9 @@ function AdminLayout() {
         return () => cancelAnimationFrame(frame);
     }, []);
 
-    const isRoomManagementPage = location.pathname === "/admin/rooms";
+    const isNoScrollAdminPage =
+        location.pathname === "/admin/rooms" ||
+        location.pathname === "/admin/room-types";
 
     return (
         <div
@@ -34,9 +36,9 @@ function AdminLayout() {
 
             <main
                 className={`admin-main-content ${
-                    isRoomManagementPage
-                        ? "room-management-no-scroll"
-                        : ""
+                        isNoScrollAdminPage
+                            ? "admin-no-scroll"
+                            : ""
                 }`}
             >
                 {!isSidebarOpen && (
