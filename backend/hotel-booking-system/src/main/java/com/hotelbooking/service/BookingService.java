@@ -129,9 +129,12 @@ public class BookingService {
                         bookingItem.getPrice(),
                         bookingItemRoomCnt));
             }
+            String bookingUserId = booking.getUserId();
+
             LocalDateTime createdAtDate = LocalDateTime.ofInstant(booking.getCreatedAt(),
                     ZoneId.systemDefault());
-            simpleBookingResponseList.add(toSimpleBookingResponse(booking, totalAmount, createdAtDate));
+
+            simpleBookingResponseList.add(toSimpleBookingResponse(booking, bookingUserId, totalAmount, createdAtDate));
         }
         return PageableUtils.addPagingAttributes(simpleBookingResponseList, page, size);
     }
@@ -318,13 +321,14 @@ public class BookingService {
         return ChronoUnit.DAYS.between(checkInDate, checkOutDate);
     }
 
-    private SimpleBookingResponse toSimpleBookingResponse(Booking booking, BigDecimal totalAmount,
-                                                          LocalDateTime createdAtDateTime) {
+    private SimpleBookingResponse toSimpleBookingResponse(Booking booking, String bookingUserId,
+                                                          BigDecimal totalAmount, LocalDateTime createdAtDateTime) {
         PaymentStatus paymentStatus = getPaymentStatus(booking.getId());
         String paymentMethod = getPaymentMethod(booking.getId());
 
         return new SimpleBookingResponse(
                 booking.getId(),
+                bookingUserId,
                 booking.getStatus(),
                 totalAmount,
                 paymentStatus,

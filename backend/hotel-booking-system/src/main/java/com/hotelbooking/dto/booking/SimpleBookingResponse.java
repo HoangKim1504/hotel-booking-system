@@ -10,7 +10,8 @@ import java.time.LocalDateTime;
  * DTO — response booking.
  */
 public record SimpleBookingResponse(
-        String id,
+        String bookingId,
+        String userId,
         BookingStatus bookingStatus,
         BigDecimal totalAmount,
         PaymentStatus paymentStatus,
