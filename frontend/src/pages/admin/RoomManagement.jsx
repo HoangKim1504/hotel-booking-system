@@ -19,7 +19,7 @@ import ConfirmPopup from "../../components/common/ConfirmPopup";
 import CreateRoomPopup from "../../components/admin/CreateRoomPopup";
 import SuccessPopup from "../../components/common/SuccessPopup";
 
-function AdminDashboard() {
+function RoomManagement() {
     const { token } = useAuth();
 
     const [rooms, setRooms] = useState([]);
@@ -350,20 +350,13 @@ function AdminDashboard() {
         <>
             <LoadingSpinner show={loading} />
 
-            <div className="admin-dashboard">
-                <div className="admin-dashboard-content">
-
-                    <div className="admin-dashboard-header">
-                        <div>
-                            <h2>Hotel Management</h2>
-                            <p>Manage all rooms in the hotel.</p>
-                        </div>
-                    </div>
+            <div className="room-management">
+                <div className="room-management-content">
 
                     {/* Room Management Card */}
-                    <div className="admin-dashboard-card">
+                    <div className="room-management-card">
 
-                        <div className="admin-dashboard-card-header">
+                        <div className="room-management-card-header">
                             <div>
                                 <h4>Room Management</h4>
 
@@ -679,5 +672,4 @@ function AdminDashboard() {
     );
 }
 
-
-export default AdminDashboard;
+export default RoomManagement;

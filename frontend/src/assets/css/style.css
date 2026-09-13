@@ -920,51 +920,51 @@
     box-shadow: 0 10px 35px rgba(15, 23, 43, 0.1);
 }
 
-/*** Admin Dashboard ***/
-.admin-dashboard {
-    min-height: 100vh;
-    padding: 40px 30px 180px;
+/*** Room Management Page ***/
+.room-management {
+    min-height: auto;
+    padding: 36px 28px 36px;
     background: #f5f6f8;
 }
 
-.admin-dashboard-content {
+.room-management-content {
     width: 100%;
     max-width: 1350px;
     margin: 0 auto;
 }
 
-.admin-dashboard-header {
+.room-management-header {
     margin-bottom: 25px;
 }
 
-.admin-dashboard-header h2 {
+.room-management-header h2 {
     margin-bottom: 6px;
     color: var(--dark);
     font-weight: 700;
 }
 
-.admin-dashboard-header p {
+.room-management-header p {
     margin: 0;
     color: #6c757d;
 }
 
 
 /*** Admin Dashboard Card ***/
-.admin-dashboard-card {
+.room-management-card {
     padding: 28px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(15, 23, 43, 0.08);
 }
 
-.admin-dashboard-card-header {
+.room-management-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 22px;
 }
 
-.admin-dashboard-card-header h4 {
+.room-management-card-header h4 {
     margin-bottom: 4px;
     color: var(--dark);
     font-weight: 700;
@@ -1558,7 +1558,7 @@
 }
 
 /*** Admin Dashboard Card Header ***/
-.admin-dashboard-card-header {
+.room-management-card-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1670,4 +1670,278 @@
 
     color: #5f6670;
     font-size: 16px;
+}
+
+/*** Admin Layout ***/
+.admin-layout {
+    height: 100vh;
+    display: flex;
+    background: #f4f6fb;
+    overflow: hidden;
+}
+
+.admin-main-content {
+    flex: 1;
+    min-width: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: margin-left 0.25s ease;
+}
+
+.admin-layout.sidebar-open .admin-main-content {
+    margin-left: 270px;
+}
+
+.admin-layout.sidebar-closed .admin-main-content {
+    margin-left: 0;
+}
+
+
+/*** Admin Sidebar ***/
+.admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    width: 280px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 20px 16px;
+
+    background: linear-gradient(180deg, #0f172a 0%, #13203b 100%);
+    color: #ffffff;
+
+    box-shadow: 4px 0 18px rgba(15, 23, 43, 0.12);
+    transition: transform 0.25s ease;
+
+    z-index: 1000;
+}
+
+.admin-sidebar.open {
+    transform: translateX(0);
+}
+
+.admin-sidebar.closed {
+    transform: translateX(-100%);
+}
+
+
+/*** Admin Sidebar Header ***/
+.admin-sidebar-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 8px 8px 18px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-toggle-btn {
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.admin-sidebar-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+
+/*** Admin Sidebar Logo ***/
+.admin-sidebar-logo h3 {
+    margin: 0;
+    color: #f59e0b;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.admin-sidebar-logo span {
+    display: block;
+    margin-top: 4px;
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+
+/*** Admin Sidebar User ***/
+.admin-sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 18px 8px 20px;
+    margin-top: 6px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-welcome-label {
+    color: #cbd5e1;
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.admin-sidebar-welcome-name {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 4px 12px;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/*** Admin Sidebar Navigation ***/
+.admin-sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    margin-top: 22px;
+}
+
+.admin-sidebar-link {
+    display: block;
+
+    padding: 14px 16px;
+
+    border-radius: 10px;
+
+    color: #e2e8f0;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.admin-sidebar-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar-link.active {
+    color: #ffffff;
+    background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+
+/*** Admin Sidebar Footer ***/
+.admin-sidebar-footer {
+    margin-top: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-view-site-btn,
+.admin-logout-btn {
+    width: 100%;
+
+    padding: 12px 16px;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-view-site-btn {
+    border: none;
+    background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%);
+    color: #0f172a;
+}
+
+.admin-view-site-btn:hover {
+    transform: translateY(-1px);
+}
+
+.admin-logout-btn {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: #ffffff;
+}
+
+.admin-logout-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+
+/*** Open Sidebar Button ***/
+.admin-open-sidebar-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+
+    z-index: 1100;
+
+    padding: 10px 16px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #0f172a;
+    color: #ffffff;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    box-shadow: 0 10px 20px rgba(15, 23, 43, 0.18);
+    cursor: pointer;
+}
+
+.admin-open-sidebar-btn:hover {
+    background: #1e293b;
+}
+
+
+/*** Admin Page ***/
+.admin-page {
+    padding: 40px 35px 80px;
+}
+
+
+/*** Responsive ***/
+@media (max-width: 991px) {
+    .admin-layout.sidebar-open .admin-main-content {
+        margin-left: 0;
+    }
+
+    .admin-sidebar {
+        width: 250px;
+    }
 }

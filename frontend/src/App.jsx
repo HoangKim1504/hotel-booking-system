@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import Navbar from "./components/layout/Navbar";
@@ -16,10 +17,18 @@ import RoomDetail from "./pages/RoomDetail";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLayout from "./components/admin/AdminLayout";
+import RoomManagement from "./pages/admin/RoomManagement";
+import UserManagement from "./pages/admin/UserManagement";
+import RoomTypeManagement from "./pages/admin/RoomTypeManagement";
+import BookingManagement from "./pages/admin/BookingManagement";
 
 function App() {
     const [loading, setLoading] = useState(true);
+
+    const location = useLocation();
+
+    const isAdminPage = location.pathname.startsWith("/admin");
 
     useEffect(() => {
         // Temporary loading effect
@@ -38,7 +47,7 @@ function App() {
             <LoadingSpinner show={loading} />
 
             {/* Header */}
-            <Navbar />
+            {!isAdminPage && <Navbar />}
 
             {/* Pages */}
             <Routes>
@@ -50,8 +59,39 @@ function App() {
 
                 <Route
                     path="/admin"
-                    element={<AdminDashboard />}
-                />
+                    element={<AdminLayout />}
+                >
+                    <Route
+                        index
+                        element={
+                            <Navigate
+                                to="rooms"
+                                replace
+                            />
+                        }
+                    />
+
+                    <Route
+                        path="users"
+                        element={<UserManagement />}
+                    />
+
+                    <Route
+                        path="room-types"
+                        element={<RoomTypeManagement />}
+                    />
+
+                    <Route
+                        path="rooms"
+                        element={<RoomManagement />}
+                    />
+
+                    <Route
+                        path="bookings"
+                        element={<BookingManagement />}
+                    />
+
+                </Route>
 
                 <Route
                     path="/login"
@@ -111,7 +151,7 @@ function App() {
             </Routes>
 
             {/* Footer */}
-            <Footer />
+            {!isAdminPage && <Footer />}
 
             {/* Back to top */}
             <BackToTop />
