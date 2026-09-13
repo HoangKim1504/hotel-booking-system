@@ -286,7 +286,7 @@ public class AdminBookingService {
 
         switch (newStatus) {
 
-            case PAID -> {
+            case CHECKED_IN, PAID -> {
                 payment.setStatus(PaymentStatus.SUCCESS);
 
                 if (payment.getPaymentDate() == null) {
@@ -314,7 +314,7 @@ public class AdminBookingService {
             }
 
             default -> {
-                // CONFIRMED / CHECKED_IN / COMPLETED
+                // CONFIRMED / COMPLETED
                 // Không tự thay đổi PaymentStatus
             }
         }
