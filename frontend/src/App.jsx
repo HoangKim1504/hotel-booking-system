@@ -23,6 +23,8 @@ import RoomManagement from "./pages/admin/RoomManagement";
 import UserManagement from "./pages/admin/UserManagement";
 import RoomTypeManagement from "./pages/admin/RoomTypeManagement";
 import BookingManagement from "./pages/admin/BookingManagement";
+import BookingDetail from "./pages/BookingDetail";
+import BookingHistory from "./pages/BookingHistory";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -82,10 +84,6 @@ function App() {
                         element={<RoomManagement />}
                     />
 
-                    <Route
-                        path="bookings"
-                        element={<BookingManagement />}
-                    />
                 </Route>
 
                 <Route
@@ -116,6 +114,16 @@ function App() {
                 <Route
                     path="/booking/:roomId"
                     element={<Booking />}
+                />
+
+                <Route
+                    path="/bookings"
+                    element={<BookingHistory />}
+                />
+
+                <Route
+                    path="/bookings/:bookingId"
+                    element={<BookingDetail />}
                 />
 
                 <Route

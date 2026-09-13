@@ -173,6 +173,15 @@ function Navbar() {
                                         Rooms
                                     </NavLink>
 
+                                    {isAuthenticated && (
+                                        <NavLink
+                                            to="/bookings"
+                                            className="nav-item nav-link"
+                                        >
+                                            My Bookings
+                                        </NavLink>
+                                    )}
+
                                     {/* Dropdown */}
                                     <div className="nav-item dropdown">
 

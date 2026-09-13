@@ -49,6 +49,8 @@ function BookingForm() {
     const [showErrorPopup, setShowErrorPopup] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
+    const [createdBookingId, setCreatedBookingId] = useState(null);
+
     const handleChange = (event) => {
         const { name, value } = event.target;
 
@@ -78,14 +80,13 @@ function BookingForm() {
         setBookingLoading(true);
 
         try {
-            // 1. Convert cart to booking items
             const items = cartItems.map((item) => ({
                 roomTypeId: item.roomTypeId,
                 quantity: item.quantity,
                 price: item.price,
             }));
 
-            // 2. Create booking
+            // 1. Create booking
             const booking = await createBooking({
                 items,
                 checkInDate: formData.checkIn,
@@ -93,20 +94,17 @@ function BookingForm() {
                 token,
             });
 
-            // 3. Create payment after booking successfully created
-            const payment = await createPayment({
+            // 2. Create payment
+            await createPayment({
                 bookingId: booking.id,
                 paymentMethod: formData.paymentMethod,
                 token,
             });
 
-            console.log("Created booking:", booking);
-            console.log("Created payment:", payment);
+            // 3. Save created booking id
+            setCreatedBookingId(booking.id);
 
-            // 4. Close confirm popup
             setShowConfirm(false);
-
-            // 5. Only show success after payment API succeeds
             setShowSuccessPopup(true);
 
         } catch (error) {
@@ -435,7 +433,11 @@ function BookingForm() {
                     onClose={() => {
                         setShowSuccessPopup(false);
 
-                        navigate("/");
+                        if (createdBookingId) {
+                            navigate(
+                                `/bookings/${createdBookingId}`
+                            );
+                        }
                     }}
                 />
             </div>
