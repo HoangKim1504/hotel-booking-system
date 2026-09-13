@@ -1,6 +1,6 @@
 package com.hotelbooking.controller;
 
-import com.hotelbooking.dto.cart.AddCartItemRequest;
+import com.hotelbooking.dto.cart.AddCartRequest;
 import com.hotelbooking.dto.cart.CartResponse;
 import com.hotelbooking.dto.cart.UpdateCartItemRequest;
 import com.hotelbooking.service.CartService;
@@ -25,10 +25,8 @@ public class CartController {
     }
 
     @PostMapping("/items")
-    public CartResponse addItem(@Valid @RequestBody AddCartItemRequest request,
-                                Authentication authentication) {
-        String username = authentication.getName();
-        return cartService.addCartItem(request, username);
+    public CartResponse addCartItems(@Valid @RequestBody AddCartRequest request, Authentication authentication) {
+        return cartService.addCartItems(request, authentication.getName());
     }
 
     @PutMapping("/items/{itemId}")

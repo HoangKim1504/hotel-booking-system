@@ -1,9 +1,6 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.cart.AddCartItemRequest;
-import com.hotelbooking.dto.cart.CartItemResponse;
-import com.hotelbooking.dto.cart.CartResponse;
-import com.hotelbooking.dto.cart.UpdateCartItemRequest;
+import com.hotelbooking.dto.cart.*;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.model.Cart;
 import com.hotelbooking.model.CartItem;
@@ -57,52 +54,121 @@ public class CartService {
         return toCartResponse(cart, cartItemList, totalAmount, null);
     }
 
-    public CartResponse addCartItem(AddCartItemRequest request, String username) {
-        BigDecimal subTotal;
-        CartItemResponse cartItemResponse;
-        CartItem item;
-        List<CartItemResponse> cartItemList = new ArrayList<>();
-
+    public CartResponse addCartItems(AddCartRequest request, String username) {
+        // 1. Lấy User + Cart
         String userId = getUserId(username);
-        Cart cart = getOrCreateCart(userId, username);
-        RoomType roomType = entityValidator.requireRoomType(request.roomTypeId(), RoomTypeStatus.ACTIVE);
 
-        // Get room type name
-        String roomTypeName = roomType.getRoomTypeName();
+        Cart cart = getOrCreateCart(
+                userId,
+                username
+        );
 
-        Optional<CartItem> existItem = cartItemRepository.findByCartIdAndRoomTypeIdAndDeleteFlagFalse(
-                cart.getId(),
-                request.roomTypeId());
+        Instant now = Instant.now();
 
-        if (existItem.isPresent()) {
-            item = existItem.get();
-            item.setQuantity(item.getQuantity() + request.quantity()); // Đã có → cộng quantity
-            item.setPrice(roomType.getPrice()); // Refresh lại giá hiện tại
-            item.setUpdatedBy(username);
-            item.setUpdatedAt(Instant.now());
-        } else {
-            // Chưa có → tạo CartItem mới
-            item = new CartItem();
-            item.setCartId(cart.getId());
-            item.setRoomTypeId(request.roomTypeId());
-            item.setQuantity(request.quantity());
-            item.setPrice(roomType.getPrice());
-            item.setDeleteFlag(false);
-            item.setCreatedBy(username);
-            item.setCreatedAt(Instant.now());
-            item.setUpdatedBy(null);
-            item.setUpdatedAt(null);
+        List<CartItemResponse> cartItemResponseList = new ArrayList<>();
+
+        // 2. Duyệt từng item FE gửi lên
+        for (AddCartItemRequest requestItem : request.items()) {
+
+            // 3. Check RoomType tồn tại + ACTIVE
+            RoomType roomType =
+                    entityValidator.requireRoomType(
+                            requestItem.roomTypeId(),
+                            RoomTypeStatus.ACTIVE
+                    );
+
+            // 4. Check RoomType này đã có trong Cart chưa
+            Optional<CartItem> existingItem =
+                    cartItemRepository
+                            .findByCartIdAndRoomTypeIdAndDeleteFlagFalse(
+                                    cart.getId(),
+                                    requestItem.roomTypeId()
+                            );
+
+            CartItem cartItem;
+
+            if (existingItem.isPresent()) {
+
+                // Đã có trong Cart
+                // → cộng thêm quantity
+                cartItem = existingItem.get();
+
+                cartItem.setQuantity(
+                        cartItem.getQuantity()
+                                + requestItem.quantity()
+                );
+
+                // Refresh lại giá RoomType hiện tại
+                cartItem.setPrice(
+                        roomType.getPrice()
+                );
+
+                cartItem.setUpdatedBy(username);
+                cartItem.setUpdatedAt(now);
+
+            } else {
+
+                // Chưa có trong Cart
+                // → tạo mới
+                cartItem = new CartItem();
+
+                cartItem.setCartId(
+                        cart.getId()
+                );
+
+                cartItem.setRoomTypeId(
+                        roomType.getId()
+                );
+
+                cartItem.setQuantity(
+                        requestItem.quantity()
+                );
+
+                // Cart luôn lấy giá hiện tại từ DB
+                cartItem.setPrice(
+                        roomType.getPrice()
+                );
+
+                cartItem.setDeleteFlag(false);
+
+                cartItem.setCreatedBy(username);
+                cartItem.setCreatedAt(now);
+
+                cartItem.setUpdatedBy(null);
+                cartItem.setUpdatedAt(null);
+            }
+
+            // 5. Save CartItem
+            CartItem savedItem =
+                    cartItemRepository.save(cartItem);
+
+            // 6. Tính subtotal
+            BigDecimal subTotal =
+                    savedItem.getPrice()
+                            .multiply(
+                                    BigDecimal.valueOf(
+                                            savedItem.getQuantity()
+                                    )
+                            );
+
+            // 7. Tạo response
+            CartItemResponse response =
+                    toCartItemResponse(
+                            savedItem,
+                            roomType.getRoomTypeName(),
+                            subTotal
+                    );
+
+            cartItemResponseList.add(response);
         }
 
-        cartItemRepository.save(item);
-
-        // Calculate total price of a cart
-        subTotal = item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
-
-        cartItemResponse = toCartItemResponse(item, roomTypeName, subTotal);
-        cartItemList.add(cartItemResponse);
-
-        return toCartResponse(cart, cartItemList, null, null);
+        // 8. Return Cart
+        return toCartResponse(
+                cart,
+                cartItemResponseList,
+                null,
+                null
+        );
     }
 
     public CartResponse updateQuantity(String itemId, UpdateCartItemRequest request, String username) {
