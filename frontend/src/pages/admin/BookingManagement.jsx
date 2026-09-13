@@ -5,6 +5,7 @@ import { getErrorMessages } from "../../utils/apiErrorUtils";
 
 import {
     getAdminBookings,
+    getAdminBookingById,
     cancelAdminBooking,
     deleteAdminBooking,
 } from "../../services/admin/adminBookingService";
@@ -13,6 +14,7 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ErrorPopup from "../../components/common/ErrorPopup";
 import ConfirmPopup from "../../components/common/ConfirmPopup";
 import SuccessPopup from "../../components/common/SuccessPopup";
+import BookingDetailPopup from "../../components/admin/BookingDetailPopup";
 
 function BookingManagement() {
     const { token } = useAuth();
@@ -40,6 +42,10 @@ function BookingManagement() {
     const [refreshKey, setRefreshKey] = useState(0);
 
     const [successMessage, setSuccessMessage] = useState("");
+
+    const [selectedBooking, setSelectedBooking] = useState(null);
+    const [showDetailPopup, setShowDetailPopup] = useState(false);
+    const [detailLoading, setDetailLoading] = useState(false);
 
     useEffect(() => {
         const loadBookings = async () => {
@@ -251,6 +257,31 @@ function BookingManagement() {
         }
     };
 
+    const handleViewBooking = async (booking) => {
+        setDetailLoading(true);
+
+        try {
+            const data = await getAdminBookingById({
+                bookingId: booking.bookingId,
+                userId: booking.userId,
+                token,
+            });
+
+            setSelectedBooking(data);
+            setShowDetailPopup(true);
+        } catch (error) {
+            setErrors(getErrorMessages(error));
+            setShowErrorPopup(true);
+        } finally {
+            setDetailLoading(false);
+        }
+    };
+
+    const handleCloseDetail = () => {
+        setShowDetailPopup(false);
+        setSelectedBooking(null);
+    };
+
     return (
         <>
             <LoadingSpinner show={loading} />
@@ -344,7 +375,6 @@ function BookingManagement() {
                             <table className="table align-middle admin-booking-table">
 
                                 <colgroup>
-                                    <col className="admin-col-booking-id" />
                                     <col className="admin-col-booking-user" />
                                     <col className="admin-col-booking-status" />
                                     <col className="admin-col-booking-total" />
@@ -356,8 +386,6 @@ function BookingManagement() {
 
                                 <thead>
                                     <tr>
-                                        <th>Booking ID</th>
-
                                         <th>Full Name</th>
 
                                         <th className="text-center">
@@ -392,13 +420,6 @@ function BookingManagement() {
 
                                         return (
                                             <tr key={booking.bookingId}>
-
-                                                <td
-                                                    className="admin-booking-id"
-                                                    title={booking.bookingId}
-                                                >
-                                                    {booking.bookingId}
-                                                </td>
 
                                                 <td
                                                     className={
@@ -453,6 +474,15 @@ function BookingManagement() {
 
                                                 <td>
                                                     <div className="admin-booking-actions">
+                                                        <button
+                                                            type="button"
+                                                            className="btn btn-sm btn-outline-primary"
+                                                            onClick={() =>
+                                                                handleViewBooking(booking)
+                                                            }
+                                                        >
+                                                            View
+                                                        </button>
 
                                                         <button
                                                             type="button"
@@ -602,6 +632,13 @@ function BookingManagement() {
                 onClose={() =>
                     setShowErrorPopup(false)
                 }
+            />
+
+            <BookingDetailPopup
+                show={showDetailPopup}
+                booking={selectedBooking}
+                loading={detailLoading}
+                onClose={handleCloseDetail}
             />
         </>
     );
