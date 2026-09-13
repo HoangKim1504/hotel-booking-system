@@ -19,7 +19,8 @@ function AdminLayout() {
 
     const isNoScrollAdminPage =
         location.pathname === "/admin/rooms" ||
-        location.pathname === "/admin/room-types";
+        location.pathname === "/admin/room-types" ||
+        location.pathname === "/admin/users";
 
     return (
         <div
