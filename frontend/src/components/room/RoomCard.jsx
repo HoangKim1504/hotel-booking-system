@@ -17,8 +17,7 @@ function RoomCard({ room }) {
     const { addToCart } = useCart();
     const [addingToCart, setAddingToCart] = useState(false);
     const [cartErrors, setCartErrors] = useState([]);
-
-    const { ddToCart } = useCart();
+    const [addedToCart, setAddedToCart] = useState(false);
 
     const handleAddToCart = async () => {
         if (!isAuthenticated) {
@@ -33,6 +32,12 @@ function RoomCard({ room }) {
                 room.id,
                 1
             );
+
+            setAddedToCart(true);
+
+            setTimeout(() => {
+                setAddedToCart(false);
+            }, 1200);
         } catch (error) {
             setCartErrors(
                 getErrorMessages(error)
@@ -106,13 +111,19 @@ function RoomCard({ room }) {
 
                        <button
                            type="button"
-                           className="btn btn-dark room-add-cart-btn"
+                           className={`btn btn-dark room-add-cart-btn ${
+                               addedToCart
+                                   ? "room-add-cart-success"
+                                   : ""
+                           }`}
                            disabled={addingToCart}
                            onClick={handleAddToCart}
                        >
                            {addingToCart
                                ? "ADDING..."
-                               : "ADD TO CART"}
+                               : addedToCart
+                                 ? "ADDED ✓"
+                                 : "ADD TO CART"}
                        </button>
                     </div>
 

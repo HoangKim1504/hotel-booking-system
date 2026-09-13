@@ -3654,3 +3654,89 @@
 .navbar-cart-remove-btn:hover {
     background: rgba(220, 53, 69, 0.1);
 }
+
+/*** Room Add To Cart Success ***/
+.room-add-cart-btn {
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.room-add-cart-success {
+    transform: scale(1.05);
+
+    background: #198754;
+    border-color: #198754;
+}
+
+/*** Navbar Cart Added Animation ***/
+.navbar-cart-added-animation {
+    animation: cart-added-bounce 0.55s ease;
+}
+
+@keyframes cart-added-bounce {
+    0% {
+        transform: scale(1);
+    }
+
+    30% {
+        transform: scale(1.25) rotate(-8deg);
+    }
+
+    55% {
+        transform: scale(1.15) rotate(8deg);
+    }
+
+    75% {
+        transform: scale(1.08) rotate(-4deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+/*** Navbar Cart Count Animation ***/
+.navbar-cart-added-animation .navbar-cart-count {
+    animation: cart-count-pop 0.55s ease;
+}
+
+@keyframes cart-count-pop {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.4);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/*** User Fixed Header ***/
+.user-fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    z-index: 1200;
+
+    width: 100%;
+
+    box-shadow: 0 4px 14px rgba(15, 23, 43, 0.14);
+}
+
+/*** User Fixed Header Spacer ***/
+.user-fixed-header-spacer {
+    height: 100px;
+}
+
+/*** User Fixed Header Mobile Spacer ***/
+@media (max-width: 991.98px) {
+    .user-fixed-header-spacer {
+        height: 72px;
+    }
+}
