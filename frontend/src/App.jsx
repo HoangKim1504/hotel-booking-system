@@ -17,6 +17,7 @@ import RoomDetail from "./pages/RoomDetail";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import AdminHome from "./pages/admin/AdminHome";
 import AdminLayout from "./components/admin/AdminLayout";
 import RoomManagement from "./pages/admin/RoomManagement";
 import UserManagement from "./pages/admin/UserManagement";
@@ -63,12 +64,7 @@ function App() {
                 >
                     <Route
                         index
-                        element={
-                            <Navigate
-                                to="rooms"
-                                replace
-                            />
-                        }
+                        element={<AdminHome />}
                     />
 
                     <Route
@@ -90,7 +86,6 @@ function App() {
                         path="bookings"
                         element={<BookingManagement />}
                     />
-
                 </Route>
 
                 <Route

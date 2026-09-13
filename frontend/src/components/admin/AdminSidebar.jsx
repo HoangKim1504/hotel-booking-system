@@ -21,7 +21,7 @@ function AdminSidebar({
     const handleConfirmLogout = () => {
         logout();
         setShowLogoutConfirm(false);
-        navigate("/");
+        navigate("/login");
         window.scrollTo({
             top: 0,
             left: 0,
@@ -38,10 +38,13 @@ function AdminSidebar({
             >
                 {/* Header */}
                 <div className="admin-sidebar-header">
-                    <div className="admin-sidebar-logo">
+                    <NavLink
+                        to="/admin"
+                        className="admin-sidebar-logo"
+                    >
                         <h3>HOTELIER</h3>
                         <span>ADMIN PANEL</span>
-                    </div>
+                    </NavLink>
 
                     <button
                         type="button"

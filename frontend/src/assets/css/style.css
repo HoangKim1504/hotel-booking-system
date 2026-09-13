@@ -1767,12 +1767,19 @@
 
 
 /*** Admin Sidebar Logo ***/
+.admin-sidebar-logo {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 .admin-sidebar-logo h3 {
     margin: 0;
     color: #f59e0b;
     font-size: 24px;
     font-weight: 800;
     letter-spacing: 0.5px;
+    transition: color 0.2s ease;
 }
 
 .admin-sidebar-logo span {
@@ -1784,6 +1791,9 @@
     letter-spacing: 2px;
 }
 
+.admin-sidebar-logo:hover h3 {
+    color: #fbbf24;
+}
 
 /*** Admin Sidebar User ***/
 .admin-sidebar-user {
@@ -1951,4 +1961,127 @@
 /*** Room Management Disable Scroll ***/
 .admin-main-content.room-management-no-scroll {
     overflow-y: hidden;
+}
+
+/*** Admin Home ***/
+.admin-home {
+    width: 100%;
+    min-height: 100vh;
+
+    padding: 48px 40px;
+
+    background: #f4f6fb;
+
+    box-sizing: border-box;
+}
+
+.admin-home-content {
+    width: 100%;
+    max-width: 1200px;
+
+    margin: 0 auto;
+}
+
+
+/*** Admin Home Welcome ***/
+.admin-home-welcome {
+    margin-bottom: 36px;
+}
+
+.admin-home-welcome h1 {
+    margin: 0 0 8px;
+
+    color: var(--dark);
+
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.admin-home-welcome p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 16px;
+}
+
+
+/*** Admin Home Menu ***/
+.admin-home-menu {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 24px;
+}
+
+
+/*** Admin Home Card ***/
+.admin-home-card {
+    display: block;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 43, 0.06);
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.admin-home-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 12px 30px rgba(15, 23, 43, 0.1);
+}
+
+.admin-home-card h3 {
+    margin: 0 0 10px;
+
+    color: var(--dark);
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.admin-home-card p {
+    min-height: 48px;
+
+    margin: 0 0 18px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.admin-home-card span {
+    color: #2563eb;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+
+/*** Admin Home Responsive ***/
+@media (max-width: 768px) {
+    .admin-home {
+        padding: 30px 20px;
+    }
+
+    .admin-home-menu {
+        grid-template-columns: 1fr;
+    }
 }
