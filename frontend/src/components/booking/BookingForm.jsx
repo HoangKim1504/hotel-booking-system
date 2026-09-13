@@ -11,9 +11,9 @@ import { useCart } from "../../context/CartContext";
 
 import { createBooking } from "../../services/bookingService";
 import { getErrorMessages } from "../../utils/apiErrorUtils";
+import { createPayment } from "../../services/paymentService";
 
 import BookingConfirmPopup from "./BookingConfirmPopup";
-
 import ErrorPopup from "../common/ErrorPopup";
 import SuccessPopup from "../common/SuccessPopup";
 
@@ -24,7 +24,8 @@ function BookingForm() {
         checkIn: "",
         checkOut: "",
         adults: "1",
-        children: "0"
+        children: "0",
+        paymentMethod: "",
     });
 
     const navigate = useNavigate();
@@ -77,24 +78,37 @@ function BookingForm() {
         setBookingLoading(true);
 
         try {
+            // 1. Convert cart to booking items
             const items = cartItems.map((item) => ({
                 roomTypeId: item.roomTypeId,
                 quantity: item.quantity,
                 price: item.price,
             }));
 
-            await createBooking({
+            // 2. Create booking
+            const booking = await createBooking({
                 items,
                 checkInDate: formData.checkIn,
                 checkOutDate: formData.checkOut,
                 token,
             });
 
+            // 3. Create payment after booking successfully created
+            const payment = await createPayment({
+                bookingId: booking.id,
+                paymentMethod: formData.paymentMethod,
+                token,
+            });
+
+            console.log("Created booking:", booking);
+            console.log("Created payment:", payment);
+
+            // 4. Close confirm popup
             setShowConfirm(false);
 
+            // 5. Only show success after payment API succeeds
             setShowSuccessPopup(true);
 
-            await loadCart();
         } catch (error) {
             setBookingErrors(
                 getErrorMessages(error)
@@ -102,6 +116,7 @@ function BookingForm() {
 
             setShowConfirm(false);
             setShowErrorPopup(true);
+
         } finally {
             setBookingLoading(false);
         }
@@ -339,8 +354,43 @@ function BookingForm() {
                                     </div>
                                 </div>
 
+                                {/* Payment Method */}
+                                <div className="col-md-6">
+                                    <div className="form-floating">
+
+                                        <select
+                                            className="form-select"
+                                            id="paymentMethod"
+                                            name="paymentMethod"
+                                            value={formData.paymentMethod}
+                                            onChange={handleChange}
+                                            required
+                                        >
+                                            <option value="">
+                                                Select payment method
+                                            </option>
+
+                                            <option value="CASH">
+                                                Cash
+                                            </option>
+
+                                            <option value="ONLINE">
+                                                Online
+                                            </option>
+                                        </select>
+
+                                        <label
+                                            htmlFor="paymentMethod"
+                                            className="required-label"
+                                        >
+                                            Payment Method
+                                        </label>
+
+                                    </div>
+                                </div>
+
                                 {/* Submit */}
-                                <div className="col-12">
+                                <div className="col-md-12">
 
                                     <button
                                         className="btn btn-primary w-100 py-3"
