@@ -6,6 +6,7 @@ import { getErrorMessages } from "../../utils/apiErrorUtils";
 import {
     getAdminBookings,
     getAdminBookingById,
+    updateAdminBookingStatus,
     cancelAdminBooking,
     deleteAdminBooking,
 } from "../../services/admin/adminBookingService";
@@ -15,6 +16,7 @@ import ErrorPopup from "../../components/common/ErrorPopup";
 import ConfirmPopup from "../../components/common/ConfirmPopup";
 import SuccessPopup from "../../components/common/SuccessPopup";
 import BookingDetailPopup from "../../components/admin/BookingDetailPopup";
+import UpdateBookingStatusPopup from "../../components/admin/UpdateBookingStatusPopup";
 
 function BookingManagement() {
     const { token } = useAuth();
@@ -46,6 +48,10 @@ function BookingManagement() {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [showDetailPopup, setShowDetailPopup] = useState(false);
     const [detailLoading, setDetailLoading] = useState(false);
+
+    const [bookingToUpdateStatus, setBookingToUpdateStatus] = useState(null);
+    const [statusLoading, setStatusLoading] = useState(false);
+    const [statusErrors, setStatusErrors] = useState([]);
 
     useEffect(() => {
         const loadBookings = async () => {
@@ -161,6 +167,18 @@ function BookingManagement() {
             default:
                return "admin-payment-status-none";
         }
+    };
+
+    const getBookingUserName = (booking) => {
+        if (booking.fullName?.trim()) {
+            return booking.fullName;
+        }
+
+        if (booking.username?.trim()) {
+            return `@${booking.username}`;
+        }
+
+        return "this user";
     };
 
     const formatAmount = (amount) => {
@@ -280,6 +298,48 @@ function BookingManagement() {
     const handleCloseDetail = () => {
         setShowDetailPopup(false);
         setSelectedBooking(null);
+    };
+
+    const handleStatusClick = (booking) => {
+        setStatusErrors([]);
+        setBookingToUpdateStatus(booking);
+    };
+
+    const handleUpdateBookingStatus = async (bookingStatus) => {
+        if (!bookingToUpdateStatus) {
+            return;
+        }
+
+        setStatusLoading(true);
+        setStatusErrors([]);
+
+        try {
+            await updateAdminBookingStatus({
+                bookingId: bookingToUpdateStatus.bookingId,
+                userId: bookingToUpdateStatus.userId,
+                bookingStatus,
+                token,
+            });
+
+            setBookingToUpdateStatus(null);
+
+            setSuccessMessage(
+                `Booking status updated to ${bookingStatus.replaceAll("_", " ")} successfully.`
+            );
+
+            setRefreshKey((prev) => prev + 1);
+        } catch (error) {
+            setStatusErrors(
+                getErrorMessages(error)
+            );
+        } finally {
+            setStatusLoading(false);
+        }
+    };
+
+    const handleCancelStatusUpdate = () => {
+        setBookingToUpdateStatus(null);
+        setStatusErrors([]);
     };
 
     return (
@@ -486,6 +546,16 @@ function BookingManagement() {
 
                                                         <button
                                                             type="button"
+                                                            className="btn btn-sm btn-outline-secondary"
+                                                            onClick={() =>
+                                                                handleStatusClick(booking)
+                                                            }
+                                                        >
+                                                            Status
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
                                                             className="btn btn-sm btn-outline-warning"
                                                             disabled={
                                                                 booking.bookingStatus === "CANCELLED" ||
@@ -579,7 +649,9 @@ function BookingManagement() {
                 title="Confirm Cancel"
                 message={
                     bookingToCancel
-                        ? `Are you sure you want to cancel booking ${bookingToCancel.bookingId}?`
+                        ? `Are you sure you want to cancel booking of ${getBookingUserName(
+                              bookingToCancel
+                          )}?`
                         : ""
                 }
                 confirmText={
@@ -593,6 +665,22 @@ function BookingManagement() {
                 onCancel={() =>
                     setBookingToCancel(null)
                 }
+            />
+
+            <BookingDetailPopup
+                show={showDetailPopup}
+                booking={selectedBooking}
+                loading={detailLoading}
+                onClose={handleCloseDetail}
+            />
+
+            <UpdateBookingStatusPopup
+                show={bookingToUpdateStatus !== null}
+                booking={bookingToUpdateStatus}
+                loading={statusLoading}
+                errors={statusErrors}
+                onUpdate={handleUpdateBookingStatus}
+                onCancel={handleCancelStatusUpdate}
             />
 
             <ConfirmPopup
@@ -632,13 +720,6 @@ function BookingManagement() {
                 onClose={() =>
                     setShowErrorPopup(false)
                 }
-            />
-
-            <BookingDetailPopup
-                show={showDetailPopup}
-                booking={selectedBooking}
-                loading={detailLoading}
-                onClose={handleCloseDetail}
             />
         </>
     );
