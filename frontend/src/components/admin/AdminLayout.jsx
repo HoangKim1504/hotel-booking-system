@@ -1,10 +1,14 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 import AdminSidebar from "./AdminSidebar";
 
 function AdminLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+    const location = useLocation();
+
+    const isRoomManagementPage = location.pathname === "/admin/rooms";
 
     return (
         <div
@@ -17,7 +21,13 @@ function AdminLayout() {
                 onClose={() => setIsSidebarOpen(false)}
             />
 
-            <main className="admin-main-content">
+            <main
+                className={`admin-main-content ${
+                    isRoomManagementPage
+                        ? "room-management-no-scroll"
+                        : ""
+                }`}
+            >
                 {!isSidebarOpen && (
                     <button
                         type="button"

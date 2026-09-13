@@ -922,9 +922,12 @@
 
 /*** Room Management Page ***/
 .room-management {
-    min-height: auto;
-    padding: 36px 28px 36px;
+    width: 100%;
+    height: 100%;
+    padding: 32px 30px;
     background: #f5f6f8;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .room-management-content {
@@ -1674,18 +1677,20 @@
 
 /*** Admin Layout ***/
 .admin-layout {
+    width: 100%;
     height: 100vh;
     display: flex;
     background: #f4f6fb;
     overflow: hidden;
 }
 
+/*** Admin Main Content ***/
 .admin-main-content {
     flex: 1;
     min-width: 0;
     height: 100vh;
-    overflow-y: auto;
     overflow-x: hidden;
+    overflow-y: auto;
     transition: margin-left 0.25s ease;
 }
 
@@ -1696,7 +1701,6 @@
 .admin-layout.sidebar-closed .admin-main-content {
     margin-left: 0;
 }
-
 
 /*** Admin Sidebar ***/
 .admin-sidebar {
@@ -1928,12 +1932,10 @@
     background: #1e293b;
 }
 
-
 /*** Admin Page ***/
 .admin-page {
     padding: 40px 35px 80px;
 }
-
 
 /*** Responsive ***/
 @media (max-width: 991px) {
@@ -1944,4 +1946,9 @@
     .admin-sidebar {
         width: 250px;
     }
+}
+
+/*** Room Management Disable Scroll ***/
+.admin-main-content.room-management-no-scroll {
+    overflow-y: hidden;
 }
