@@ -60,6 +60,7 @@ public class BookingService {
 
     // List các trạng thái Booking không thể bị Cancel
     private static final List<BookingStatus> CANNOT_BE_CANCELLED_STATUSES = List.of(
+            BookingStatus.PAID,
             BookingStatus.CHECKED_IN,
             BookingStatus.COMPLETED,
             BookingStatus.CANCELLED,
@@ -131,10 +132,12 @@ public class BookingService {
             }
             String bookingUserId = booking.getUserId();
 
+            User user = entityValidator.requireUserByUserId(bookingUserId);
+
             LocalDateTime createdAtDate = LocalDateTime.ofInstant(booking.getCreatedAt(),
                     ZoneId.systemDefault());
 
-            simpleBookingResponseList.add(toSimpleBookingResponse(booking, bookingUserId, totalAmount, createdAtDate));
+            simpleBookingResponseList.add(toSimpleBookingResponse(booking, bookingUserId, user, totalAmount, createdAtDate));
         }
         return PageableUtils.addPagingAttributes(simpleBookingResponseList, page, size);
     }
@@ -290,6 +293,17 @@ public class BookingService {
         Booking updatedBooking =
                 bookingRepository.save(booking);
 
+        // Nếu có Payment thì chuyển status -> NONE
+        Payment payment = paymentRepository.findByBookingIdAndDeleteFlagFalse(bookingId);
+
+        if (payment != null) {
+            payment.setStatus(PaymentStatus.NONE);
+            payment.setUpdatedBy(username);
+            payment.setUpdatedAt(now);
+
+            paymentRepository.save(payment);
+        }
+
         // 4. Release RoomBookingSlot
         roomBookingSlotRepository.deleteByBookingId(bookingId);
 
@@ -321,7 +335,7 @@ public class BookingService {
         return ChronoUnit.DAYS.between(checkInDate, checkOutDate);
     }
 
-    private SimpleBookingResponse toSimpleBookingResponse(Booking booking, String bookingUserId,
+    private SimpleBookingResponse toSimpleBookingResponse(Booking booking, String bookingUserId, User user,
                                                           BigDecimal totalAmount, LocalDateTime createdAtDateTime) {
         PaymentStatus paymentStatus = getPaymentStatus(booking.getId());
         String paymentMethod = getPaymentMethod(booking.getId());
@@ -329,6 +343,8 @@ public class BookingService {
         return new SimpleBookingResponse(
                 booking.getId(),
                 bookingUserId,
+                user.getUsername(),
+                user.getFullName(),
                 booking.getStatus(),
                 totalAmount,
                 paymentStatus,

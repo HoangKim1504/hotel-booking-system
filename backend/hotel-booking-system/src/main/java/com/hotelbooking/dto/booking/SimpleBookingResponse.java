@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 public record SimpleBookingResponse(
         String bookingId,
         String userId,
+        String username,
+        String fullName,
         BookingStatus bookingStatus,
         BigDecimal totalAmount,
         PaymentStatus paymentStatus,
