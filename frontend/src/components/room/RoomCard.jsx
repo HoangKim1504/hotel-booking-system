@@ -1,11 +1,46 @@
 import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import { getErrorMessages } from "../../utils/apiErrorUtils";
 import { getRoomImage } from "../../utils/roomImageUtils";
 
 function RoomCard({ room }) {
     const location = useLocation();
 
     const roomImage = getRoomImage(room.id);
+
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
+    const { addToCart } = useCart();
+    const [addingToCart, setAddingToCart] = useState(false);
+    const [cartErrors, setCartErrors] = useState([]);
+
+    const { ddToCart } = useCart();
+
+    const handleAddToCart = async () => {
+        if (!isAuthenticated) {
+            navigate("/login");
+            return;
+        }
+
+        setAddingToCart(true);
+
+        try {
+            await addToCart(
+                room.id,
+                1
+            );
+        } catch (error) {
+            setCartErrors(
+                getErrorMessages(error)
+            );
+        } finally {
+            setAddingToCart(false);
+        }
+    };
 
     return (
         <div className="col-lg-4 col-md-6 d-flex">
@@ -69,12 +104,16 @@ function RoomCard({ room }) {
                             View Detail
                         </Link>
 
-                        <Link
-                            className="btn btn-sm btn-dark rounded py-2 px-4"
-                            to={`/booking/${room.id}`}
-                        >
-                            Book Now
-                        </Link>
+                       <button
+                           type="button"
+                           className="btn btn-dark room-add-cart-btn"
+                           disabled={addingToCart}
+                           onClick={handleAddToCart}
+                       >
+                           {addingToCart
+                               ? "ADDING..."
+                               : "ADD TO CART"}
+                       </button>
                     </div>
 
                 </div>

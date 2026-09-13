@@ -1,9 +1,11 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 
 import ConfirmPopup from "../common/ConfirmPopup";
+import CartDropdown from "../cart/CartDropdown";
 
 function Navbar() {
     const { isAuthenticated, username, logout } = useAuth();
@@ -31,6 +33,9 @@ function Navbar() {
     const handleCancelLogout = () => {
         setShowLogoutConfirm(false);
     };
+
+    const { cartCount } = useCart();
+    const [showCartDropdown, setShowCartDropdown] = useState(false);
 
     return (
         <header className="container-fluid bg-dark px-0">
@@ -221,6 +226,36 @@ function Navbar() {
                                         Login
                                     </NavLink>
                                 )}
+
+                                <div className="navbar-cart-wrapper">
+
+                                    <button
+                                        type="button"
+                                        className="navbar-cart-icon-btn"
+                                        onClick={() =>
+                                            setShowCartDropdown(
+                                                (prev) => !prev
+                                            )
+                                        }
+                                        aria-label="Shopping cart"
+                                    >
+                                        <i className="fa fa-shopping-cart" />
+
+                                        {cartCount > 0 && (
+                                            <span className="navbar-cart-count">
+                                                {cartCount}
+                                            </span>
+                                        )}
+                                    </button>
+
+                                    <CartDropdown
+                                        show={showCartDropdown}
+                                        onClose={() =>
+                                            setShowCartDropdown(false)
+                                        }
+                                    />
+
+                                </div>
 
                                 <NavLink
                                     to="/booking"
