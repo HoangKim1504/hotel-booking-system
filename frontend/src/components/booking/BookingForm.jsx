@@ -1,9 +1,21 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import about1 from "../../assets/images/about-1.jpg";
 import about2 from "../../assets/images/about-2.jpg";
 import about3 from "../../assets/images/about-3.jpg";
 import about4 from "../../assets/images/about-4.jpg";
+
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+
+import { createBooking } from "../../services/bookingService";
+import { getErrorMessages } from "../../utils/apiErrorUtils";
+
+import BookingConfirmPopup from "./BookingConfirmPopup";
+
+import ErrorPopup from "../common/ErrorPopup";
+import SuccessPopup from "../common/SuccessPopup";
 
 function BookingForm() {
     const [formData, setFormData] = useState({
@@ -12,26 +24,29 @@ function BookingForm() {
         checkIn: "",
         checkOut: "",
         adults: "1",
-        children: "0",
-        roomId: "",
-        specialRequest: "",
+        children: "0"
     });
 
-    // TODO: Replace mock room data with Spring Boot API
-    const rooms = [
-        {
-            id: 1,
-            name: "Junior Suite",
-        },
-        {
-            id: 2,
-            name: "Executive Suite",
-        },
-        {
-            id: 3,
-            name: "Super Deluxe",
-        },
-    ];
+    const navigate = useNavigate();
+
+    const {
+        token,
+    } = useAuth();
+
+    const {
+        cartItems,
+        cartTotal,
+        cartWarnings,
+        loadCart,
+    } = useCart();
+
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const [bookingLoading, setBookingLoading] = useState(false);
+
+    const [bookingErrors, setBookingErrors] = useState([]);
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -45,18 +60,51 @@ function BookingForm() {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        console.log("Booking data:", formData);
+        if (cartItems.length === 0) {
+            setBookingErrors([
+                "Your cart is empty. Please add a room before booking.",
+            ]);
 
-        // TODO: Send booking data to Spring Boot API
-        // Example:
-        //
-        // axios.post("http://localhost:8080/api/bookings", formData)
-        //     .then((response) => {
-        //         console.log(response.data);
-        //     })
-        //     .catch((error) => {
-        //         console.error(error);
-        //     });
+            setShowErrorPopup(true);
+
+            return;
+        }
+
+        setShowConfirm(true);
+    };
+
+    const handleConfirmBooking = async () => {
+        setBookingLoading(true);
+
+        try {
+            const items = cartItems.map((item) => ({
+                roomTypeId: item.roomTypeId,
+                quantity: item.quantity,
+                price: item.price,
+            }));
+
+            await createBooking({
+                items,
+                checkInDate: formData.checkIn,
+                checkOutDate: formData.checkOut,
+                token,
+            });
+
+            setShowConfirm(false);
+
+            setShowSuccessPopup(true);
+
+            await loadCart();
+        } catch (error) {
+            setBookingErrors(
+                getErrorMessages(error)
+            );
+
+            setShowConfirm(false);
+            setShowErrorPopup(true);
+        } finally {
+            setBookingLoading(false);
+        }
     };
 
     return (
@@ -142,7 +190,10 @@ function BookingForm() {
                                             required
                                         />
 
-                                        <label htmlFor="name">
+                                        <label
+                                            htmlFor="name"
+                                            className="required-label"
+                                        >
                                             Your Name
                                         </label>
 
@@ -164,7 +215,10 @@ function BookingForm() {
                                             required
                                         />
 
-                                        <label htmlFor="email">
+                                        <label
+                                            htmlFor="email"
+                                            className="required-label"
+                                        >
                                             Your Email
                                         </label>
 
@@ -185,7 +239,10 @@ function BookingForm() {
                                             required
                                         />
 
-                                        <label htmlFor="checkIn">
+                                        <label
+                                            htmlFor="checkIn"
+                                            className="required-label"
+                                        >
                                             Check In
                                         </label>
 
@@ -206,7 +263,10 @@ function BookingForm() {
                                             required
                                         />
 
-                                        <label htmlFor="checkOut">
+                                        <label
+                                            htmlFor="checkOut"
+                                            className="required-label"
+                                        >
                                             Check Out
                                         </label>
 
@@ -279,62 +339,6 @@ function BookingForm() {
                                     </div>
                                 </div>
 
-                                {/* Room */}
-                                <div className="col-12">
-                                    <div className="form-floating">
-
-                                        <select
-                                            className="form-select"
-                                            id="roomId"
-                                            name="roomId"
-                                            value={formData.roomId}
-                                            onChange={handleChange}
-                                            required
-                                        >
-                                            <option value="">
-                                                Select room
-                                            </option>
-
-                                            {rooms.map((room) => (
-                                                <option
-                                                    key={room.id}
-                                                    value={room.id}
-                                                >
-                                                    {room.name}
-                                                </option>
-                                            ))}
-                                        </select>
-
-                                        <label htmlFor="roomId">
-                                            Select A Room
-                                        </label>
-
-                                    </div>
-                                </div>
-
-                                {/* Special Request */}
-                                <div className="col-12">
-                                    <div className="form-floating">
-
-                                        <textarea
-                                            className="form-control"
-                                            id="specialRequest"
-                                            name="specialRequest"
-                                            placeholder="Special Request"
-                                            value={formData.specialRequest}
-                                            onChange={handleChange}
-                                            style={{
-                                                height: "100px",
-                                            }}
-                                        />
-
-                                        <label htmlFor="specialRequest">
-                                            Special Request
-                                        </label>
-
-                                    </div>
-                                </div>
-
                                 {/* Submit */}
                                 <div className="col-12">
 
@@ -353,6 +357,37 @@ function BookingForm() {
                     </div>
 
                 </div>
+                <BookingConfirmPopup
+                    show={showConfirm}
+                    formData={formData}
+                    cartItems={cartItems}
+                    cartTotal={cartTotal}
+                    loading={bookingLoading}
+                    onConfirm={handleConfirmBooking}
+                    onCancel={() =>
+                        setShowConfirm(false)
+                    }
+                />
+
+                <ErrorPopup
+                    show={showErrorPopup}
+                    title="Booking Failed"
+                    errors={bookingErrors}
+                    onClose={() =>
+                        setShowErrorPopup(false)
+                    }
+                />
+
+                <SuccessPopup
+                    show={showSuccessPopup}
+                    title="Booking Successful"
+                    message="Your booking has been created successfully."
+                    onClose={() => {
+                        setShowSuccessPopup(false);
+
+                        navigate("/");
+                    }}
+                />
             </div>
         </div>
     );

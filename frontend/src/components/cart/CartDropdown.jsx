@@ -33,7 +33,7 @@ function CartDropdown({
 
     const handleBooking = () => {
         onClose();
-        navigate("/cart");
+        navigate("/booking");
     };
 
     const handleRemoveItem = async (itemId) => {
@@ -159,6 +159,7 @@ function CartDropdown({
                             type="button"
                             className="btn btn-primary"
                             onClick={handleBooking}
+                            disabled={cartItems.length === 0}
                         >
                             Book Now
                         </button>

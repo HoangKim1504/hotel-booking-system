@@ -8,8 +8,6 @@ function Booking() {
         <>
             <PageHeader title="Booking" />
 
-            <BookingSearch />
-
             <BookingForm />
 
             <Newsletter />

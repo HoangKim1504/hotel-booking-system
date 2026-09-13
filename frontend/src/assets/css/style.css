@@ -3740,3 +3740,266 @@
         height: 72px;
     }
 }
+
+/*** Booking Confirm Overlay ***/
+.booking-confirm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(15, 23, 43, 0.6);
+}
+
+/*** Booking Confirm Header ***/
+.booking-confirm-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding-bottom: 18px;
+    margin-bottom: 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.booking-confirm-header h4 {
+    margin: 0 0 5px;
+
+    color: var(--dark);
+
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.booking-confirm-header p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+/*** Booking Confirm User Information ***/
+.booking-confirm-user-info {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 24px;
+}
+
+.booking-confirm-info-item {
+    padding: 14px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.booking-confirm-info-item span {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #64748b;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.booking-confirm-info-item strong {
+    display: block;
+
+    color: #1f2937;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    overflow-wrap: anywhere;
+}
+
+/*** Booking Confirm Room Section ***/
+.booking-confirm-room-section {
+    margin-bottom: 5px;
+}
+
+.booking-confirm-room-section h5 {
+    margin-bottom: 10px;
+
+    color: var(--dark);
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.booking-confirm-room-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.booking-confirm-room-item > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.booking-confirm-room-item span {
+    margin-top: 4px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+/*** Booking Confirm Total ***/
+.booking-confirm-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 18px 0;
+
+    color: var(--dark);
+
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.booking-confirm-total strong {
+    color: var(--primary);
+
+    font-size: 23px;
+    font-weight: 700;
+}
+
+/*** Booking Confirm Popup ***/
+.booking-confirm-popup {
+    position: relative;
+
+    width: 100%;
+    max-width: 650px;
+    max-height: 85vh;
+
+    padding: 28px 32px;
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 20px 60px rgba(15, 23, 43, 0.3);
+}
+
+/*** Booking Confirm Close Button ***/
+.booking-confirm-close {
+    flex-shrink: 0;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+    color: #94a3b8;
+
+    font-size: 24px;
+
+    cursor: pointer;
+}
+
+.booking-confirm-close:hover {
+    background: #f1f5f9;
+    color: var(--dark);
+}
+
+/*** Booking Confirm Room List ***/
+.booking-confirm-room-section {
+    margin-top: 10px;
+}
+
+.booking-confirm-room-section h5 {
+    margin-bottom: 12px;
+
+    color: var(--dark);
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.booking-confirm-room-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid #eeeeee;
+}
+
+.booking-confirm-room-item > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.booking-confirm-room-item span {
+    margin-top: 4px;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+/*** Booking Confirm Actions ***/
+.booking-confirm-actions {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+}
+
+.booking-confirm-actions .btn {
+    padding: 11px 16px;
+
+    font-weight: 600;
+}
+
+/*** Booking Confirm Responsive ***/
+@media (max-width: 575.98px) {
+    .booking-confirm-user-info {
+        grid-template-columns: 1fr;
+    }
+
+    .booking-confirm-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
