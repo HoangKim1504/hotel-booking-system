@@ -1691,7 +1691,6 @@
     height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
-    transition: margin-left 0.25s ease;
 }
 
 .admin-layout.sidebar-open .admin-main-content {
@@ -1700,6 +1699,11 @@
 
 .admin-layout.sidebar-closed .admin-main-content {
     margin-left: 0;
+}
+
+/*** Admin Layout Animation ***/
+.admin-layout.admin-layout-ready .admin-main-content {
+    transition: margin-left 0.25s ease;
 }
 
 /*** Admin Sidebar ***/
