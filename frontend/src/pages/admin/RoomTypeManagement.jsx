@@ -142,6 +142,8 @@ function RoomTypeManagement() {
     const handleSearchSubmit = (event) => {
         event.preventDefault();
 
+        setSortOption("default");
+
         setSearchCriteria({
             roomTypeName: searchForm.roomTypeName.trim(),
         });
@@ -384,7 +386,7 @@ function RoomTypeManagement() {
                                 <select
                                     id="adminRoomTypeSort"
                                     className="admin-room-sort-select"
-                                    value={`${sortBy}-${order}`}
+                                    value={sortOption}
                                     onChange={handleSortChange}
                                 >
                                     <option value="default">
