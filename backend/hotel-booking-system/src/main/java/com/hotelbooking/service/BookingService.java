@@ -346,6 +346,8 @@ public class BookingService {
                 user.getUsername(),
                 user.getFullName(),
                 booking.getStatus(),
+                booking.getCheckInDate(),
+                booking.getCheckOutDate(),
                 totalAmount,
                 paymentStatus,
                 paymentMethod,

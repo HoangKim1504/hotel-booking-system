@@ -84,6 +84,11 @@ function App() {
                         element={<RoomManagement />}
                     />
 
+                    <Route
+                        path="bookings"
+                        element={<BookingManagement />}
+                    />
+
                 </Route>
 
                 <Route

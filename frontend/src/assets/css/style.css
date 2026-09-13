@@ -4003,15 +4003,6 @@
     }
 }
 
-/*** User Booking Detail Page ***/
-.user-booking-detail-page {
-    min-height: 70vh;
-
-    padding: 60px 30px;
-
-    background: #f8fafc;
-}
-
 .user-booking-detail-container {
     width: 100%;
     max-width: 950px;
@@ -4023,7 +4014,8 @@
 .user-booking-detail-page {
     min-height: calc(100vh - 100px);
 
-    padding: 55px 30px 80px;
+    padding: 55px 30px 140px;
+    padding-bottom: 150px;
 
     background: #f8fafc;
 }
@@ -4725,5 +4717,17 @@
     color: #64748b;
 
     text-align: center;
+}
+
+/*** User Booking Total ***/
+.user-booking-total {
+    border-top: 1px solid #dee2e6;
+    margin-top: 12px;
+    padding-top: 18px;
+}
+
+/*** Booking divider ***/
+.user-booking-divider {
+    margin: 12px 0 18px;
 }
 
