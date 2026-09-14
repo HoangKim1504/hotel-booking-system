@@ -1,9 +1,6 @@
 package com.hotelbooking.service;
 
-import com.hotelbooking.dto.cart.AddCartItemRequest;
-import com.hotelbooking.dto.cart.CartItemResponse;
-import com.hotelbooking.dto.cart.CartResponse;
-import com.hotelbooking.dto.cart.UpdateCartItemRequest;
+import com.hotelbooking.dto.cart.*;
 import com.hotelbooking.enums.RoomTypeStatus;
 import com.hotelbooking.model.Cart;
 import com.hotelbooking.model.CartItem;
@@ -57,52 +54,96 @@ public class CartService {
         return toCartResponse(cart, cartItemList, totalAmount, null);
     }
 
-    public CartResponse addCartItem(AddCartItemRequest request, String username) {
-        BigDecimal subTotal;
-        CartItemResponse cartItemResponse;
-        CartItem item;
-        List<CartItemResponse> cartItemList = new ArrayList<>();
+    public CartResponse addCartItems(
+            AddCartRequest request,
+            String username) {
 
+        // 1. Get User + Cart
         String userId = getUserId(username);
-        Cart cart = getOrCreateCart(userId, username);
-        RoomType roomType = entityValidator.requireRoomType(request.roomTypeId(), RoomTypeStatus.ACTIVE);
 
-        // Get room type name
-        String roomTypeName = roomType.getRoomTypeName();
+        Cart cart = getOrCreateCart(
+                userId,
+                username
+        );
 
-        Optional<CartItem> existItem = cartItemRepository.findByCartIdAndRoomTypeIdAndDeleteFlagFalse(
-                cart.getId(),
-                request.roomTypeId());
+        Instant now = Instant.now();
 
-        if (existItem.isPresent()) {
-            item = existItem.get();
-            item.setQuantity(item.getQuantity() + request.quantity()); // Đã có → cộng quantity
-            item.setPrice(roomType.getPrice()); // Refresh lại giá hiện tại
-            item.setUpdatedBy(username);
-            item.setUpdatedAt(Instant.now());
-        } else {
-            // Chưa có → tạo CartItem mới
-            item = new CartItem();
-            item.setCartId(cart.getId());
-            item.setRoomTypeId(request.roomTypeId());
-            item.setQuantity(request.quantity());
-            item.setPrice(roomType.getPrice());
-            item.setDeleteFlag(false);
-            item.setCreatedBy(username);
-            item.setCreatedAt(Instant.now());
-            item.setUpdatedBy(null);
-            item.setUpdatedAt(null);
+        // 2. Process each item sent from FE
+        for (AddCartItemRequest requestItem : request.items()) {
+
+            // 3. Check RoomType exists and is ACTIVE
+            RoomType roomType =
+                    entityValidator.requireRoomType(
+                            requestItem.roomTypeId(),
+                            RoomTypeStatus.ACTIVE
+                    );
+
+            // 4. Check whether RoomType already exists in Cart
+            Optional<CartItem> existingItem =
+                    cartItemRepository
+                            .findByCartIdAndRoomTypeIdAndDeleteFlagFalse(
+                                    cart.getId(),
+                                    requestItem.roomTypeId()
+                            );
+
+            CartItem cartItem;
+
+            if (existingItem.isPresent()) {
+
+                // Already exists
+                // -> increase quantity
+                cartItem = existingItem.get();
+
+                cartItem.setQuantity(
+                        cartItem.getQuantity()
+                                + requestItem.quantity()
+                );
+
+                // Refresh current RoomType price
+                cartItem.setPrice(
+                        roomType.getPrice()
+                );
+
+                cartItem.setUpdatedBy(username);
+                cartItem.setUpdatedAt(now);
+
+            } else {
+
+                // Does not exist
+                // -> create new CartItem
+                cartItem = new CartItem();
+
+                cartItem.setCartId(
+                        cart.getId()
+                );
+
+                cartItem.setRoomTypeId(
+                        roomType.getId()
+                );
+
+                cartItem.setQuantity(
+                        requestItem.quantity()
+                );
+
+                cartItem.setPrice(
+                        roomType.getPrice()
+                );
+
+                cartItem.setDeleteFlag(false);
+
+                cartItem.setCreatedBy(username);
+                cartItem.setCreatedAt(now);
+
+                cartItem.setUpdatedBy(null);
+                cartItem.setUpdatedAt(null);
+            }
+
+            // 5. Save CartItem
+            cartItemRepository.save(cartItem);
         }
 
-        cartItemRepository.save(item);
-
-        // Calculate total price of a cart
-        subTotal = item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
-
-        cartItemResponse = toCartItemResponse(item, roomTypeName, subTotal);
-        cartItemList.add(cartItemResponse);
-
-        return toCartResponse(cart, cartItemList, null, null);
+        // 6. Reload full cart and recalculate total amount
+        return findByUsername(username);
     }
 
     public CartResponse updateQuantity(String itemId, UpdateCartItemRequest request, String username) {
@@ -138,15 +179,36 @@ public class CartService {
     }
 
     public CartResponse deleteCartItem(String itemId, String username) {
-        List<CartItemResponse> cartItemList = new ArrayList<>();
+
+        String userId = getUserId(username);
+
+        Cart cart = getOrCreateCart(userId, username);
+
+        CartItem cartItem = entityValidator.requireCartItem(cart.getId(), itemId);
+
+        // Delete selected cart item
+        cartItemRepository.delete(cartItem);
+
+        // Reload remaining cart items and recalculate total amount
+        return findByUsername(username);
+    }
+
+    /**
+     * Remove all items from current user's cart.
+     */
+    public CartResponse clearCart(String username) {
 
         String userId = getUserId(username);
         Cart cart = getOrCreateCart(userId, username);
-        CartItem cartItem = entityValidator.requireCartItem(cart.getId(), itemId);
 
-        cartItemRepository.delete(cartItem);
+        List<CartItem> cartItems =
+                cartItemRepository.findByCartIdAndDeleteFlagFalse(cart.getId());
 
-        return toCartResponse(cart, cartItemList, BigDecimal.valueOf(0), null);
+        if (!cartItems.isEmpty()) {
+            cartItemRepository.deleteAll(cartItems);
+        }
+
+        return findByUsername(username);
     }
 
     private Cart getOrCreateCart(String userId, String username) {

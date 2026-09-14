@@ -12,8 +12,7 @@ import java.time.LocalDate;
  * Field null = không cập nhật field đó.
  */
 public record UpdateUserRequest(
-
-        @NotNull(message = "Password is required when updating user information")
+        
         @Size(
                 min = 6,
                 max = 100,

@@ -7,13 +7,19 @@ import {
     searchAdminRooms,
     getAdminRoomById,
     updateAdminRoom,
-} from "../../services/adminRoomService";
+    deleteAdminRoom,
+    createAdminRoom,
+} from "../../services/admin/adminRoomService";
+import { getAdminRoomTypes } from "../../services/admin/adminRoomTypeService";
 
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ErrorPopup from "../../components/common/ErrorPopup";
-import EditRoomPopup from "./EditRoomPopup";
+import EditRoomPopup from "../../components/admin/EditRoomPopup";
+import ConfirmPopup from "../../components/common/ConfirmPopup";
+import CreateRoomPopup from "../../components/admin/CreateRoomPopup";
+import SuccessPopup from "../../components/common/SuccessPopup";
 
-function AdminDashboard() {
+function RoomManagement() {
     const { token } = useAuth();
 
     const [rooms, setRooms] = useState([]);
@@ -27,7 +33,7 @@ function AdminDashboard() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalRecords, setTotalRecords] = useState(0);
 
-    const [sortBy, setSortBy] = useState("");
+    const [sortBy, setSortBy] = useState("roomNumber");
     const [order, setOrder] = useState("ASC");
 
     const [searchKeyword, setSearchKeyword] = useState("");
@@ -50,6 +56,33 @@ function AdminDashboard() {
     const [editErrors, setEditErrors] = useState([]);
     const [refreshKey, setRefreshKey] = useState(0);
 
+    const [roomToDelete, setRoomToDelete] = useState(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    const [showCreatePopup, setShowCreatePopup] = useState(false);
+    const [createLoading, setCreateLoading] = useState(false);
+    const [createErrors, setCreateErrors] = useState([]);
+
+    const [roomTypes, setRoomTypes] = useState([]);
+    const [roomTypesLoading, setRoomTypesLoading] = useState(false);
+
+    const [successMessage, setSuccessMessage] = useState("");
+
+    const getStatusClass = (status) => {
+        switch (status) {
+            case "ACTIVE":
+                return "admin-status-active";
+
+            case "MAINTENANCE":
+                return "admin-status-maintenance";
+
+            case "OUT_OF_SERVICE":
+                return "admin-status-out-of-service";
+
+            default:
+                return "";
+        }
+    };
 
     useEffect(() => {
         const loadRooms = async () => {
@@ -98,6 +131,31 @@ function AdminDashboard() {
         loadRooms();
     }, [currentPage, pageSize, sortBy, order, token, searchCriteria, refreshKey]);
 
+    useEffect(() => {
+        const loadRoomTypes = async () => {
+            setRoomTypesLoading(true);
+
+            try {
+                const data = await getAdminRoomTypes({
+                    page: 1,
+                    size: 100,
+                    sortBy: "roomTypeName",
+                    order: "ASC",
+                    token,
+                });
+
+                setRoomTypes(data.data);
+            } catch (error) {
+                setErrors(getErrorMessages(error));
+                setShowErrorPopup(true);
+            } finally {
+                setRoomTypesLoading(false);
+            }
+        };
+
+        loadRoomTypes();
+    }, [token]);
+
     const handlePageChange = (page) => {
         setCurrentPage(page);
     };
@@ -120,7 +178,7 @@ function AdminDashboard() {
             roomStatus: searchForm.roomStatus,
         });
 
-        setSortBy("");
+        setSortBy("roomNumber");
         setOrder("ASC");
         setCurrentPage(1);
     };
@@ -138,7 +196,7 @@ function AdminDashboard() {
             roomStatus: ""
         });
 
-        setSortBy("");
+        setSortBy("roomNumber");
         setOrder("ASC");
         setCurrentPage(1);
     };
@@ -147,7 +205,7 @@ function AdminDashboard() {
         const value = event.target.value;
 
         if (!value) {
-            setSortBy("");
+            setSortBy("roomNumber");
             setOrder("ASC");
             setCurrentPage(1);
             return;
@@ -199,6 +257,8 @@ function AdminDashboard() {
            setEditingRoom(null);
            setEditErrors([]);
 
+           setSuccessMessage(`Room ${roomData.roomNumber} updated successfully.`);
+
            // Reload current table
            setRefreshKey((prev) => prev + 1);
        } catch (error) {
@@ -214,24 +274,89 @@ function AdminDashboard() {
         setEditErrors([]);
     };
 
+    const handleDeleteClick = (room) => {
+        setRoomToDelete(room);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!roomToDelete) {
+            return;
+        }
+
+        setDeleteLoading(true);
+
+        const deletedRoomNumber = roomToDelete.roomNumber;
+
+        try {
+            await deleteAdminRoom({
+                id: roomToDelete.id,
+                token,
+            });
+
+            setRoomToDelete(null);
+
+            setSuccessMessage(`Room ${deletedRoomNumber} deleted successfully.`);
+
+            /*
+             * Nếu xóa record cuối cùng của page hiện tại,
+             * quay về page trước.
+             */
+            if (rooms.length === 1 && currentPage > 1) {
+                setCurrentPage((prev) => prev - 1);
+            } else {
+                // Reload lại page hiện tại
+                setRefreshKey((prev) => prev + 1);
+            }
+        } catch (error) {
+            // Đóng confirm trước để ErrorPopup không bị che
+            setRoomToDelete(null);
+
+            setErrors(getErrorMessages(error));
+            setShowErrorPopup(true);
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
+
+    const handleCreateRoom = async (roomData) => {
+        setCreateLoading(true);
+        setCreateErrors([]);
+
+        try {
+            await createAdminRoom({
+                roomData,
+                token,
+            });
+
+            setShowCreatePopup(false);
+            setCreateErrors([]);
+
+            setSuccessMessage(`Room ${roomData.roomNumber} created successfully.`);
+
+            setRefreshKey((prev) => prev + 1);
+        } catch (error) {
+            setCreateErrors(getErrorMessages(error));
+        } finally {
+            setCreateLoading(false);
+        }
+    };
+
+    const handleCancelCreate = () => {
+        setShowCreatePopup(false);
+        setCreateErrors([]);
+    };
+
     return (
         <>
             <LoadingSpinner show={loading} />
 
-            <div className="admin-dashboard">
-                <div className="admin-dashboard-content">
-
-                    <div className="admin-dashboard-header">
-                        <div>
-                            <h2>Hotel Management</h2>
-                            <p>Manage all rooms in the hotel.</p>
-                        </div>
-                    </div>
+            <div className="room-management">
+                <div className="room-management-content">
 
                     {/* Room Management Card */}
-                    <div className="admin-dashboard-card">
+                    <div className="room-management-card">
 
-                        <div className="admin-dashboard-card-header">
+                        <div className="room-management-card-header">
                             <div>
                                 <h4>Room Management</h4>
 
@@ -239,6 +364,17 @@ function AdminDashboard() {
                                     Total: {totalRecords} rooms
                                 </span>
                             </div>
+
+                            <button
+                                type="button"
+                                className="btn btn-primary admin-create-room-btn"
+                                onClick={() => {
+                                    setCreateErrors([]);
+                                    setShowCreatePopup(true);
+                                }}
+                            >
+                                Create Room
+                            </button>
                         </div>
 
                         {/* Search and Sort */}
@@ -325,7 +461,7 @@ function AdminDashboard() {
                                     }
                                     onChange={handleSortChange}
                                 >
-                                    <option value="">
+                                    <option value="roomNumber-ASC">
                                         Default
                                     </option>
 
@@ -403,11 +539,7 @@ function AdminDashboard() {
 
                                             <td className="text-center">
                                                 <span
-                                                    className={`admin-status-badge ${
-                                                        room.status === "ACTIVE"
-                                                            ? "admin-status-active"
-                                                            : "admin-status-maintenance"
-                                                    }`}
+                                                    className={`admin-status-badge ${getStatusClass(room.status)}`}
                                                 >
                                                     {room.status}
                                                 </span>
@@ -424,12 +556,13 @@ function AdminDashboard() {
                                                         Edit
                                                     </button>
 
-                                                    <button
-                                                        type="button"
-                                                        className="btn btn-sm btn-outline-danger"
-                                                    >
-                                                        Delete
-                                                    </button>
+                                                     <button
+                                                         type="button"
+                                                         className="btn btn-sm btn-outline-danger"
+                                                         onClick={() => handleDeleteClick(room)}
+                                                     >
+                                                         Delete
+                                                     </button>
 
                                                 </div>
                                             </td>
@@ -486,13 +619,48 @@ function AdminDashboard() {
                 errors={errors}
                 onClose={() => setShowErrorPopup(false)}
             />
+            <CreateRoomPopup
+                show={showCreatePopup}
+                roomTypes={roomTypes}
+                roomTypesLoading={roomTypesLoading}
+                loading={createLoading}
+                errors={createErrors}
+                onCreate={handleCreateRoom}
+                onCancel={handleCancelCreate}
+            />
             <EditRoomPopup
                 show={showEditPopup}
                 room={editingRoom}
+                roomTypes={roomTypes}
+                roomTypesLoading={roomTypesLoading}
                 loading={editLoading}
                 errors={editErrors}
                 onUpdate={handleUpdateRoom}
                 onCancel={handleCancelEdit}
+            />
+            <ConfirmPopup
+                show={roomToDelete !== null}
+                title="Confirm Delete"
+                message={
+                    roomToDelete
+                        ? `Are you sure you want to delete room ${roomToDelete.roomNumber}?`
+                        : ""
+                }
+                confirmText={
+                    deleteLoading
+                        ? "Deleting..."
+                        : "Delete"
+                }
+                cancelText="Cancel"
+                loading={deleteLoading}
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setRoomToDelete(null)}
+            />
+            <SuccessPopup
+                show={Boolean(successMessage)}
+                title="Success"
+                message={successMessage}
+                onClose={() => setSuccessMessage("")}
             />
             <ErrorPopup
                 show={showErrorPopup}
@@ -504,5 +672,4 @@ function AdminDashboard() {
     );
 }
 
-
-export default AdminDashboard;
+export default RoomManagement;

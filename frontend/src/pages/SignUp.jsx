@@ -107,7 +107,7 @@ function SignUp() {
                                     <div className="col-md-6">
                                         <label
                                             htmlFor="username"
-                                            className="form-label"
+                                            className="form-label required-label"
                                         >
                                             Username
                                         </label>
@@ -128,7 +128,7 @@ function SignUp() {
                                     <div className="col-md-6">
                                         <label
                                             htmlFor="fullName"
-                                            className="form-label"
+                                            className="form-label required-label"
                                         >
                                             Full Name
                                         </label>
@@ -149,7 +149,7 @@ function SignUp() {
                                     <div className="col-md-6">
                                         <label
                                             htmlFor="gender"
-                                            className="form-label"
+                                            className="form-label required-label"
                                         >
                                             Gender
                                         </label>
@@ -173,7 +173,7 @@ function SignUp() {
                                     <div className="col-md-6">
                                         <label
                                             htmlFor="dateOfBirth"
-                                            className="form-label"
+                                            className="form-label required-label"
                                         >
                                             Date of Birth
                                         </label>
@@ -193,7 +193,7 @@ function SignUp() {
                                     <div className="col-md-6">
                                         <label
                                             htmlFor="email"
-                                            className="form-label"
+                                            className="form-label required-label"
                                         >
                                             Email
                                         </label>
@@ -214,7 +214,7 @@ function SignUp() {
                                     <div className="col-md-6">
                                         <label
                                             htmlFor="phoneNumber"
-                                            className="form-label"
+                                            className="form-label required-label"
                                         >
                                             Phone Number
                                         </label>
@@ -255,7 +255,7 @@ function SignUp() {
                                     <div className="col-md-6">
                                         <label
                                             htmlFor="password"
-                                            className="form-label"
+                                            className="form-label required-label"
                                         >
                                             Password
                                         </label>
@@ -276,7 +276,7 @@ function SignUp() {
                                     <div className="col-md-6">
                                         <label
                                             htmlFor="confirmPassword"
-                                            className="form-label"
+                                            className="form-label required-label"
                                         >
                                             Confirm Password
                                         </label>

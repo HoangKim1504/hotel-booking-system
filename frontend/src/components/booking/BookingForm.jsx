@@ -1,9 +1,21 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import about1 from "../../assets/images/about-1.jpg";
 import about2 from "../../assets/images/about-2.jpg";
 import about3 from "../../assets/images/about-3.jpg";
 import about4 from "../../assets/images/about-4.jpg";
+
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+
+import { createBooking } from "../../services/bookingService";
+import { getErrorMessages } from "../../utils/apiErrorUtils";
+import { createPayment } from "../../services/paymentService";
+
+import BookingConfirmPopup from "./BookingConfirmPopup";
+import ErrorPopup from "../common/ErrorPopup";
+import SuccessPopup from "../common/SuccessPopup";
 
 function BookingForm() {
     const [formData, setFormData] = useState({
@@ -13,25 +25,32 @@ function BookingForm() {
         checkOut: "",
         adults: "1",
         children: "0",
-        roomId: "",
-        specialRequest: "",
+        paymentMethod: "",
     });
 
-    // TODO: Replace mock room data with Spring Boot API
-    const rooms = [
-        {
-            id: 1,
-            name: "Junior Suite",
-        },
-        {
-            id: 2,
-            name: "Executive Suite",
-        },
-        {
-            id: 3,
-            name: "Super Deluxe",
-        },
-    ];
+    const navigate = useNavigate();
+
+    const {
+        token,
+    } = useAuth();
+
+    const {
+        cartItems,
+        cartTotal,
+        cartWarnings,
+        loadCart,
+        clearCart,
+    } = useCart();
+
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const [bookingLoading, setBookingLoading] = useState(false);
+
+    const [bookingErrors, setBookingErrors] = useState([]);
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
+    const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
+    const [createdBookingId, setCreatedBookingId] = useState(null);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -45,22 +64,110 @@ function BookingForm() {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        console.log("Booking data:", formData);
+        if (cartItems.length === 0) {
+            setBookingErrors([
+                "Your cart is empty. Please add a room before booking.",
+            ]);
 
-        // TODO: Send booking data to Spring Boot API
-        // Example:
-        //
-        // axios.post("http://localhost:8080/api/bookings", formData)
-        //     .then((response) => {
-        //         console.log(response.data);
-        //     })
-        //     .catch((error) => {
-        //         console.error(error);
-        //     });
+            setShowErrorPopup(true);
+
+            return;
+        }
+
+        setShowConfirm(true);
     };
 
+    const handleConfirmBooking = async () => {
+        setBookingLoading(true);
+
+        try {
+            // 1. Create booking
+            const booking = await createBooking({
+                items: cartItems.map((item) => ({
+                    roomTypeId: item.roomTypeId,
+                    quantity: item.quantity,
+                    price: item.price,
+                })),
+                checkInDate: formData.checkIn,
+                checkOutDate: formData.checkOut,
+                token,
+            });
+
+            // 2. Create payment
+            await createPayment({
+                bookingId: booking.id,
+                paymentMethod:
+                    formData.paymentMethod,
+                token,
+            });
+
+            // 3. Clear cart AFTER booking and payment success
+            await clearCart();
+
+            // 4. Save booking ID for detail page
+            setCreatedBookingId(
+                booking.id
+            );
+
+            // 5. Close confirmation popup
+            setShowConfirm(false);
+
+            // 6. Show booking success popup
+            setShowSuccessPopup(true);
+
+        } catch (error) {
+            const errorMessages = getErrorMessages(error);
+
+            // Close confirm popup
+            setShowConfirm(false);
+
+            // Save booking errors
+            setBookingErrors(
+                errorMessages
+            );
+
+            // Show error popup
+            setShowErrorPopup(true);
+        } finally {
+            setBookingLoading(false);
+        }
+    };
+
+    const calculateNights = (checkIn, checkOut) => {
+        if (!checkIn || !checkOut) {
+            return 0;
+        }
+
+        const checkInDate = new Date(
+            `${checkIn}T00:00:00`
+        );
+
+        const checkOutDate = new Date(
+            `${checkOut}T00:00:00`
+        );
+
+        const difference =
+            checkOutDate.getTime() -
+            checkInDate.getTime();
+
+        const nights =
+            difference /
+            (1000 * 60 * 60 * 24);
+
+        return nights > 0
+            ? nights
+            : 0;
+    };
+
+    const numberOfNights = calculateNights(
+        formData.checkIn,
+        formData.checkOut
+    );
+
+    const estimatedTotal = Number(cartTotal) * numberOfNights;
+
     return (
-        <div className="container-xxl py-5">
+        <div className="container-xxl py-2">
             <div className="container">
 
                 {/* Title */}
@@ -142,7 +249,10 @@ function BookingForm() {
                                             required
                                         />
 
-                                        <label htmlFor="name">
+                                        <label
+                                            htmlFor="name"
+                                            className="required-label"
+                                        >
                                             Your Name
                                         </label>
 
@@ -164,7 +274,10 @@ function BookingForm() {
                                             required
                                         />
 
-                                        <label htmlFor="email">
+                                        <label
+                                            htmlFor="email"
+                                            className="required-label"
+                                        >
                                             Your Email
                                         </label>
 
@@ -185,7 +298,10 @@ function BookingForm() {
                                             required
                                         />
 
-                                        <label htmlFor="checkIn">
+                                        <label
+                                            htmlFor="checkIn"
+                                            className="required-label"
+                                        >
                                             Check In
                                         </label>
 
@@ -206,7 +322,10 @@ function BookingForm() {
                                             required
                                         />
 
-                                        <label htmlFor="checkOut">
+                                        <label
+                                            htmlFor="checkOut"
+                                            className="required-label"
+                                        >
                                             Check Out
                                         </label>
 
@@ -279,72 +398,148 @@ function BookingForm() {
                                     </div>
                                 </div>
 
-                                {/* Room */}
-                                <div className="col-12">
+                                {/* Payment Method */}
+                                <div className="col-md-6">
                                     <div className="form-floating">
 
                                         <select
                                             className="form-select"
-                                            id="roomId"
-                                            name="roomId"
-                                            value={formData.roomId}
+                                            id="paymentMethod"
+                                            name="paymentMethod"
+                                            value={formData.paymentMethod}
                                             onChange={handleChange}
                                             required
                                         >
                                             <option value="">
-                                                Select room
+                                                Select payment method
                                             </option>
 
-                                            {rooms.map((room) => (
-                                                <option
-                                                    key={room.id}
-                                                    value={room.id}
-                                                >
-                                                    {room.name}
-                                                </option>
-                                            ))}
+                                            <option value="CASH">
+                                                Cash
+                                            </option>
+
+                                            <option value="ONLINE">
+                                                Online
+                                            </option>
                                         </select>
 
-                                        <label htmlFor="roomId">
-                                            Select A Room
+                                        <label
+                                            htmlFor="paymentMethod"
+                                            className="required-label"
+                                        >
+                                            Payment Method
                                         </label>
 
                                     </div>
                                 </div>
 
-                                {/* Special Request */}
+                                {/* Selected Cart Items */}
                                 <div className="col-12">
-                                    <div className="form-floating">
+                                    <div className="booking-selected-rooms">
 
-                                        <textarea
-                                            className="form-control"
-                                            id="specialRequest"
-                                            name="specialRequest"
-                                            placeholder="Special Request"
-                                            value={formData.specialRequest}
-                                            onChange={handleChange}
-                                            style={{
-                                                height: "100px",
-                                            }}
-                                        />
+                                        <div className="booking-selected-rooms-header">
+                                            <div>
+                                                <h5>Selected Rooms</h5>
 
-                                        <label htmlFor="specialRequest">
-                                            Special Request
-                                        </label>
+                                                <p>
+                                                    Rooms you are about to book
+                                                </p>
+                                            </div>
+
+                                            <span>
+                                                {cartItems.length} Room Type
+                                                {cartItems.length !== 1 ? "s" : ""}
+                                            </span>
+                                        </div>
+
+                                        {cartItems.length === 0 ? (
+                                            <div className="booking-selected-rooms-empty">
+                                                Your cart is empty.
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="booking-selected-room-list">
+
+                                                    {cartItems.map((item) => (
+                                                        <div
+                                                            key={item.id}
+                                                            className="booking-selected-room-item"
+                                                        >
+                                                            <div className="booking-selected-room-icon">
+                                                                <i className="fa fa-bed" />
+                                                            </div>
+
+                                                            <div className="booking-selected-room-info">
+                                                                <strong>
+                                                                    {item.roomTypeName}
+                                                                </strong>
+
+                                                                <span>
+                                                                    ${Number(
+                                                                        item.price
+                                                                    ).toLocaleString()}
+                                                                    {" / night × "}
+                                                                    {item.quantity}
+                                                                </span>
+                                                            </div>
+
+                                                            <strong className="booking-selected-room-price">
+                                                                $
+                                                                {Number(
+                                                                    item.subtotal
+                                                                ).toLocaleString()}
+                                                            </strong>
+                                                        </div>
+                                                    ))}
+
+                                                </div>
+
+                                                <div className="booking-selected-summary">
+
+                                                    <div className="booking-selected-summary-row">
+                                                        <span>Price Per Night</span>
+
+                                                        <strong>
+                                                            ${Number(cartTotal).toLocaleString()}
+                                                        </strong>
+                                                    </div>
+
+                                                    <div className="booking-selected-summary-row">
+                                                        <span>Number of Nights</span>
+
+                                                        <strong>
+                                                            {numberOfNights > 0
+                                                                ? numberOfNights
+                                                                : "-"}
+                                                        </strong>
+                                                    </div>
+
+                                                    <div className="booking-selected-summary-row booking-selected-estimated-total">
+                                                        <span>Estimated Total</span>
+
+                                                        <strong>
+                                                            {numberOfNights > 0
+                                                                ? `$${estimatedTotal.toLocaleString()}`
+                                                                : "-"}
+                                                        </strong>
+                                                    </div>
+
+                                                </div>
+                                            </>
+                                        )}
 
                                     </div>
                                 </div>
 
                                 {/* Submit */}
                                 <div className="col-12">
-
                                     <button
                                         className="btn btn-primary w-100 py-3"
                                         type="submit"
+                                        disabled={cartItems.length === 0}
                                     >
                                         Book Now
                                     </button>
-
                                 </div>
 
                             </div>
@@ -353,6 +548,43 @@ function BookingForm() {
                     </div>
 
                 </div>
+                <BookingConfirmPopup
+                    show={showConfirm}
+                    formData={formData}
+                    cartItems={cartItems}
+                    cartTotal={cartTotal}
+                    numberOfNights={numberOfNights}
+                    estimatedTotal={estimatedTotal}
+                    loading={bookingLoading}
+                    onConfirm={handleConfirmBooking}
+                    onCancel={() =>
+                        setShowConfirm(false)
+                    }
+                />
+
+                <ErrorPopup
+                    show={showErrorPopup}
+                    title="Booking Failed"
+                    errors={bookingErrors}
+                    onClose={() =>
+                        setShowErrorPopup(false)
+                    }
+                />
+
+                <SuccessPopup
+                    show={showSuccessPopup}
+                    title="Booking Successful"
+                    message="Your booking has been created successfully."
+                    onClose={() => {
+                        setShowSuccessPopup(false);
+
+                        if (createdBookingId) {
+                            navigate(
+                                `/bookings/${createdBookingId}`
+                            );
+                        }
+                    }}
+                />
             </div>
         </div>
     );

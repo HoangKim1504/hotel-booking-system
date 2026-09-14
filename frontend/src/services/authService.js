@@ -38,3 +38,26 @@ export async function register(userData) {
 
     return data;
 }
+
+/**
+ * Get current authenticated user information
+ */
+export async function getMe(token) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/auth/me`,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}

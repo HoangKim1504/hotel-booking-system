@@ -6,15 +6,15 @@ import com.hotelbooking.dto.booking.SimpleBookingResponse;
 import com.hotelbooking.dto.booking.UpdateBookingResponse;
 import com.hotelbooking.dto.common.PageResponse;
 import com.hotelbooking.enums.BookingStatus;
+import com.hotelbooking.enums.PaymentStatus;
 import com.hotelbooking.exception.ConflictException;
 import com.hotelbooking.model.Booking;
 import com.hotelbooking.model.BookingItem;
+import com.hotelbooking.model.Payment;
 import com.hotelbooking.model.RoomAssignment;
-import com.hotelbooking.repository.BookingItemRepository;
-import com.hotelbooking.repository.BookingRepository;
-import com.hotelbooking.repository.RoomAssignmentRepository;
-import com.hotelbooking.repository.RoomBookingSlotRepository;
+import com.hotelbooking.repository.*;
 import com.hotelbooking.service.BookingService;
+import com.hotelbooking.utils.DateUtils;
 import com.hotelbooking.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * SERVICE — CRUD Booking.
@@ -41,6 +42,7 @@ public class AdminBookingService {
     private final BookingItemRepository bookingItemRepository;
     private final RoomAssignmentRepository roomAssignmentRepository;
     private final RoomBookingSlotRepository roomBookingSlotRepository;
+    private final PaymentRepository paymentRepository;
 
     private final EntityValidator entityValidator;
 
@@ -153,10 +155,18 @@ public class AdminBookingService {
 
         Booking updatedBooking = bookingRepository.save(booking);
 
-        // 5. Nếu Booking không còn giữ phòng thì release RoomBookingSlot
+        // 5. Update Payment nếu status cần đồng bộ
+        updatePaymentStatusIfNeeded(
+                bookingId,
+                newStatus,
+                username,
+                now
+        );
+
+        // 6. Nếu Booking không còn giữ phòng thì release RoomBookingSlot
         releaseRoomsIfNeeded(newStatus, bookingId, username, now);
 
-        // 5. Return response
+        // 7. Return response
         return bookingService.toUpdateBookingResponse(updatedBooking);
     }
 
@@ -260,5 +270,61 @@ public class AdminBookingService {
         bookingService.releaseRoomAssignments(bookingId, username, now);
     }
 
+    private void updatePaymentStatusIfNeeded(
+            String bookingId,
+            BookingStatus newStatus,
+            String username,
+            Instant now
+    ) {
+        Payment payment = paymentRepository.findByBookingIdAndDeleteFlagFalse(bookingId);
+
+        if (payment == null) {
+            return;
+        }
+
+        boolean paymentChanged = false;
+
+        switch (newStatus) {
+
+            case CHECKED_IN, PAID -> {
+                payment.setStatus(PaymentStatus.SUCCESS);
+
+                if (payment.getPaymentDate() == null) {
+                    payment.setPaymentDate(DateUtils.toLocalDateTime(now));
+                }
+
+                if (payment.getTransactionId() == null) {
+                    payment.setTransactionId(UUID.randomUUID().toString());
+                }
+
+                paymentChanged = true;
+            }
+
+            case REFUNDED -> {
+                payment.setStatus(PaymentStatus.REFUNDED);
+                paymentChanged = true;
+            }
+
+            case EXPIRED -> {
+                if (PaymentStatus.PENDING.equals(payment.getStatus())) {
+                    payment.setStatus(PaymentStatus.FAILED);
+
+                    paymentChanged = true;
+                }
+            }
+
+            default -> {
+                // CONFIRMED / COMPLETED
+                // Không tự thay đổi PaymentStatus
+            }
+        }
+
+        if (paymentChanged) {
+            payment.setUpdatedBy(username);
+            payment.setUpdatedAt(now);
+
+            paymentRepository.save(payment);
+        }
+    }
 
 }

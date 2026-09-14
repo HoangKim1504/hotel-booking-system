@@ -142,3 +142,65 @@ export async function updateAdminRoom({
 
     return data;
 }
+
+export async function deleteAdminRoom({
+    id,
+    token,
+}) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/admin/rooms/${id}`,
+        {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const text = await response.text();
+
+    let data = null;
+
+    if (text) {
+        try {
+            data = JSON.parse(text);
+        } catch {
+            data = {
+                message: text,
+            };
+        }
+    }
+
+    if (!response.ok) {
+        throw data || {
+            message: "Unable to delete room",
+        };
+    }
+
+    return data;
+}
+
+export async function createAdminRoom({
+    roomData,
+    token,
+}) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/admin/rooms`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(roomData),
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}

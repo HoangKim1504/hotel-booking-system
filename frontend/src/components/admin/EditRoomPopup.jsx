@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 function EditRoomPopup({
     show,
     room,
+    roomTypes = [],
+    roomTypesLoading,
     loading,
     errors = [],
     onUpdate,
@@ -15,17 +17,22 @@ function EditRoomPopup({
         status: "",
     });
 
+    const [initialData, setInitialData] = useState(null);
+
     useEffect(() => {
         if (!room) {
             return;
         }
 
-        setFormData({
+        const roomData = {
             roomTypeName: room.roomTypeName || "",
             roomNumber: room.roomNumber || "",
             floorNumber: room.floorNumber || "",
             status: room.status || "",
-        });
+        };
+
+        setFormData(roomData);
+        setInitialData(roomData);
     }, [room]);
 
     if (!show || !room) {
@@ -51,6 +58,15 @@ function EditRoomPopup({
             status: formData.status,
         });
     };
+
+    const hasChanges =
+        initialData &&
+        (
+            formData.roomTypeName !== initialData.roomTypeName ||
+            String(formData.roomNumber) !== String(initialData.roomNumber) ||
+            String(formData.floorNumber) !== String(initialData.floorNumber) ||
+            formData.status !== initialData.status
+        );
 
     return (
         <div
@@ -101,27 +117,42 @@ function EditRoomPopup({
                     <div className="mb-3">
                         <label
                             htmlFor="editRoomTypeName"
-                            className="form-label"
+                            className="form-label required-label"
                         >
                             Room Type
                         </label>
 
-                        <input
-                            type="text"
+                        <select
                             id="editRoomTypeName"
                             name="roomTypeName"
-                            className="form-control"
+                            className="form-select"
                             value={formData.roomTypeName}
                             onChange={handleChange}
+                            disabled={roomTypesLoading}
                             required
-                        />
+                        >
+                            <option value="">
+                                {roomTypesLoading
+                                    ? "Loading room types..."
+                                    : "Select room type"}
+                            </option>
+
+                            {roomTypes.map((roomType) => (
+                                <option
+                                    key={roomType.id}
+                                    value={roomType.roomTypeName}
+                                >
+                                    {roomType.roomTypeName}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="row g-3">
                         <div className="col-md-6">
                             <label
                                 htmlFor="editRoomNumber"
-                                className="form-label"
+                                className="form-label required-label"
                             >
                                 Room Number
                             </label>
@@ -142,7 +173,7 @@ function EditRoomPopup({
                         <div className="col-md-6">
                             <label
                                 htmlFor="editFloorNumber"
-                                className="form-label"
+                                className="form-label required-label"
                             >
                                 Floor Number
                             </label>
@@ -164,7 +195,7 @@ function EditRoomPopup({
                     <div className="mt-3">
                         <label
                             htmlFor="editRoomStatus"
-                            className="form-label"
+                            className="form-label required-label"
                         >
                             Status
                         </label>
@@ -203,8 +234,8 @@ function EditRoomPopup({
 
                         <button
                             type="submit"
-                            className="btn btn-primary"
-                            disabled={loading}
+                            className="btn btn-primary edit-room-update-btn"
+                            disabled={loading || !hasChanges}
                         >
                             {loading ? "UPDATING..." : "UPDATE"}
                         </button>
