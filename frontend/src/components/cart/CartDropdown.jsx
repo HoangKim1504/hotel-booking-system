@@ -26,11 +26,6 @@ function CartDropdown({
         return null;
     }
 
-    const handleViewCart = () => {
-        onClose();
-        navigate("/cart");
-    };
-
     const handleBooking = () => {
         onClose();
         navigate("/booking");
@@ -147,14 +142,6 @@ function CartDropdown({
                     </div>
 
                     <div className="navbar-cart-actions">
-                        <button
-                            type="button"
-                            className="btn btn-outline-primary"
-                            onClick={handleViewCart}
-                        >
-                            View Cart
-                        </button>
-
                         <button
                             type="button"
                             className="btn btn-primary"

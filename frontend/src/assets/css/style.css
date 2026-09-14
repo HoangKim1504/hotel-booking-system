@@ -3596,14 +3596,12 @@
 
 /*** Navbar Cart Actions ***/
 .navbar-cart-actions {
-    display: grid;
-
-    grid-template-columns: 1fr 1fr;
-
-    gap: 10px;
+    display: block;
 }
 
 .navbar-cart-actions .btn {
+    width: 100%;
+
     font-size: 13px;
     font-weight: 600;
 }
