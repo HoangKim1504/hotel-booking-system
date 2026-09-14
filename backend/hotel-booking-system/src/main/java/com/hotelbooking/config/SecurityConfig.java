@@ -167,6 +167,12 @@ public class SecurityConfig {
                                 "/api/admin/bookings/*"
                         ).hasAuthority("USER_DELETE")
 
+                        // Statistics management for Admin
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/admin/statistics/revenue"
+                        ).hasAuthority("ADMIN_VIEW")
+
                         // springdoc: UI + spec JSON (để Try it out không bị 401)
                         .requestMatchers(
                                 "/swagger-ui.html",
