@@ -53,6 +53,8 @@ function BookingManagement() {
     const [statusLoading, setStatusLoading] = useState(false);
     const [statusErrors, setStatusErrors] = useState([]);
 
+    const canCancelBooking = (status) => ["PENDING", "PAID", "CONFIRMED"].includes(status);
+
     useEffect(() => {
         const loadBookings = async () => {
             setLoading(true);
@@ -556,17 +558,14 @@ function BookingManagement() {
 
                                                         <button
                                                             type="button"
-                                                            className="btn btn-sm btn-outline-warning"
+                                                            className="admin-action-btn admin-action-btn-cancel"
                                                             disabled={
-                                                                booking.bookingStatus === "CANCELLED" ||
-                                                                booking.bookingStatus === "COMPLETED" ||
-                                                                booking.bookingStatus === "EXPIRED" ||
-                                                                booking.bookingStatus === "REFUNDED"
+                                                                !canCancelBooking(
+                                                                    booking.bookingStatus
+                                                                )
                                                             }
                                                             onClick={() =>
-                                                                handleCancelClick(
-                                                                    booking
-                                                                )
+                                                                setBookingToCancel(booking)
                                                             }
                                                         >
                                                             Cancel

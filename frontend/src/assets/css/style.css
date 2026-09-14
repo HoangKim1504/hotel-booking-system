@@ -4892,3 +4892,49 @@
     color: #64748b;
 }
 
+/*** Admin Cancel Booking Button ***/
+.admin-action-btn-cancel {
+    min-width: 72px;
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 12px;
+
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #d97706;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+/*** Admin Cancel Booking Button Hover ***/
+.admin-action-btn-cancel:hover:not(:disabled) {
+    background: #f59e0b;
+    color: #ffffff;
+}
+
+/*** Admin Cancel Booking Button Disabled ***/
+.admin-action-btn-cancel:disabled {
+    border-color: #d1d5db;
+
+    background: #f3f4f6;
+    color: #9ca3af;
+
+    opacity: 1;
+
+    box-shadow: none;
+}
+
