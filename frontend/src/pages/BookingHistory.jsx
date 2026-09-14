@@ -146,6 +146,9 @@ function BookingHistory() {
             setRefreshKey((prev) => prev + 1);
 
         } catch (error) {
+            // Close cancel confirmation popup
+            setBookingToCancel(null);
+
             setErrors(
                 getErrorMessages(error)
             );
