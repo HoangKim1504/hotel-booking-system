@@ -25,6 +25,7 @@ import RoomTypeManagement from "./pages/admin/RoomTypeManagement";
 import BookingManagement from "./pages/admin/BookingManagement";
 import BookingDetail from "./pages/BookingDetail";
 import BookingHistory from "./pages/BookingHistory";
+import RevenueStatistics from "./pages/admin/RevenueStatistics";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -87,6 +88,11 @@ function App() {
                     <Route
                         path="bookings"
                         element={<BookingManagement />}
+                    />
+
+                    <Route
+                        path="statistics"
+                        element={<RevenueStatistics />}
                     />
 
                 </Route>

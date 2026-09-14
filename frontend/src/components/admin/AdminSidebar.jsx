@@ -112,6 +112,13 @@ function AdminSidebar({
                     >
                         Booking Management
                     </NavLink>
+
+                    <NavLink
+                        to="/admin/statistics"
+                        className="admin-sidebar-link"
+                    >
+                        Revenue Statistics
+                    </NavLink>
                 </nav>
 
                 {/* Footer buttons */}
