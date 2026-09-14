@@ -55,9 +55,10 @@ function Login() {
             );
 
             // 4. Redirect by role
-            if (
-                currentUser.roleCodes?.includes("ADMIN")
-            ) {
+            const isAdmin =
+                currentUser.roles?.includes("ADMIN");
+
+            if (isAdmin) {
                 navigate("/admin");
             } else {
                 navigate("/");

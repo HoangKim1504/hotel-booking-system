@@ -42,10 +42,10 @@ export function AuthProvider({ children }) {
         userInfo
     ) => {
         const newRoles =
-            userInfo.roleCodes ?? [];
+            userInfo.roles ?? [];
 
         const newPermissions =
-            userInfo.permissionCodes ?? [];
+            userInfo.permissions ?? [];
 
         localStorage.setItem(
             "authToken",
