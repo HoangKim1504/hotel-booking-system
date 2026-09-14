@@ -193,6 +193,24 @@ public class CartService {
         return findByUsername(username);
     }
 
+    /**
+     * Remove all items from current user's cart.
+     */
+    public CartResponse clearCart(String username) {
+
+        String userId = getUserId(username);
+        Cart cart = getOrCreateCart(userId, username);
+
+        List<CartItem> cartItems =
+                cartItemRepository.findByCartIdAndDeleteFlagFalse(cart.getId());
+
+        if (!cartItems.isEmpty()) {
+            cartItemRepository.deleteAll(cartItems);
+        }
+
+        return findByUsername(username);
+    }
+
     private Cart getOrCreateCart(String userId, String username) {
         return cartRepository.findByUserIdAndDeleteFlagFalse(userId)
                 .orElseGet(() -> {

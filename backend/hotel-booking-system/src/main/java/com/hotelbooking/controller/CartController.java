@@ -42,4 +42,13 @@ public class CartController {
         return cartService.deleteCartItem(itemId, username);
     }
 
+    /**
+     * Clear all items in current user's cart.
+     */
+    @DeleteMapping("/items")
+    public CartResponse clearCart(Authentication authentication) {
+        String username = authentication.getName();
+        return cartService.clearCart(username);
+    }
+
 }
