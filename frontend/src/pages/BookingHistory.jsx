@@ -179,7 +179,6 @@ function BookingHistory() {
 
                     <div className="my-bookings-header">
                         <div>
-                            <span>YOUR BOOKINGS</span>
 
                             <h2>My Bookings</h2>
 
@@ -243,6 +242,15 @@ function BookingHistory() {
 
                                 <table className="table my-bookings-table">
 
+                                    <colgroup>
+                                        <col className="my-bookings-col-check-in" />
+                                        <col className="my-bookings-col-check-out" />
+                                        <col className="my-bookings-col-total" />
+                                        <col className="my-bookings-col-payment" />
+                                        <col className="my-bookings-col-status" />
+                                        <col className="my-bookings-col-actions" />
+                                    </colgroup>
+
                                     <thead>
                                         <tr>
                                             <th>Check In</th>
@@ -278,9 +286,12 @@ function BookingHistory() {
                                                 </td>
 
                                                 <td>
-                                                    <span className="my-bookings-payment">
-                                                        {booking.paymentStatus ??
-                                                            "NONE"}
+                                                    <span
+                                                        className={`my-bookings-payment my-bookings-payment-${(
+                                                            booking.paymentStatus ?? "NONE"
+                                                        ).toLowerCase()}`}
+                                                    >
+                                                        {booking.paymentStatus ?? "NONE"}
                                                     </span>
                                                 </td>
 
@@ -288,11 +299,10 @@ function BookingHistory() {
                                                     <span
                                                         className={`my-bookings-status my-bookings-status-${booking.bookingStatus?.toLowerCase()}`}
                                                     >
-                                                        {booking.bookingStatus
-                                                            ?.replaceAll(
-                                                                "_",
-                                                                " "
-                                                            )}
+                                                        {booking.bookingStatus?.replaceAll(
+                                                            "_",
+                                                            " "
+                                                        )}
                                                     </span>
                                                 </td>
 
@@ -336,6 +346,7 @@ function BookingHistory() {
                                     </tbody>
 
                                 </table>
+
                             </div>
                         )}
 

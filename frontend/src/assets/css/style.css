@@ -4547,25 +4547,28 @@
 .my-bookings-page {
     min-height: calc(100vh - 100px);
 
-    padding: 55px 30px 90px;
+    padding: 48px 30px 100px;
 
     background: #f8fafc;
 }
 
 .my-bookings-container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1180px;
 
     margin: 0 auto;
 }
 
-
 /*** My Bookings Header ***/
 .my-bookings-header {
-    margin-bottom: 22px;
+    margin-bottom: 24px;
 }
 
-.my-bookings-header span {
+.my-bookings-header > div > span {
+    display: block;
+
+    margin-bottom: 5px;
+
     color: var(--primary);
 
     font-size: 13px;
@@ -4575,7 +4578,7 @@
 }
 
 .my-bookings-header h2 {
-    margin: 5px 0;
+    margin: 0 0 5px;
 
     color: var(--dark);
 
@@ -4587,22 +4590,22 @@
     margin: 0;
 
     color: #64748b;
-}
 
+    font-size: 14px;
+}
 
 /*** My Bookings Card ***/
 .my-bookings-card {
-    padding: 28px;
+    padding: 26px;
 
     background: #ffffff;
 
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e2e8f0;
     border-radius: 14px;
 
     box-shadow:
-        0 10px 35px rgba(15, 23, 43, 0.07);
+        0 10px 32px rgba(15, 23, 43, 0.07);
 }
-
 
 /*** My Bookings Toolbar ***/
 .my-bookings-toolbar {
@@ -4611,46 +4614,85 @@
 
     gap: 10px;
 
-    margin-bottom: 25px;
+    padding: 14px 16px;
+    margin-bottom: 22px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
 }
 
 .my-bookings-toolbar .form-select {
     width: 220px;
+    height: 40px;
 }
 
+.my-bookings-toolbar .btn {
+    height: 40px;
+
+    padding-left: 17px;
+    padding-right: 17px;
+
+    font-size: 13px;
+    font-weight: 600;
+}
 
 /*** My Bookings Table ***/
 .my-bookings-table {
+    width: 100%;
+
     margin-bottom: 0;
+
+    table-layout: fixed;
+
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .my-bookings-table thead th {
-    padding: 14px;
+    padding: 15px 13px;
 
+    background: #f8fafc;
     color: var(--dark);
+
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #dbe2ea;
 
     font-size: 14px;
     font-weight: 700;
 
-    border-bottom: 2px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.my-bookings-table thead th:first-child {
+    border-radius: 8px 0 0 0;
+}
+
+.my-bookings-table thead th:last-child {
+    border-radius: 0 8px 0 0;
 }
 
 .my-bookings-table tbody td {
-    padding: 16px 14px;
+    padding: 16px 13px;
+
+    color: #1f2937;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    font-size: 14px;
 
     vertical-align: middle;
 }
 
-.my-bookings-total {
-    color: var(--primary);
-
-    font-weight: 700;
-}
-
-
 /*** My Bookings Status ***/
+/*** My Bookings Status Badge ***/
 .my-bookings-status {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 82px;
 
     padding: 6px 11px;
 
@@ -4686,10 +4728,37 @@
 /*** My Bookings Actions ***/
 .my-bookings-actions {
     display: flex;
+    align-items: center;
+    justify-content: center;
 
     gap: 8px;
 }
 
+.my-bookings-actions .btn {
+    min-width: 66px;
+    height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 11px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/*** My Bookings Disabled Action ***/
+.my-bookings-actions .btn:disabled {
+    border-color: #d1d5db;
+
+    background: #f3f4f6;
+    color: #9ca3af;
+
+    opacity: 1;
+
+    cursor: not-allowed;
+}
 
 /*** My Bookings Pagination ***/
 .my-bookings-pagination {
@@ -4719,15 +4788,107 @@
     text-align: center;
 }
 
-/*** User Booking Total ***/
-.user-booking-total {
-    border-top: 1px solid #dee2e6;
-    margin-top: 12px;
-    padding-top: 18px;
+/*** My Bookings Total ***/
+.my-bookings-total {
+    color: var(--dark) !important;
+
+    font-size: 15px;
+    font-weight: 700;
 }
 
 /*** Booking divider ***/
 .user-booking-divider {
     margin: 12px 0 18px;
+}
+
+/*** My Bookings Status And Actions Alignment ***/
+.my-bookings-table th:nth-child(5),
+.my-bookings-table th:nth-child(6),
+.my-bookings-table td:nth-child(5),
+.my-bookings-table td:nth-child(6) {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/*** My Bookings Table Columns ***/
+.my-bookings-col-check-in {
+    width: 16%;
+}
+
+.my-bookings-col-check-out {
+    width: 16%;
+}
+
+.my-bookings-col-total {
+    width: 12%;
+}
+
+.my-bookings-col-payment {
+    width: 16%;
+}
+
+.my-bookings-col-status {
+    width: 18%;
+}
+
+.my-bookings-col-actions {
+    width: 22%;
+}
+
+/*** My Bookings Table Row Hover ***/
+.my-bookings-table tbody tr {
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.my-bookings-table tbody tr:hover td {
+    background: #fffaf2;
+}
+
+.my-bookings-table tbody tr:hover td:first-child {
+    box-shadow:
+        inset 3px 0 0 var(--primary);
+}
+
+/*** My Bookings Payment Badge ***/
+.my-bookings-payment {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 76px;
+
+    padding: 6px 11px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.my-bookings-payment-success {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.my-bookings-payment-pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.my-bookings-payment-failed {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.my-bookings-payment-refunded {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.my-bookings-payment-none {
+    background: #e5e7eb;
+    color: #64748b;
 }
 
