@@ -108,10 +108,6 @@ function BookingDetail() {
                     {/* Page Header */}
                     <div className="user-booking-detail-page-header">
                         <div>
-                            <span className="user-booking-detail-label">
-                                YOUR BOOKING
-                            </span>
-
                             <h2>Booking Detail</h2>
 
                             <p>
@@ -122,10 +118,10 @@ function BookingDetail() {
                         <button
                             type="button"
                             className="btn btn-outline-primary"
-                            onClick={() => navigate("/rooms")}
+                            onClick={() => navigate("/bookings")}
                         >
                             <i className="fa fa-arrow-left me-2" />
-                            Back To Rooms
+                            Back To My Bookings
                         </button>
                     </div>
 
@@ -204,7 +200,7 @@ function BookingDetail() {
 
                         </div>
 
-                        {/* Rooms */}
+                        {/* Booked Rooms */}
                         <div className="user-booking-rooms-section">
 
                             <div className="user-booking-section-title">
@@ -215,13 +211,13 @@ function BookingDetail() {
                                         Rooms included in this reservation
                                     </p>
                                 </div>
+                            </div>
 
-                                <span>
-                                    {booking.items?.length ?? 0} Room Type
-                                    {(booking.items?.length ?? 0) !== 1
-                                        ? "s"
-                                        : ""}
-                                </span>
+                            <div className="user-booking-room-count">
+                                {booking.items?.length ?? 0} Room Type
+                                {(booking.items?.length ?? 0) !== 1
+                                    ? "s"
+                                    : ""}
                             </div>
 
                             <div className="user-booking-room-list">
@@ -240,9 +236,7 @@ function BookingDetail() {
                                             </strong>
 
                                             <span>
-                                                ${Number(
-                                                    item.price
-                                                ).toLocaleString()}
+                                                ${Number(item.price).toLocaleString()}
                                                 {" / night × "}
                                                 {item.quantity}
                                             </span>
@@ -250,10 +244,7 @@ function BookingDetail() {
 
                                         <div className="user-booking-room-price">
                                             $
-                                            {(
-                                                Number(item.price) *
-                                                item.quantity
-                                            ).toLocaleString()}
+                                            {Number(item.price).toLocaleString()}
                                         </div>
                                     </div>
                                 ))}
@@ -261,9 +252,10 @@ function BookingDetail() {
 
                         </div>
 
-                        {/* Total */}
+                        {/* Total Amount */}
                         <div className="user-booking-total-section">
-                            <div>
+
+                            <div className="user-booking-total-label">
                                 <span>Total Amount</span>
 
                                 <small>
@@ -271,12 +263,10 @@ function BookingDetail() {
                                 </small>
                             </div>
 
-                            <strong>
-                                $
-                                {Number(
-                                    booking.totalAmount
-                                ).toLocaleString()}
+                            <strong className="user-booking-total-price">
+                                ${Number(booking.totalAmount).toLocaleString()}
                             </strong>
+
                         </div>
 
                     </div>

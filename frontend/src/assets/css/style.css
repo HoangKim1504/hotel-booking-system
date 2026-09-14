@@ -4014,7 +4014,7 @@
 .user-booking-detail-page {
     min-height: calc(100vh - 100px);
 
-    padding: 55px 30px 140px;
+    padding: 40px 30px 140px;
     padding-bottom: 150px;
 
     background: #f8fafc;
@@ -4128,20 +4128,7 @@
 
     gap: 24px;
 
-    margin-bottom: 24px;
-}
-
-.user-booking-detail-label {
-    display: block;
-
-    margin-bottom: 5px;
-
-    color: var(--primary);
-
-    font-size: 13px;
-    font-weight: 700;
-
-    letter-spacing: 1px;
+    margin-bottom: 20px;
 }
 
 .user-booking-detail-page-header h2 {
@@ -4180,7 +4167,7 @@
 
     gap: 20px;
 
-    padding: 24px 30px;
+    padding: 22px 30px;
 
     background: var(--dark);
 }
@@ -4195,7 +4182,7 @@
 .user-booking-summary-label {
     color: #cbd5e1;
 
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .user-booking-status-badge {
@@ -4241,7 +4228,7 @@
 .user-booking-payment-summary > span {
     color: #94a3b8;
 
-    font-size: 13px;
+    font-size: 17px;
 }
 
 .user-booking-payment-summary strong {
@@ -4338,9 +4325,48 @@
 
     gap: 25px;
 
-    padding: 30px;
+    padding: 20px;
 
     border-bottom: 1px solid #e5e7eb;
+}
+
+/*** User Booking Rooms Section ***/
+.user-booking-rooms-section {
+    padding-top: 15px;
+    margin-top: 0;
+}
+
+/*** User Booking Rooms Title ***/
+.user-booking-section-title {
+    margin-bottom: 15px;
+}
+
+.user-booking-section-title h4 {
+    margin: 0 0 6px;
+
+    color: var(--dark);
+
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.user-booking-section-title p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 15px;
+}
+
+
+/*** User Booking Room Count ***/
+.user-booking-room-count {
+    margin-bottom: 10px;
+
+    color: #475569;
+
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .user-booking-date-box {
@@ -4382,7 +4408,7 @@
 
     color: #64748b;
 
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
 }
 
@@ -4463,7 +4489,7 @@
 
     gap: 15px;
 
-    padding: 17px 0;
+    padding: 15px 0;
 
     border-bottom: 1px solid #edf2f7;
 }
@@ -4490,7 +4516,7 @@
 .user-booking-room-info strong {
     color: var(--dark);
 
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
 }
 
@@ -4506,6 +4532,54 @@
     color: var(--dark);
 
     font-size: 16px;
+    font-weight: 700;
+}
+
+/*** User Booking Total Section ***/
+.user-booking-total-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    padding-top: 20px;
+    margin-top: 20px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+
+/*** User Booking Total Label ***/
+.user-booking-total-label {
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.user-booking-total-label span {
+    color: var(--dark);
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.user-booking-total-label small {
+    color: #64748b;
+
+    font-size: 1p4x;
+    font-weight: 400;
+}
+
+
+/*** User Booking Total Price ***/
+.user-booking-total-price {
+    flex-shrink: 0;
+
+    color: var(--primary);
+
+    font-size: 26px;
     font-weight: 700;
 }
 
@@ -4547,21 +4621,21 @@
 .my-bookings-page {
     min-height: calc(100vh - 100px);
 
-    padding: 48px 30px 100px;
+    padding: 35px 30px 140px;
 
     background: #f8fafc;
 }
 
 .my-bookings-container {
     width: 100%;
-    max-width: 1180px;
+    max-width: 1050px;
 
     margin: 0 auto;
 }
 
 /*** My Bookings Header ***/
 .my-bookings-header {
-    margin-bottom: 24px;
+    margin-bottom: 12px;
 }
 
 .my-bookings-header > div > span {
@@ -4582,7 +4656,7 @@
 
     color: var(--dark);
 
-    font-size: 30px;
+    font-size: 35px;
     font-weight: 700;
 }
 
@@ -4591,7 +4665,7 @@
 
     color: #64748b;
 
-    font-size: 14px;
+    font-size: 17px;
 }
 
 /*** My Bookings Card ***/
@@ -4614,13 +4688,8 @@
 
     gap: 10px;
 
-    padding: 14px 16px;
-    margin-bottom: 22px;
-
-    background: #f8fafc;
-
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
+    margin-top: 8px;
+    margin-bottom: 20px;
 }
 
 .my-bookings-toolbar .form-select {
@@ -4659,7 +4728,7 @@
     border-top: 1px solid #e5e7eb;
     border-bottom: 1px solid #dbe2ea;
 
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 700;
 
     vertical-align: middle;
@@ -4680,7 +4749,7 @@
 
     border-bottom: 1px solid #e5e7eb;
 
-    font-size: 14px;
+    font-size: 15px;
 
     vertical-align: middle;
 }
@@ -4820,11 +4889,11 @@
 }
 
 .my-bookings-col-total {
-    width: 12%;
+    width: 14%;
 }
 
 .my-bookings-col-payment {
-    width: 16%;
+    width: 14%;
 }
 
 .my-bookings-col-status {
@@ -4832,7 +4901,7 @@
 }
 
 .my-bookings-col-actions {
-    width: 22%;
+    width: 23%;
 }
 
 /*** My Bookings Table Row Hover ***/
