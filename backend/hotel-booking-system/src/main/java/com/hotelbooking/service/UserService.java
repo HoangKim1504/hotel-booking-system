@@ -98,7 +98,7 @@ public class UserService {
             user.setDateOfBirth(request.dateOfBirth());
         }
 
-        if (request.email() != null) {
+        if (request.email() != null && !request.email().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.email())) {
                 throw new ConflictException("Email already exists");
             }
@@ -119,7 +119,6 @@ public class UserService {
 
         if (request.enabled() != null) {
             user.setEnabled(request.enabled());
-            user.setDeleteFlag(!request.enabled());
         }
 
         if (request.password() != null) {

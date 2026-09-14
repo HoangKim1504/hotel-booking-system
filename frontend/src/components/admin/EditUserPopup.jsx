@@ -189,7 +189,7 @@ function EditUserPopup({
                         <div className="user-form-group">
                             <label
                                 htmlFor="editPassword"
-                                className="form-label required-label"
+                                className="form-label"
                             >
                                 New Password
                             </label>
