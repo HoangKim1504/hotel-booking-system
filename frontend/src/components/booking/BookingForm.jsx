@@ -120,6 +120,39 @@ function BookingForm() {
         }
     };
 
+    const calculateNights = (checkIn, checkOut) => {
+        if (!checkIn || !checkOut) {
+            return 0;
+        }
+
+        const checkInDate = new Date(
+            `${checkIn}T00:00:00`
+        );
+
+        const checkOutDate = new Date(
+            `${checkOut}T00:00:00`
+        );
+
+        const difference =
+            checkOutDate.getTime() -
+            checkInDate.getTime();
+
+        const nights =
+            difference /
+            (1000 * 60 * 60 * 24);
+
+        return nights > 0
+            ? nights
+            : 0;
+    };
+
+    const numberOfNights = calculateNights(
+        formData.checkIn,
+        formData.checkOut
+    );
+
+    const estimatedTotal = Number(cartTotal) * numberOfNights;
+
     return (
         <div className="container-xxl py-2">
             <div className="container">
@@ -448,15 +481,36 @@ function BookingForm() {
 
                                                 </div>
 
-                                                <div className="booking-selected-rooms-total">
-                                                    <span>Cart Total</span>
+                                                <div className="booking-selected-summary">
 
-                                                    <strong>
-                                                        $
-                                                        {Number(
-                                                            cartTotal
-                                                        ).toLocaleString()}
-                                                    </strong>
+                                                    <div className="booking-selected-summary-row">
+                                                        <span>Price Per Night</span>
+
+                                                        <strong>
+                                                            ${Number(cartTotal).toLocaleString()}
+                                                        </strong>
+                                                    </div>
+
+                                                    <div className="booking-selected-summary-row">
+                                                        <span>Number of Nights</span>
+
+                                                        <strong>
+                                                            {numberOfNights > 0
+                                                                ? numberOfNights
+                                                                : "-"}
+                                                        </strong>
+                                                    </div>
+
+                                                    <div className="booking-selected-summary-row booking-selected-estimated-total">
+                                                        <span>Estimated Total</span>
+
+                                                        <strong>
+                                                            {numberOfNights > 0
+                                                                ? `$${estimatedTotal.toLocaleString()}`
+                                                                : "-"}
+                                                        </strong>
+                                                    </div>
+
                                                 </div>
                                             </>
                                         )}
@@ -486,6 +540,8 @@ function BookingForm() {
                     formData={formData}
                     cartItems={cartItems}
                     cartTotal={cartTotal}
+                    numberOfNights={numberOfNights}
+                    estimatedTotal={estimatedTotal}
                     loading={bookingLoading}
                     onConfirm={handleConfirmBooking}
                     onCancel={() =>

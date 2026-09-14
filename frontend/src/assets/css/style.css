@@ -5150,3 +5150,49 @@
     text-align: center;
 }
 
+/*** Booking Selected Summary ***/
+.booking-selected-summary {
+    padding-top: 14px;
+}
+
+/*** Booking Selected Summary Row ***/
+.booking-selected-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 6px 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.booking-selected-summary-row strong {
+    color: var(--dark);
+
+    font-weight: 600;
+}
+
+/*** Booking Estimated Total ***/
+.booking-selected-estimated-total {
+    margin-top: 7px;
+    padding-top: 13px;
+
+    border-top: 1px solid #e2e8f0;
+
+    color: var(--dark);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.booking-selected-estimated-total strong {
+    color: var(--primary);
+
+    font-size: 20px;
+    font-weight: 700;
+}
+

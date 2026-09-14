@@ -3,6 +3,8 @@ function BookingConfirmPopup({
     formData,
     cartItems,
     cartTotal,
+    numberOfNights,
+    estimatedTotal,
     loading,
     onConfirm,
     onCancel,
@@ -88,6 +90,14 @@ function BookingConfirmPopup({
                         </strong>
                     </div>
 
+                    <div className="booking-confirm-info-item">
+                        <span>Total nights</span>
+                        <strong>
+                            {numberOfNights} night
+                            {numberOfNights !== 1 ? "s" : ""}
+                        </strong>
+                    </div>
+
                 </div>
 
                 {/* Selected Rooms */}
@@ -126,14 +136,18 @@ function BookingConfirmPopup({
 
                 {/* Total */}
                 <div className="booking-confirm-total">
-                    <span>Total</span>
+
+                    <div>
+                        <span>Estimated Total</span>
+
+                    </div>
 
                     <strong>
-                        $
-                        {Number(
-                            cartTotal
+                        ${Number(
+                            estimatedTotal
                         ).toLocaleString()}
                     </strong>
+
                 </div>
 
                 {/* Actions */}
