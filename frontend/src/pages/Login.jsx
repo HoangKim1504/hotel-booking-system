@@ -4,7 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 import PageHeader from "../components/layout/PageHeader";
 import ErrorPopup from "../components/common/ErrorPopup";
 
-import { login as loginApi } from "../services/authService";
+import {
+    login as loginApi,
+    getMe,
+} from "../services/authService";
 import { getErrorMessages } from "../utils/apiErrorUtils";
 import { useAuth } from "../context/AuthContext";
 
@@ -35,16 +38,25 @@ function Login() {
         setLoading(true);
 
         try {
+            // 1. Login and get JWT
             const data = await loginApi(
                 formData.username,
                 formData.password
             );
 
-           login(data.token, formData.username);
+            // 2. Get current user information and roles
+            const currentUser =
+                await getMe(data.token);
 
+            // 3. Save authentication information
+            login(
+                data.token,
+                currentUser
+            );
+
+            // 4. Redirect by role
             if (
-                formData.username === "admin" ||
-                formData.username === "editor"
+                currentUser.roleCodes?.includes("ADMIN")
             ) {
                 navigate("/admin");
             } else {
@@ -56,9 +68,14 @@ function Login() {
                 left: 0,
                 behavior: "auto",
             });
+
         } catch (error) {
-            setErrors(getErrorMessages(error));
+            setErrors(
+                getErrorMessages(error)
+            );
+
             setShowErrorPopup(true);
+
         } finally {
             setLoading(false);
         }

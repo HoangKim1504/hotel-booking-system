@@ -26,6 +26,7 @@ import BookingManagement from "./pages/admin/BookingManagement";
 import BookingDetail from "./pages/BookingDetail";
 import BookingHistory from "./pages/BookingHistory";
 import RevenueStatistics from "./pages/admin/RevenueStatistics";
+import AdminRoute from "./components/auth/AdminRoute";
 
 function App() {
     const [loading, setLoading] = useState(true);
@@ -61,40 +62,41 @@ function App() {
                     element={<Home />}
                 />
 
-                <Route
-                    path="/admin"
-                    element={<AdminLayout />}
-                >
+                <Route element={<AdminRoute />}>
                     <Route
-                        index
-                        element={<AdminHome />}
-                    />
+                        path="/admin"
+                        element={<AdminLayout />}
+                    >
+                        <Route
+                            index
+                            element={<AdminHome />}
+                        />
 
-                    <Route
-                        path="users"
-                        element={<UserManagement />}
-                    />
+                        <Route
+                            path="users"
+                            element={<UserManagement />}
+                        />
 
-                    <Route
-                        path="room-types"
-                        element={<RoomTypeManagement />}
-                    />
+                        <Route
+                            path="room-types"
+                            element={<RoomTypeManagement />}
+                        />
 
-                    <Route
-                        path="rooms"
-                        element={<RoomManagement />}
-                    />
+                        <Route
+                            path="rooms"
+                            element={<RoomManagement />}
+                        />
 
-                    <Route
-                        path="bookings"
-                        element={<BookingManagement />}
-                    />
+                        <Route
+                            path="bookings"
+                            element={<BookingManagement />}
+                        />
 
-                    <Route
-                        path="statistics"
-                        element={<RevenueStatistics />}
-                    />
-
+                        <Route
+                            path="statistics"
+                            element={<RevenueStatistics />}
+                        />
+                    </Route>
                 </Route>
 
                 <Route
