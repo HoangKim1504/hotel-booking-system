@@ -121,7 +121,7 @@ function BookingForm() {
     };
 
     return (
-        <div className="container-xxl py-5">
+        <div className="container-xxl py-2">
             <div className="container">
 
                 {/* Title */}
@@ -387,16 +387,92 @@ function BookingForm() {
                                     </div>
                                 </div>
 
-                                {/* Submit */}
-                                <div className="col-md-12">
+                                {/* Selected Cart Items */}
+                                <div className="col-12">
+                                    <div className="booking-selected-rooms">
 
+                                        <div className="booking-selected-rooms-header">
+                                            <div>
+                                                <h5>Selected Rooms</h5>
+
+                                                <p>
+                                                    Rooms you are about to book
+                                                </p>
+                                            </div>
+
+                                            <span>
+                                                {cartItems.length} Room Type
+                                                {cartItems.length !== 1 ? "s" : ""}
+                                            </span>
+                                        </div>
+
+                                        {cartItems.length === 0 ? (
+                                            <div className="booking-selected-rooms-empty">
+                                                Your cart is empty.
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="booking-selected-room-list">
+
+                                                    {cartItems.map((item) => (
+                                                        <div
+                                                            key={item.id}
+                                                            className="booking-selected-room-item"
+                                                        >
+                                                            <div className="booking-selected-room-icon">
+                                                                <i className="fa fa-bed" />
+                                                            </div>
+
+                                                            <div className="booking-selected-room-info">
+                                                                <strong>
+                                                                    {item.roomTypeName}
+                                                                </strong>
+
+                                                                <span>
+                                                                    ${Number(
+                                                                        item.price
+                                                                    ).toLocaleString()}
+                                                                    {" / night × "}
+                                                                    {item.quantity}
+                                                                </span>
+                                                            </div>
+
+                                                            <strong className="booking-selected-room-price">
+                                                                $
+                                                                {Number(
+                                                                    item.subtotal
+                                                                ).toLocaleString()}
+                                                            </strong>
+                                                        </div>
+                                                    ))}
+
+                                                </div>
+
+                                                <div className="booking-selected-rooms-total">
+                                                    <span>Cart Total</span>
+
+                                                    <strong>
+                                                        $
+                                                        {Number(
+                                                            cartTotal
+                                                        ).toLocaleString()}
+                                                    </strong>
+                                                </div>
+                                            </>
+                                        )}
+
+                                    </div>
+                                </div>
+
+                                {/* Submit */}
+                                <div className="col-12">
                                     <button
                                         className="btn btn-primary w-100 py-3"
                                         type="submit"
+                                        disabled={cartItems.length === 0}
                                     >
                                         Book Now
                                     </button>
-
                                 </div>
 
                             </div>
