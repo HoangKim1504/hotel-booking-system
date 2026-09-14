@@ -46,97 +46,85 @@ public class DataSeeder implements ApplicationRunner {
     @Override
     public void run(@NonNull ApplicationArguments args) {
 
-        // 1. RBAC
-        if (userRepository.existsByUsername("admin")) {
-            log.info("RbacDataSeeder: RBAC data already present — skip");
-        } else {
-            seedRbacData();
-        }
+        log.warn("DemoDataSeeder: RESETTING demo collections before seeding...");
+        resetDemoData();
 
-        // 2. ROOM TYPES
+        // 1. RBAC + users (> 10 users for pagination)
+        seedRbacData();
+
+        // 2. Room types (> 10 room types for pagination)
         seedRoomTypeData();
 
-        // 3. ROOMS
+        // 3. Rooms (> 10 rooms for pagination)
         seedRoomData();
 
-        // 4. BOOKING + BOOKING ITEMS + ROOM ASSIGNMENTS
-        seedSearchBookingData();
+        // 4. Bookings + booking items + room assignments
+        //    - Dynamic demo bookings based on today
+        //    - Historical/statistics data for 2024, 2025, 2026
+        seedBookingData();
 
-        // 5. CART + CART ITEMS
+        // 5. Cart + cart items
         seedCartData();
 
-        // 6. ROOM BOOKING SLOTS
+        // 6. Room booking slots for statuses that are currently holding rooms
         seedRoomBookingSlots();
 
-        // 7. PAYMENT
+        // 7. Payments, consistent with booking statuses
         seedPayments();
+
+        log.info("DemoDataSeeder: DONE");
+        log.info("Demo login ADMIN : admin / @Admin123");
+        log.info("Demo login USER  : alice / @User123");
+        log.info("Locked USER      : lockeduser / @Locked123");
     }
 
     // =========================================================
-    // RBAC
+    // RESET
+    // =========================================================
+
+    /**
+     * Reset demo collections in child -> parent order so every application start
+     * recreates the same demo dataset structure.
+     * <p>
+     * IMPORTANT: this intentionally deletes existing demo/application data.
+     */
+    private void resetDemoData() {
+
+        roomBookingSlotRepository.deleteAll();
+        roomAssignmentRepository.deleteAll();
+        paymentRepository.deleteAll();
+        bookingItemRepository.deleteAll();
+        bookingRepository.deleteAll();
+
+        cartItemRepository.deleteAll();
+        cartRepository.deleteAll();
+
+        roomRepository.deleteAll();
+        roomTypeRepository.deleteAll();
+
+        userRepository.deleteAll();
+        roleRepository.deleteAll();
+        permissionRepository.deleteAll();
+
+        log.info("DemoDataSeeder: collections reset successfully");
+    }
+
+    // =========================================================
+    // RBAC + USERS
     // =========================================================
 
     private void seedRbacData() {
 
-        log.info("RbacDataSeeder: seeding permissions, roles, users...");
-
-        // ========================
-        // Permissions
-        // ========================
+        log.info("DemoDataSeeder: seeding permissions, roles and users...");
 
         Map<String, Permission> perms = new LinkedHashMap<>();
 
-        perms.put(
-                "USER_VIEW",
-                savePermission(
-                        "USER_VIEW",
-                        "View users"
-                )
-        );
-
-        perms.put(
-                "USER_CREATE",
-                savePermission(
-                        "USER_CREATE",
-                        "Create user"
-                )
-        );
-
-        perms.put(
-                "USER_UPDATE",
-                savePermission(
-                        "USER_UPDATE",
-                        "Update user"
-                )
-        );
-
-        perms.put(
-                "USER_DELETE",
-                savePermission(
-                        "USER_DELETE",
-                        "Delete user"
-                )
-        );
-
-        perms.put(
-                "USER_ASSIGN_ROLE",
-                savePermission(
-                        "USER_ASSIGN_ROLE",
-                        "Assign or remove role"
-                )
-        );
-
-        perms.put(
-                "ADMIN_VIEW",
-                savePermission(
-                        "ADMIN_VIEW",
-                        "Admin can view"
-                )
-        );
-
-        // ========================
-        // Roles
-        // ========================
+        perms.put("USER_VIEW", savePermission("USER_VIEW", "View users"));
+        perms.put("USER_CREATE", savePermission("USER_CREATE", "Create user"));
+        perms.put("USER_UPDATE", savePermission("USER_UPDATE", "Update user"));
+        perms.put("USER_DELETE", savePermission("USER_DELETE", "Delete user"));
+        perms.put("USER_ASSIGN_ROLE", savePermission("USER_ASSIGN_ROLE", "Assign or remove role"));
+        perms.put("ADMIN_VIEW", savePermission("ADMIN_VIEW", "Admin can view"));
 
         Role roleAdmin = saveRole(
                 "ADMIN",
@@ -165,15 +153,10 @@ public class DataSeeder implements ApplicationRunner {
         Role roleUser = saveRole(
                 "USER",
                 "User",
-                List.of(
-                        perms.get("USER_VIEW")
-                )
+                List.of(perms.get("USER_VIEW"))
         );
 
-        // ========================
-        // Users
-        // ========================
-
+        // Main demo accounts
         saveUser(
                 "admin",
                 "admin@demo.local",
@@ -184,6 +167,7 @@ public class DataSeeder implements ApplicationRunner {
                 "0901000001",
                 "Ho Chi Minh City",
                 null,
+                true,
                 List.of(roleAdmin.getId())
         );
 
@@ -197,6 +181,7 @@ public class DataSeeder implements ApplicationRunner {
                 "0901000002",
                 "Ho Chi Minh City",
                 null,
+                true,
                 List.of(roleEditor.getId())
         );
 
@@ -210,6 +195,7 @@ public class DataSeeder implements ApplicationRunner {
                 "0901000003",
                 "Da Nang",
                 null,
+                true,
                 List.of(roleUser.getId())
         );
 
@@ -220,37 +206,65 @@ public class DataSeeder implements ApplicationRunner {
                 "Peter Tran",
                 Gender.MALE,
                 LocalDate.of(2001, 8, 5),
-                "0902000015",
+                "0901000004",
                 "Ha Noi",
                 null,
+                true,
                 List.of(roleUser.getId())
         );
 
-        log.info(
-                "RbacDataSeeder: done. " +
-                        "Logins: admin/@Admin123, " +
-                        "editor/@Editor123, " +
-                        "alice/@User123, " +
-                        "peter/@User456"
+        // Locked account for login/authorization demo
+        saveUser(
+                "lockeduser",
+                "lockeduser@demo.local",
+                "@Locked123",
+                "Locked Demo User",
+                Gender.MALE,
+                LocalDate.of(1999, 3, 12),
+                "0901000005",
+                "Can Tho",
+                null,
+                false,
+                List.of(roleUser.getId())
         );
+
+        // Extra users for admin pagination/search demo
+        String[] cities = {
+                "Ho Chi Minh City",
+                "Ha Noi",
+                "Da Nang",
+                "Can Tho",
+                "Hue"
+        };
+
+        for (int i = 1; i <= 12; i++) {
+            String number = String.format("%02d", i);
+
+            saveUser(
+                    "demo" + number,
+                    "demo" + number + "@demo.local",
+                    "@Demo123",
+                    "Demo User " + number,
+                    i % 2 == 0 ? Gender.FEMALE : Gender.MALE,
+                    LocalDate.of(1990 + (i % 10), ((i - 1) % 12) + 1, Math.min(i + 5, 28)),
+                    "09120000" + number,
+                    cities[(i - 1) % cities.length],
+                    null,
+                    true,
+                    List.of(roleUser.getId())
+            );
+        }
+
+        log.info("DemoDataSeeder: users seeded = {}", userRepository.count());
     }
 
     // =========================================================
-    // ROOM TYPE
+    // ROOM TYPES
     // =========================================================
 
     private void seedRoomTypeData() {
 
-        // Đã có RoomType chưa bị soft delete → skip
-        List<RoomType> existingRoomTypes =
-                roomTypeRepository.findAllByDeleteFlagFalse();
-
-        if (!existingRoomTypes.isEmpty()) {
-            log.info("RoomTypeSeeder: data already present — skip");
-            return;
-        }
-
-        log.info("RoomTypeSeeder: seeding room types...");
+        log.info("DemoDataSeeder: seeding room types...");
 
         saveRoomType("Deluxe King Room", 35.5, "WiFi, Air Conditioning, Mini Bar, Flat-screen TV, Safe", 2, new BigDecimal("120.00"), RoomTypeStatus.ACTIVE);
         saveRoomType("Standard Twin Room", 22.0, "WiFi, Air Conditioning, Flat-screen TV", 2, new BigDecimal("75.50"), RoomTypeStatus.ACTIVE);
@@ -288,95 +302,35 @@ public class DataSeeder implements ApplicationRunner {
         saveRoomType("Skyline Suite", 58.0, "WiFi, Air Conditioning, Mini Bar, Panoramic City View, Balcony", 3, new BigDecimal("260.00"), RoomTypeStatus.ACTIVE);
         saveRoomType("Traditional Family Room", 47.0, "WiFi, Air Conditioning, Extra Bed, Flat-screen TV", 4, new BigDecimal("165.00"), RoomTypeStatus.ACTIVE);
 
-        log.info("RoomTypeSeeder: done");
-    }
-
-    private void saveRoomType(
-            String roomTypeName,
-            Double roomSize,
-            String facility,
-            Integer maximumPeople,
-            BigDecimal price,
-            RoomTypeStatus status
-    ) {
-
-        RoomType roomType = new RoomType();
-
-        roomType.setRoomTypeName(roomTypeName);
-        roomType.setRoomSize(roomSize);
-        roomType.setFacility(facility);
-        roomType.setMaximumPeople(maximumPeople);
-        roomType.setPrice(price);
-        roomType.setStatus(status);
-
-        // Soft delete
-        roomType.setDeleteFlag(false);
-
-        // Audit
-        Instant now = Instant.now();
-
-        roomType.setCreatedBy("admin");
-        roomType.setCreatedAt(now);
-        roomType.setUpdatedBy("admin");
-        roomType.setUpdatedAt(now);
-
-        roomTypeRepository.save(roomType);
+        log.info("DemoDataSeeder: room types seeded = {}", roomTypeRepository.count());
     }
 
     // =========================================================
-    // ROOM
+    // ROOMS
     // =========================================================
+
     private void seedRoomData() {
 
-        if (roomRepository.count() > 0) {
-            log.info("RoomSeeder: data already present — skip");
-            return;
-        }
+        List<RoomType> roomTypes = roomTypeRepository.findAllByDeleteFlagFalse();
 
-        List<RoomType> roomTypes =
-                roomTypeRepository.findAllByDeleteFlagFalse();
+        RoomType deluxeKing = requireSeedRoomType(roomTypes, "Deluxe King Room");
+        RoomType standardTwin = requireSeedRoomType(roomTypes, "Standard Twin Room");
+        RoomType executiveSuite = requireSeedRoomType(roomTypes, "Executive Suite");
+        RoomType familyRoom = requireSeedRoomType(roomTypes, "Family Room");
+        RoomType singleEconomy = requireSeedRoomType(roomTypes, "Single Economy Room");
+        RoomType deluxeQueen = requireSeedRoomType(roomTypes, "Deluxe Queen Room");
+        RoomType familySuite = requireSeedRoomType(roomTypes, "Family Suite");
+        RoomType honeymoonSuite = requireSeedRoomType(roomTypes, "Honeymoon Suite");
+        RoomType accessibleRoom = requireSeedRoomType(roomTypes, "Accessible Room");
+        RoomType gardenView = requireSeedRoomType(roomTypes, "Garden View Room");
+        RoomType oceanViewSuite = requireSeedRoomType(roomTypes, "Ocean View Suite");
+        RoomType studioRoom = requireSeedRoomType(roomTypes, "Studio Room");
+        RoomType poolsideRoom = requireSeedRoomType(roomTypes, "Poolside Room");
+        RoomType classicDouble = requireSeedRoomType(roomTypes, "Classic Double Room");
+        RoomType mountainView = requireSeedRoomType(roomTypes, "Mountain View Room");
+        RoomType duplexSuite = requireSeedRoomType(roomTypes, "Duplex Suite");
 
-        if (roomTypes.isEmpty()) {
-            log.warn("RoomSeeder: no room types found — skip");
-            return;
-        }
-
-        log.info("RoomSeeder: seeding rooms...");
-
-        RoomType deluxeKing =
-                requireSeedRoomType(roomTypes, "Deluxe King Room");
-        RoomType standardTwin =
-                requireSeedRoomType(roomTypes, "Standard Twin Room");
-        RoomType executiveSuite =
-                requireSeedRoomType(roomTypes, "Executive Suite");
-        RoomType familyRoom =
-                requireSeedRoomType(roomTypes, "Family Room");
-        RoomType singleEconomy =
-                requireSeedRoomType(roomTypes, "Single Economy Room");
-        RoomType deluxeQueen =
-                requireSeedRoomType(roomTypes, "Deluxe Queen Room");
-        RoomType familySuite =
-                requireSeedRoomType(roomTypes, "Family Suite");
-        RoomType honeymoonSuite =
-                requireSeedRoomType(roomTypes, "Honeymoon Suite");
-        RoomType accessibleRoom =
-                requireSeedRoomType(roomTypes, "Accessible Room");
-        RoomType gardenView =
-                requireSeedRoomType(roomTypes, "Garden View Room");
-        RoomType oceanViewSuite =
-                requireSeedRoomType(roomTypes, "Ocean View Suite");
-        RoomType studioRoom =
-                requireSeedRoomType(roomTypes, "Studio Room");
-        RoomType poolsideRoom =
-                requireSeedRoomType(roomTypes, "Poolside Room");
-        RoomType classicDouble =
-                requireSeedRoomType(roomTypes, "Classic Double Room");
-        RoomType mountainView =
-                requireSeedRoomType(roomTypes, "Mountain View Room");
-        RoomType duplexSuite =
-                requireSeedRoomType(roomTypes, "Duplex Suite");
-
-        // Tầng 1 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 1
         saveRoom(deluxeKing, 101, 1, RoomStatus.ACTIVE);
         saveRoom(standardTwin, 102, 1, RoomStatus.ACTIVE);
         saveRoom(executiveSuite, 103, 1, RoomStatus.ACTIVE);
@@ -384,7 +338,7 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(singleEconomy, 105, 1, RoomStatus.ACTIVE);
         saveRoom(deluxeQueen, 106, 1, RoomStatus.MAINTENANCE);
 
-        // Tầng 2 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 2
         saveRoom(standardTwin, 201, 2, RoomStatus.ACTIVE);
         saveRoom(deluxeQueen, 202, 2, RoomStatus.ACTIVE);
         saveRoom(deluxeKing, 203, 2, RoomStatus.ACTIVE);
@@ -392,7 +346,7 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(executiveSuite, 205, 2, RoomStatus.ACTIVE);
         saveRoom(accessibleRoom, 206, 2, RoomStatus.ACTIVE);
 
-        // Tầng 3 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 3
         saveRoom(familyRoom, 301, 3, RoomStatus.ACTIVE);
         saveRoom(gardenView, 302, 3, RoomStatus.ACTIVE);
         saveRoom(deluxeKing, 303, 3, RoomStatus.ACTIVE);
@@ -400,7 +354,7 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(executiveSuite, 305, 3, RoomStatus.ACTIVE);
         saveRoom(studioRoom, 306, 3, RoomStatus.MAINTENANCE);
 
-        // Tầng 4 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 4
         saveRoom(oceanViewSuite, 401, 4, RoomStatus.ACTIVE);
         saveRoom(familySuite, 402, 4, RoomStatus.ACTIVE);
         saveRoom(standardTwin, 403, 4, RoomStatus.ACTIVE);
@@ -408,7 +362,7 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(honeymoonSuite, 405, 4, RoomStatus.ACTIVE);
         saveRoom(accessibleRoom, 406, 4, RoomStatus.OUT_OF_SERVICE);
 
-        // Tầng 5 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 5
         saveRoom(executiveSuite, 501, 5, RoomStatus.ACTIVE);
         saveRoom(familyRoom, 502, 5, RoomStatus.ACTIVE);
         saveRoom(deluxeQueen, 503, 5, RoomStatus.ACTIVE);
@@ -416,7 +370,7 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(deluxeKing, 505, 5, RoomStatus.ACTIVE);
         saveRoom(classicDouble, 506, 5, RoomStatus.MAINTENANCE);
 
-        // Tầng 6 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 6
         saveRoom(singleEconomy, 601, 6, RoomStatus.ACTIVE);
         saveRoom(standardTwin, 602, 6, RoomStatus.ACTIVE);
         saveRoom(familyRoom, 603, 6, RoomStatus.ACTIVE);
@@ -424,7 +378,7 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(mountainView, 605, 6, RoomStatus.ACTIVE);
         saveRoom(studioRoom, 606, 6, RoomStatus.ACTIVE);
 
-        // Tầng 7 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 7
         saveRoom(deluxeKing, 701, 7, RoomStatus.ACTIVE);
         saveRoom(executiveSuite, 702, 7, RoomStatus.ACTIVE);
         saveRoom(familySuite, 703, 7, RoomStatus.ACTIVE);
@@ -432,7 +386,7 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(classicDouble, 705, 7, RoomStatus.ACTIVE);
         saveRoom(accessibleRoom, 706, 7, RoomStatus.OUT_OF_SERVICE);
 
-        // Tầng 8 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 8
         saveRoom(familyRoom, 801, 8, RoomStatus.ACTIVE);
         saveRoom(standardTwin, 802, 8, RoomStatus.ACTIVE);
         saveRoom(deluxeKing, 803, 8, RoomStatus.ACTIVE);
@@ -440,7 +394,7 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(oceanViewSuite, 805, 8, RoomStatus.ACTIVE);
         saveRoom(deluxeQueen, 806, 8, RoomStatus.MAINTENANCE);
 
-        // Tầng 9 - 6 phòng, nhiều loại phòng hỗn hợp
+        // Floor 9
         saveRoom(duplexSuite, 901, 9, RoomStatus.ACTIVE);
         saveRoom(executiveSuite, 902, 9, RoomStatus.ACTIVE);
         saveRoom(familyRoom, 903, 9, RoomStatus.ACTIVE);
@@ -448,297 +402,410 @@ public class DataSeeder implements ApplicationRunner {
         saveRoom(honeymoonSuite, 905, 9, RoomStatus.ACTIVE);
         saveRoom(mountainView, 906, 9, RoomStatus.ACTIVE);
 
-        log.info("RoomSeeder: done");
+        log.info("DemoDataSeeder: rooms seeded = {}", roomRepository.count());
     }
 
     // =========================================================
-    // BOOKING
+    // BOOKINGS
     // =========================================================
-    private void seedSearchBookingData() {
 
-        if (bookingRepository.count() > 0) {
-            log.info("BookingSeeder: data already present — skip");
-            return;
-        }
+    private void seedBookingData() {
 
-        User alice = userRepository
-                .findByUsernameAndDeleteFlagFalse("alice")
-                .orElseThrow();
-
-        User peter = userRepository
-                .findByUsernameAndDeleteFlagFalse("peter")
-                .orElseThrow();
-
-        List<RoomType> roomTypes =
-                roomTypeRepository.findAllByDeleteFlagFalse();
-
+        List<RoomType> roomTypes = roomTypeRepository.findAllByDeleteFlagFalse();
         List<Room> rooms = roomRepository.findAll();
 
-        RoomType deluxeKing =
-                requireSeedRoomType(roomTypes, "Deluxe King Room");
+        User alice = requireSeedUser("alice");
+        User peter = requireSeedUser("peter");
 
-        RoomType executiveSuite =
-                requireSeedRoomType(roomTypes, "Executive Suite");
+        // ---------------------------------------------------------
+        // A. Dynamic demo bookings based on today
+        // ---------------------------------------------------------
+        seedDynamicDemoBookings(alice, peter, roomTypes, rooms);
 
-        RoomType familyRoom =
-                requireSeedRoomType(roomTypes, "Family Room");
+        // ---------------------------------------------------------
+        // B. Historical/statistics data
+        // Revenue is intentionally spread across many months.
+        // 2024: Jan-Dec
+        // 2025: Jan-Dec
+        // 2026: Jan-Sep (no artificial future revenue after Sep 2026)
+        // ---------------------------------------------------------
+        seedStatisticsYear(2024, 12, roomTypes, rooms);
+        seedStatisticsYear(2025, 12, roomTypes, rooms);
+        seedStatisticsYear(2026, 9, roomTypes, rooms);
 
+        log.info("DemoDataSeeder: bookings seeded = {}", bookingRepository.count());
+    }
 
-        // =====================================================
-        // CASE 1
-        // CONFIRMED + overlap
-        // 10/09 -> 12/09
-        // Room 101 (tầng 1) phải bị occupied
-        // =====================================================
+    private void seedDynamicDemoBookings(
+            User alice,
+            User peter,
+            List<RoomType> roomTypes,
+            List<Room> rooms
+    ) {
 
-        Booking booking1 =
-                saveBooking(
-                        alice,
-                        BookingStatus.CONFIRMED,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 12)
-                );
+        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
 
-        BookingItem bookingItem1 =
-                saveBookingItem(
-                        booking1,
-                        deluxeKing,
-                        1,
-                        BigDecimal.valueOf(150)
-                );
+        RoomType deluxeKing = requireSeedRoomType(roomTypes, "Deluxe King Room");
+        RoomType executiveSuite = requireSeedRoomType(roomTypes, "Executive Suite");
+        RoomType familyRoom = requireSeedRoomType(roomTypes, "Family Room");
+        RoomType oceanViewSuite = requireSeedRoomType(roomTypes, "Ocean View Suite");
 
-        saveRoomAssignment(
-                bookingItem1,
-                requireSeedRoom(rooms, 101)
+        // CONFIRMED: future stay, paid successfully, currently holds room 101.
+        saveBookingScenario(
+                alice,
+                BookingStatus.CONFIRMED,
+                today.plusDays(3),
+                today.plusDays(5),
+                now.minusDays(2),
+                deluxeKing,
+                requireSeedRoom(rooms, 101),
+                1,
+                new BigDecimal("110.00")
         );
 
-
-        // =====================================================
-        // CASE 2
-        // PAID + overlap
-        // 11/09 -> 13/09
-        // Room 203 (tầng 2) cũng phải bị occupied
-        // =====================================================
-
-        Booking booking2 =
-                saveBooking(
-                        peter,
-                        BookingStatus.PAID,
-                        LocalDate.of(2026, 9, 11),
-                        LocalDate.of(2026, 9, 13)
-                );
-
-        BookingItem bookingItem2 =
-                saveBookingItem(
-                        booking2,
-                        deluxeKing,
-                        2,
-                        BigDecimal.valueOf(300)
-                );
-
-        saveRoomAssignment(
-                bookingItem2,
-                requireSeedRoom(rooms, 203)
+        // PAID: future stay, payment successful, currently holds room 203.
+        saveBookingScenario(
+                peter,
+                BookingStatus.PAID,
+                today.plusDays(4),
+                today.plusDays(6),
+                now.minusDays(1),
+                deluxeKing,
+                requireSeedRoom(rooms, 203),
+                1,
+                new BigDecimal("120.00")
         );
 
-
-        // =====================================================
-        // CASE 3
-        // CANCELLED + overlap
-        // Room 303 (tầng 3) KHÔNG được occupied
-        // =====================================================
-
-        Booking booking3 =
-                saveBooking(
-                        alice,
-                        BookingStatus.CANCELLED,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 12)
-                );
-
-        BookingItem bookingItem3 =
-                saveBookingItem(
-                        booking3,
-                        deluxeKing,
-                        3,
-                        BigDecimal.valueOf(500)
-                );
-
-        saveRoomAssignment(
-                bookingItem3,
-                requireSeedRoom(rooms, 303)
+        // CANCELLED: no longer holds room 303.
+        saveBookingScenario(
+                alice,
+                BookingStatus.CANCELLED,
+                today.plusDays(3),
+                today.plusDays(5),
+                now.minusDays(3),
+                deluxeKing,
+                requireSeedRoom(rooms, 303),
+                1,
+                new BigDecimal("118.00")
         );
 
-
-        // =====================================================
-        // CASE 4
-        // CONFIRMED nhưng checkout đúng ngày search check-in
-        //
-        // Booking: 08/09 -> 10/09
-        // Search : 10/09 -> 12/09
-        //
-        // KHÔNG overlap vì đang dùng < và >
-        // Room 404 (tầng 4) vẫn available
-        // =====================================================
-
-        Booking booking4 =
-                saveBooking(
-                        peter,
-                        BookingStatus.CONFIRMED,
-                        LocalDate.of(2026, 9, 8),
-                        LocalDate.of(2026, 9, 10)
-                );
-
-        BookingItem bookingItem4 =
-                saveBookingItem(
-                        booking4,
-                        deluxeKing,
-                        1,
-                        BigDecimal.valueOf(200)
-                );
-
-        saveRoomAssignment(
-                bookingItem4,
-                requireSeedRoom(rooms, 404)
+        // CONFIRMED boundary case: checkout is exactly today + 3.
+        saveBookingScenario(
+                peter,
+                BookingStatus.CONFIRMED,
+                today.plusDays(1),
+                today.plusDays(3),
+                now.minusDays(4),
+                deluxeKing,
+                requireSeedRoom(rooms, 404),
+                1,
+                new BigDecimal("120.00")
         );
 
-
-        // =====================================================
-        // CASE 5
-        // PENDING + overlap Executive Suite
-        // Room 702 (tầng 7) bị occupied
-        // =====================================================
-
-        Booking booking5 =
-                saveBooking(
-                        alice,
-                        BookingStatus.PENDING,
-                        LocalDate.of(2026, 9, 9),
-                        LocalDate.of(2026, 9, 11)
-                );
-
-        BookingItem bookingItem5 =
-                saveBookingItem(
-                        booking5,
-                        executiveSuite,
-                        4,
-                        BigDecimal.valueOf(600)
-                );
-
-        saveRoomAssignment(
-                bookingItem5,
-                requireSeedRoom(rooms, 702)
+        // PENDING: waiting for payment, expires in 15 minutes, holds room 702.
+        saveBookingScenario(
+                alice,
+                BookingStatus.PENDING,
+                today.plusDays(2),
+                today.plusDays(4),
+                now,
+                executiveSuite,
+                requireSeedRoom(rooms, 702),
+                1,
+                new BigDecimal("250.00")
         );
 
-
-        // =====================================================
-        // CASE 6
-        // EXPIRED + overlap Family Room
-        // Room 903 (tầng 9) KHÔNG được occupied
-        // =====================================================
-
-        Booking booking6 =
-                saveBooking(
-                        peter,
-                        BookingStatus.EXPIRED,
-                        LocalDate.of(2026, 9, 10),
-                        LocalDate.of(2026, 9, 13)
-                );
-
-        BookingItem bookingItem6 =
-                saveBookingItem(
-                        booking6,
-                        familyRoom,
-                        1,
-                        BigDecimal.valueOf(300)
-                );
-
-        saveRoomAssignment(
-                bookingItem6,
-                requireSeedRoom(rooms, 903)
+        // EXPIRED: payment window already expired, does not hold room 903.
+        saveBookingScenario(
+                peter,
+                BookingStatus.EXPIRED,
+                today.plusDays(3),
+                today.plusDays(6),
+                now.minusDays(1),
+                familyRoom,
+                requireSeedRoom(rooms, 903),
+                1,
+                new BigDecimal("180.75")
         );
 
-        log.info("BookingSeeder: search test data done");
+        // CHECKED_IN: guest is currently staying, holds room 501.
+        saveBookingScenario(
+                alice,
+                BookingStatus.CHECKED_IN,
+                today.minusDays(1),
+                today.plusDays(2),
+                now.minusDays(7),
+                executiveSuite,
+                requireSeedRoom(rooms, 501),
+                1,
+                new BigDecimal("240.00")
+        );
+
+        // COMPLETED: finished stay, suitable for booking history demo.
+        saveBookingScenario(
+                alice,
+                BookingStatus.COMPLETED,
+                today.minusDays(8),
+                today.minusDays(5),
+                now.minusDays(15),
+                familyRoom,
+                requireSeedRoom(rooms, 502),
+                1,
+                new BigDecimal("175.00")
+        );
+
+        // REFUNDED: was paid and then refunded before check-in, no active room hold.
+        saveBookingScenario(
+                alice,
+                BookingStatus.REFUNDED,
+                today.plusDays(7),
+                today.plusDays(9),
+                now.minusDays(5),
+                oceanViewSuite,
+                requireSeedRoom(rooms, 401),
+                1,
+                new BigDecimal("230.00")
+        );
+    }
+
+    /**
+     * Create historical bookings for admin statistics.
+     * Each month has one COMPLETED/SUCCESS booking so the revenue chart has data.
+     * Extra CANCELLED/REFUNDED/EXPIRED records keep booking statistics realistic.
+     */
+    private void seedStatisticsYear(
+            int year,
+            int maxMonth,
+            List<RoomType> roomTypes,
+            List<Room> rooms
+    ) {
+
+        String[] revenueRoomTypeNames = {
+                "Deluxe King Room",
+                "Standard Twin Room",
+                "Executive Suite",
+                "Family Room",
+                "Single Economy Room",
+                "Deluxe Queen Room",
+                "Family Suite",
+                "Accessible Room",
+                "Garden View Room",
+                "Ocean View Suite",
+                "Honeymoon Suite",
+                "Mountain View Room"
+        };
+
+        int[] revenueRoomNumbers = {
+                101, 102, 103, 104, 105, 202,
+                204, 206, 302, 401, 405, 605
+        };
+
+        List<User> statsUsers = List.of(
+                requireSeedUser("alice"),
+                requireSeedUser("peter"),
+                requireSeedUser("demo01"),
+                requireSeedUser("demo02"),
+                requireSeedUser("demo03"),
+                requireSeedUser("demo04"),
+                requireSeedUser("demo05"),
+                requireSeedUser("demo06")
+        );
+
+        // 1 successful completed booking per month -> revenue chart data.
+        for (int month = 1; month <= maxMonth; month++) {
+
+            int index = (month - 1) % revenueRoomTypeNames.length;
+
+            RoomType roomType = requireSeedRoomType(
+                    roomTypes,
+                    revenueRoomTypeNames[index]
+            );
+
+            Room room = requireSeedRoom(
+                    rooms,
+                    revenueRoomNumbers[index]
+            );
+
+            User user = statsUsers.get((month - 1) % statsUsers.size());
+
+            LocalDateTime createdAt = LocalDateTime.of(
+                    year,
+                    month,
+                    3,
+                    10,
+                    0
+            );
+
+            LocalDate checkInDate = LocalDate.of(
+                    year,
+                    month,
+                    10
+            );
+
+            LocalDate checkOutDate = checkInDate.plusDays(2 + (month % 3));
+
+            // Historical snapshot price differs slightly from current price.
+            BigDecimal snapshotPrice = roomType.getPrice()
+                    .subtract(new BigDecimal((month % 3) * 2))
+                    .max(new BigDecimal("20.00"));
+
+            saveBookingScenario(
+                    user,
+                    BookingStatus.COMPLETED,
+                    checkInDate,
+                    checkOutDate,
+                    createdAt,
+                    roomType,
+                    room,
+                    1,
+                    snapshotPrice
+            );
+        }
+
+        // CANCELLED bookings: one per quarter, no successful payment.
+        int[] cancelledMonths = {2, 5, 8, 11};
+
+        for (int month : cancelledMonths) {
+            if (month > maxMonth) {
+                continue;
+            }
+
+            RoomType roomType = requireSeedRoomType(roomTypes, "Standard Twin Room");
+            Room room = requireSeedRoom(rooms, 304);
+
+            saveBookingScenario(
+                    requireSeedUser("alice"),
+                    BookingStatus.CANCELLED,
+                    LocalDate.of(year, month, 18),
+                    LocalDate.of(year, month, 20),
+                    LocalDateTime.of(year, month, 6, 9, 0),
+                    roomType,
+                    room,
+                    1,
+                    new BigDecimal("72.00")
+            );
+        }
+
+        // REFUNDED bookings: paid previously, later refunded; excluded from revenue
+        // because AdminStatisticsService counts PaymentStatus.SUCCESS only.
+        int[] refundedMonths = {4, 10};
+
+        for (int month : refundedMonths) {
+            if (month > maxMonth) {
+                continue;
+            }
+
+            RoomType roomType = requireSeedRoomType(roomTypes, "Family Suite");
+            Room room = requireSeedRoom(rooms, 402);
+
+            saveBookingScenario(
+                    requireSeedUser("demo02"),
+                    BookingStatus.REFUNDED,
+                    LocalDate.of(year, month, 20),
+                    LocalDate.of(year, month, 23),
+                    LocalDateTime.of(year, month, 8, 11, 0),
+                    roomType,
+                    room,
+                    1,
+                    new BigDecimal("210.00")
+            );
+        }
+
+        // One expired booking in June for each year when June is included.
+        if (maxMonth >= 6) {
+            RoomType roomType = requireSeedRoomType(roomTypes, "Single Economy Room");
+            Room room = requireSeedRoom(rooms, 601);
+
+            saveBookingScenario(
+                    requireSeedUser("demo03"),
+                    BookingStatus.EXPIRED,
+                    LocalDate.of(year, 6, 24),
+                    LocalDate.of(year, 6, 26),
+                    LocalDateTime.of(year, 6, 15, 8, 0),
+                    roomType,
+                    room,
+                    1,
+                    new BigDecimal("42.00")
+            );
+        }
+    }
+
+    private Booking saveBookingScenario(
+            User user,
+            BookingStatus status,
+            LocalDate checkInDate,
+            LocalDate checkOutDate,
+            LocalDateTime createdAt,
+            RoomType roomType,
+            Room room,
+            int quantity,
+            BigDecimal snapshotPrice
+    ) {
+
+        Booking booking = saveBooking(
+                user,
+                status,
+                checkInDate,
+                checkOutDate,
+                createdAt
+        );
+
+        BookingItem bookingItem = saveBookingItem(
+                booking,
+                roomType,
+                quantity,
+                snapshotPrice
+        );
+
+        // For demo seed scenarios quantity is 1, therefore exactly one room
+        // assignment is created for the booking item.
+        saveRoomAssignment(
+                booking,
+                bookingItem,
+                room
+        );
+
+        return booking;
     }
 
     // =========================================================
-    // CART + CART ITEM
+    // CART
     // =========================================================
 
     private void seedCartData() {
 
-        // ========================
-        // Find RoomTypes
-        // ========================
-        List<RoomType> roomTypes =
-                roomTypeRepository.findAllByDeleteFlagFalse();
+        List<RoomType> roomTypes = roomTypeRepository.findAllByDeleteFlagFalse();
 
-        if (roomTypes.isEmpty()) {
-            log.warn("CartSeeder: no room types found — skip");
-            return;
-        }
+        // Main demo user starts with an empty cart so the video can demonstrate
+        // Add to Cart -> change quantity -> Booking -> clear cart from scratch.
+        Cart aliceCart = createCart(requireSeedUser("alice"));
 
-        // Alice:
-        // RoomType 1 x2
-        // RoomType 2 x1
-        seedCartForUser(
-                "alice",
-                roomTypes,
-                List.of(2, 1)
+        // Keep one non-empty cart for another account to demonstrate cart UI quickly.
+        Cart peterCart = createCart(requireSeedUser("peter"));
+
+        saveCartItem(
+                peterCart,
+                requireSeedRoomType(roomTypes, "Standard Twin Room"),
+                1
         );
 
-        // Peter:
-        // RoomType 1 x5
-        // RoomType 2 x1
-        // RoomType 3 x7
-        seedCartForUser(
-                "peter",
-                roomTypes,
-                List.of(5, 1, 7)
+        saveCartItem(
+                peterCart,
+                requireSeedRoomType(roomTypes, "Executive Suite"),
+                1
+        );
+
+        log.info(
+                "DemoDataSeeder: carts seeded. Alice cart={}, Peter cart={}",
+                aliceCart.getId(),
+                peterCart.getId()
         );
     }
 
-    private void seedCartForUser(
-            String username,
-            List<RoomType> roomTypes,
-            List<Integer> quantities
-    ) {
+    private Cart createCart(User user) {
 
-        // ========================
-        // Find User
-        // ========================
-        User user = userRepository
-                .findByUsernameAndDeleteFlagFalse(username)
-                .orElse(null);
-
-        if (user == null) {
-            log.warn(
-                    "CartSeeder: user {} not found — skip",
-                    username
-            );
-            return;
-        }
-
-        // ========================
-        // User đã có cart active
-        // ========================
-        if (cartRepository
-                .findByUserIdAndDeleteFlagFalse(user.getId())
-                .isPresent()) {
-
-            log.info(
-                    "CartSeeder: {} already has cart — skip",
-                    username
-            );
-
-            return;
-        }
-
-        // ========================
-        // Create Cart
-        // ========================
         Cart cart = new Cart();
-
         cart.setUserId(user.getId());
         cart.setDeleteFlag(false);
 
@@ -746,46 +813,17 @@ public class DataSeeder implements ApplicationRunner {
 
         cart.setCreatedBy("admin");
         cart.setCreatedAt(now);
-        cart.setUpdatedBy(null);
-        cart.setUpdatedAt(null);
+        cart.setUpdatedBy("admin");
+        cart.setUpdatedAt(now);
 
-        cart = cartRepository.save(cart);
-
-        // ========================
-        // Create Cart Items
-        // ========================
-
-        int itemCount = Math.min(
-                roomTypes.size(),
-                quantities.size()
-        );
-
-        for (int i = 0; i < itemCount; i++) {
-
-            RoomType roomType = roomTypes.get(i);
-            Integer quantity = quantities.get(i);
-
-            saveCartItem(
-                    cart,
-                    roomType,
-                    quantity
-            );
-        }
-
-        log.info(
-                "CartSeeder: created cart {} for {} with {} items",
-                cart.getId(),
-                username,
-                itemCount
-        );
+        return cartRepository.save(cart);
     }
 
-    private void seedRoomBookingSlots() {
+    // =========================================================
+    // ROOM BOOKING SLOTS
+    // =========================================================
 
-        if (roomBookingSlotRepository.count() > 0) {
-            System.out.println("RoomBookingSlot already exists. Skip seeding.");
-            return;
-        }
+    private void seedRoomBookingSlots() {
 
         List<BookingStatus> holdingStatuses = List.of(
                 BookingStatus.PENDING,
@@ -798,22 +836,25 @@ public class DataSeeder implements ApplicationRunner {
                 bookingRepository.findByDeleteFlagFalseAndStatusIn(holdingStatuses);
 
         for (Booking booking : bookings) {
-            // PENDING đã hết hạn thì không tạo slot
+
+            // PENDING whose payment window is already expired must not hold a room.
             if (BookingStatus.PENDING.equals(booking.getStatus())
                     && booking.getExpiresAt() != null
                     && booking.getExpiresAt().isBefore(LocalDateTime.now())) {
                 continue;
             }
 
-            // Lấy BookingItem của Booking
             List<BookingItem> bookingItems =
-                    bookingItemRepository.findByDeleteFlagFalseAndBookingId(booking.getId());
+                    bookingItemRepository.findByDeleteFlagFalseAndBookingId(
+                            booking.getId()
+                    );
 
             for (BookingItem bookingItem : bookingItems) {
 
-                // Lấy RoomAssignment của BookingItem
                 List<RoomAssignment> assignments =
-                        roomAssignmentRepository.findByBookingItemIdAndDeleteFlagFalse(bookingItem.getId());
+                        roomAssignmentRepository.findByBookingItemIdAndDeleteFlagFalse(
+                                bookingItem.getId()
+                        );
 
                 for (RoomAssignment assignment : assignments) {
                     createRoomBookingSlots(
@@ -823,89 +864,139 @@ public class DataSeeder implements ApplicationRunner {
                 }
             }
         }
+
+        log.info(
+                "DemoDataSeeder: room booking slots seeded = {}",
+                roomBookingSlotRepository.count()
+        );
     }
+
+    // =========================================================
+    // PAYMENTS
+    // =========================================================
 
     private void seedPayments() {
 
-        List<Booking> bookings =
-                bookingRepository.findByDeleteFlagFalse();
-
-        if (bookings.isEmpty()) {
-            log.info("PaymentDataSeeder: No booking found — skip");
-            return;
-        }
+        List<Booking> bookings = bookingRepository.findByDeleteFlagFalse();
 
         for (Booking booking : bookings) {
 
-            // Booking này đã có Payment thì skip
-            if (paymentRepository
-                    .existsByBookingIdAndDeleteFlagFalse(
-                            booking.getId()
-                    )) {
-                continue;
-            }
-
             switch (booking.getStatus()) {
 
-                // Booking vừa tạo, chưa thanh toán
+                // Waiting for payment.
                 case PENDING -> seedPendingPayment(booking);
 
-                // User chọn CASH, booking đã được xác nhận
-                case CONFIRMED -> seedCashPayment(booking);
-
-                // Thanh toán online thành công
+                // Payment succeeded but hotel has not confirmed yet.
                 case PAID -> seedOnlineSuccessPayment(booking);
 
-                // Đã check-in, payment trước đó đã thành công
+                // Confirmed booking must already have a successful payment.
+                // Use CASH success here so demo data contains both payment methods.
+                case CONFIRMED -> seedCashSuccessPayment(booking);
+
+                // Guest has checked in, payment was successful beforehand.
                 case CHECKED_IN -> seedOnlineSuccessPayment(booking);
 
-                // Booking đã hoàn tất
+                // Completed stay, payment was successful.
                 case COMPLETED -> seedOnlineSuccessPayment(booking);
 
-                // Booking hết hạn do không thanh toán
+                // Payment window expired / payment failed.
                 case EXPIRED -> seedFailedPayment(booking);
 
-                default -> {
-                    // CANCELLED hoặc status khác
+                // Booking was paid and later refunded.
+                case REFUNDED -> seedRefundedPayment(booking);
+
+                // CANCELLED demo records are intentionally unpaid/no-payment.
+                case CANCELLED -> {
                 }
             }
         }
 
-        log.info("PaymentDataSeeder: Payment data seeded successfully");
+        log.info("DemoDataSeeder: payments seeded = {}", paymentRepository.count());
     }
 
-    private void saveCartItem(
-            Cart cart,
-            RoomType roomType,
-            Integer quantity
-    ) {
+    private void seedCashSuccessPayment(Booking booking) {
 
-        CartItem item = new CartItem();
+        LocalDateTime paymentDate = getSeedPaymentDate(booking);
 
-        item.setCartId(cart.getId());
-        item.setRoomTypeId(roomType.getId());
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("CASH")
+                .status(PaymentStatus.SUCCESS)
+                .paymentDate(paymentDate)
+                .transactionId("CASH-" + UUID.randomUUID())
+                .build();
 
-        item.setQuantity(quantity);
+        setPaymentAudit(payment, paymentDate);
+        paymentRepository.save(payment);
+    }
 
-        // Giá lấy trực tiếp từ RoomType
-        item.setPrice(roomType.getPrice());
+    private void seedOnlineSuccessPayment(Booking booking) {
 
-        // Soft delete
-        item.setDeleteFlag(false);
+        LocalDateTime paymentDate = getSeedPaymentDate(booking);
 
-        // Audit
-        Instant now = Instant.now();
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("ONLINE")
+                .status(PaymentStatus.SUCCESS)
+                .paymentDate(paymentDate)
+                .transactionId(UUID.randomUUID().toString())
+                .build();
 
-        item.setCreatedBy("admin");
-        item.setCreatedAt(now);
-        item.setUpdatedBy(null);
-        item.setUpdatedAt(null);
+        setPaymentAudit(payment, paymentDate);
+        paymentRepository.save(payment);
+    }
 
-        cartItemRepository.save(item);
+    private void seedPendingPayment(Booking booking) {
+
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("ONLINE")
+                .status(PaymentStatus.PENDING)
+                .paymentDate(null)
+                .transactionId(null)
+                .build();
+
+        setPaymentAudit(payment, toLocalDateTime(booking.getCreatedAt()));
+        paymentRepository.save(payment);
+    }
+
+    private void seedFailedPayment(Booking booking) {
+
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("ONLINE")
+                .status(PaymentStatus.FAILED)
+                .paymentDate(null)
+                .transactionId("FAILED-" + UUID.randomUUID())
+                .build();
+
+        setPaymentAudit(payment, toLocalDateTime(booking.getCreatedAt()).plusMinutes(15));
+        paymentRepository.save(payment);
+    }
+
+    private void seedRefundedPayment(Booking booking) {
+
+        LocalDateTime paymentDate = getSeedPaymentDate(booking);
+
+        Payment payment = Payment.builder()
+                .bookingId(booking.getId())
+                .amount(calculateBookingTotal(booking))
+                .paymentMethod("ONLINE")
+                .status(PaymentStatus.REFUNDED)
+                .paymentDate(paymentDate)
+                .transactionId("REFUND-" + UUID.randomUUID())
+                .build();
+
+        setPaymentAudit(payment, paymentDate.plusDays(1));
+        paymentRepository.save(payment);
     }
 
     // =========================================================
-    // PERMISSION
+    // SAVE HELPERS
     // =========================================================
 
     private Permission savePermission(
@@ -914,17 +1005,12 @@ public class DataSeeder implements ApplicationRunner {
     ) {
 
         Permission permission = new Permission();
-
         permission.setCode(code);
         permission.setName(name);
         permission.setDescription("");
 
         return permissionRepository.save(permission);
     }
-
-    // =========================================================
-    // ROLE
-    // =========================================================
 
     private Role saveRole(
             String code,
@@ -933,7 +1019,6 @@ public class DataSeeder implements ApplicationRunner {
     ) {
 
         Role role = new Role();
-
         role.setCode(code);
         role.setRoleName(name);
         role.setDescription("");
@@ -949,10 +1034,6 @@ public class DataSeeder implements ApplicationRunner {
         return roleRepository.save(role);
     }
 
-    // =========================================================
-    // USER
-    // =========================================================
-
     private void saveUser(
             String username,
             String email,
@@ -963,36 +1044,25 @@ public class DataSeeder implements ApplicationRunner {
             String phoneNumber,
             String address,
             String profileUrlLink,
+            boolean enabled,
             List<String> roleIds
     ) {
 
         User user = new User();
 
         user.setUsername(username);
-
-        // BCrypt - encode một lần
-        user.setPassword(
-                passwordEncoder.encode(rawPassword)
-        );
-
+        user.setPassword(passwordEncoder.encode(rawPassword));
         user.setFullName(fullName);
         user.setGender(gender);
         user.setDateOfBirth(dateOfBirth);
-
         user.setEmail(email);
         user.setPhoneNumber(phoneNumber);
         user.setAddress(address);
         user.setProfileUrlLink(profileUrlLink);
-
         user.setRoleIds(roleIds);
-
-        // Account mặc định active
-        user.setEnabled(true);
-
-        // Soft delete
+        user.setEnabled(enabled);
         user.setDeleteFlag(false);
 
-        // Audit
         Instant now = Instant.now();
 
         user.setCreatedBy("admin");
@@ -1003,19 +1073,46 @@ public class DataSeeder implements ApplicationRunner {
         userRepository.save(user);
     }
 
+    private void saveRoomType(
+            String roomTypeName,
+            Double roomSize,
+            String facility,
+            Integer maximumPeople,
+            BigDecimal price,
+            RoomTypeStatus status
+    ) {
+
+        RoomType roomType = new RoomType();
+        roomType.setRoomTypeName(roomTypeName);
+        roomType.setRoomSize(roomSize);
+        roomType.setFacility(facility);
+        roomType.setMaximumPeople(maximumPeople);
+        roomType.setPrice(price);
+        roomType.setStatus(status);
+        roomType.setDeleteFlag(false);
+
+        Instant now = Instant.now();
+
+        roomType.setCreatedBy("admin");
+        roomType.setCreatedAt(now);
+        roomType.setUpdatedBy("admin");
+        roomType.setUpdatedAt(now);
+
+        roomTypeRepository.save(roomType);
+    }
+
     private void saveRoom(
             RoomType roomType,
             Integer roomNumber,
             Integer floorNumber,
             RoomStatus status
     ) {
-        Room room = new Room();
 
+        Room room = new Room();
         room.setRoomTypeId(roomType.getId());
         room.setRoomNumber(roomNumber);
         room.setFloorNumber(floorNumber);
         room.setStatus(status);
-
         room.setDeleteFlag(false);
 
         Instant now = Instant.now();
@@ -1032,33 +1129,41 @@ public class DataSeeder implements ApplicationRunner {
             User user,
             BookingStatus status,
             LocalDate checkInDate,
-            LocalDate checkOutDate
+            LocalDate checkOutDate,
+            LocalDateTime createdAt
     ) {
-        Booking booking = new Booking();
 
-        Instant now = Instant.now();
+        if (!checkOutDate.isAfter(checkInDate)) {
+            throw new IllegalArgumentException(
+                    "Seed booking checkout must be after check-in"
+            );
+        }
+
+        Booking booking = new Booking();
 
         booking.setUserId(user.getId());
         booking.setStatus(status);
         booking.setCheckInDate(checkInDate);
         booking.setCheckOutDate(checkOutDate);
 
-        // Chỉ PENDING và EXPIRED mới có thời gian giữ phòng
-        if (BookingStatus.PENDING.equals(status)
-                || BookingStatus.EXPIRED.equals(status)) {
-            booking.setExpiresAt(
-                    LocalDateTime.now().plusMinutes(15)
-            );
+        if (BookingStatus.PENDING.equals(status)) {
+            // Current pending demo booking: room hold remains valid for 15 minutes.
+            booking.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        } else if (BookingStatus.EXPIRED.equals(status)) {
+            // Expired booking must have an expiry time in the past relative to its creation.
+            booking.setExpiresAt(createdAt.plusMinutes(15));
         } else {
             booking.setExpiresAt(null);
         }
 
         booking.setDeleteFlag(false);
 
+        Instant createdInstant = toInstant(createdAt);
+
         booking.setCreatedBy("admin");
-        booking.setCreatedAt(now);
+        booking.setCreatedAt(createdInstant);
         booking.setUpdatedBy("admin");
-        booking.setUpdatedAt(now);
+        booking.setUpdatedAt(createdInstant);
 
         return bookingRepository.save(booking);
     }
@@ -1069,123 +1174,88 @@ public class DataSeeder implements ApplicationRunner {
             int quantity,
             BigDecimal price
     ) {
+
         BookingItem bookingItem = new BookingItem();
 
         bookingItem.setBookingId(booking.getId());
         bookingItem.setRoomTypeId(roomType.getId());
-
         bookingItem.setQuantity(quantity);
         bookingItem.setPrice(price);
-
         bookingItem.setDeleteFlag(false);
 
-        Instant now = Instant.now();
+        Instant auditTime = booking.getCreatedAt();
 
         bookingItem.setCreatedBy("admin");
-        bookingItem.setCreatedAt(now);
+        bookingItem.setCreatedAt(auditTime);
         bookingItem.setUpdatedBy("admin");
-        bookingItem.setUpdatedAt(now);
+        bookingItem.setUpdatedAt(auditTime);
 
         return bookingItemRepository.save(bookingItem);
     }
 
     private void saveRoomAssignment(
+            Booking booking,
             BookingItem bookingItem,
             Room room
     ) {
-        RoomAssignment assignment = new RoomAssignment();
 
+        RoomAssignment assignment = new RoomAssignment();
         assignment.setBookingItemId(bookingItem.getId());
         assignment.setRoomId(room.getId());
-
         assignment.setDeleteFlag(false);
 
-        Instant now = Instant.now();
+        Instant auditTime = booking.getCreatedAt();
 
         assignment.setCreatedBy("admin");
-        assignment.setCreatedAt(now);
+        assignment.setCreatedAt(auditTime);
         assignment.setUpdatedBy("admin");
-        assignment.setUpdatedAt(now);
+        assignment.setUpdatedAt(auditTime);
 
         roomAssignmentRepository.save(assignment);
     }
 
-    private void seedCashPayment(Booking booking) {
+    private void saveCartItem(
+            Cart cart,
+            RoomType roomType,
+            Integer quantity
+    ) {
+
+        CartItem item = new CartItem();
+        item.setCartId(cart.getId());
+        item.setRoomTypeId(roomType.getId());
+        item.setQuantity(quantity);
+        item.setPrice(roomType.getPrice());
+        item.setDeleteFlag(false);
 
         Instant now = Instant.now();
 
-        Payment payment = Payment.builder()
-                .bookingId(booking.getId())
-                .amount(calculateBookingTotal(booking))
-                .paymentMethod("CASH")
-                .status(PaymentStatus.PENDING)
-                .paymentDate(null)
-                .transactionId(null)
-                .build();
+        item.setCreatedBy("admin");
+        item.setCreatedAt(now);
+        item.setUpdatedBy("admin");
+        item.setUpdatedAt(now);
 
-        setPaymentAudit(payment, now);
-
-        paymentRepository.save(payment);
+        cartItemRepository.save(item);
     }
 
-    private void seedOnlineSuccessPayment(Booking booking) {
+    // =========================================================
+    // FIND HELPERS
+    // =========================================================
 
-        Instant now = Instant.now();
-
-        Payment payment = Payment.builder()
-                .bookingId(booking.getId())
-                .amount(calculateBookingTotal(booking))
-                .paymentMethod("ONLINE")
-                .status(PaymentStatus.SUCCESS)
-                .paymentDate(getSeedPaymentDate(booking))
-                .transactionId(UUID.randomUUID().toString())
-                .build();
-
-        setPaymentAudit(payment, now);
-
-        paymentRepository.save(payment);
-    }
-
-    private void seedPendingPayment(Booking booking) {
-
-        Instant now = Instant.now();
-
-        Payment payment = Payment.builder()
-                .bookingId(booking.getId())
-                .amount(calculateBookingTotal(booking))
-                .paymentMethod("ONLINE")
-                .status(PaymentStatus.PENDING)
-                .paymentDate(null)
-                .transactionId(null)
-                .build();
-
-        setPaymentAudit(payment, now);
-
-        paymentRepository.save(payment);
-    }
-
-    private void seedFailedPayment(Booking booking) {
-
-        Instant now = Instant.now();
-
-        Payment payment = Payment.builder()
-                .bookingId(booking.getId())
-                .amount(calculateBookingTotal(booking))
-                .paymentMethod("ONLINE")
-                .status(PaymentStatus.FAILED)
-                .paymentDate(null)
-                .transactionId(UUID.randomUUID().toString())
-                .build();
-
-        setPaymentAudit(payment, now);
-
-        paymentRepository.save(payment);
+    private User requireSeedUser(String username) {
+        return userRepository
+                .findByUsernameAndDeleteFlagFalse(username)
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Seeder user not found: " + username
+                        )
+                );
     }
 
     private RoomType requireSeedRoomType(
             List<RoomType> roomTypes,
             String roomTypeName
     ) {
+
         return roomTypes.stream()
                 .filter(roomType ->
                         roomTypeName.equals(roomType.getRoomTypeName())
@@ -1202,6 +1272,7 @@ public class DataSeeder implements ApplicationRunner {
             List<Room> rooms,
             Integer roomNumber
     ) {
+
         return rooms.stream()
                 .filter(room ->
                         roomNumber.equals(room.getRoomNumber())
@@ -1214,24 +1285,25 @@ public class DataSeeder implements ApplicationRunner {
                 );
     }
 
+    // =========================================================
+    // SLOT / PAYMENT HELPERS
+    // =========================================================
+
     private void createRoomBookingSlots(
             Booking booking,
             String roomId
     ) {
-        LocalDate stayDate =
-                booking.getCheckInDate();
 
-        while (stayDate.isBefore(
-                booking.getCheckOutDate()
-        )) {
+        LocalDate stayDate = booking.getCheckInDate();
 
-            RoomBookingSlot slot =
-                    RoomBookingSlot.builder()
-                            .roomId(roomId)
-                            .bookingId(booking.getId())
-                            .stayDate(stayDate)
-                            .createdAt(Instant.now())
-                            .build();
+        while (stayDate.isBefore(booking.getCheckOutDate())) {
+
+            RoomBookingSlot slot = RoomBookingSlot.builder()
+                    .roomId(roomId)
+                    .bookingId(booking.getId())
+                    .stayDate(stayDate)
+                    .createdAt(booking.getCreatedAt())
+                    .build();
 
             roomBookingSlotRepository.save(slot);
 
@@ -1239,36 +1311,29 @@ public class DataSeeder implements ApplicationRunner {
         }
     }
 
-    private LocalDateTime getSeedPaymentDate(
-            Booking booking
-    ) {
-        if (booking.getCreatedAt() == null) {
-            return LocalDateTime.now();
-        }
-
-        return LocalDateTime.ofInstant(
-                        booking.getCreatedAt(),
-                        ZoneId.systemDefault()
-                )
+    private LocalDateTime getSeedPaymentDate(Booking booking) {
+        return toLocalDateTime(booking.getCreatedAt())
                 .plusMinutes(5);
     }
 
-    private BigDecimal calculateBookingTotal(
-            Booking booking
-    ) {
-        List<BookingItem> bookingItems =
-                bookingItemRepository.findByDeleteFlagFalseAndBookingId(booking.getId());
+    private BigDecimal calculateBookingTotal(Booking booking) {
 
-        long numberOfNights =
-                ChronoUnit.DAYS.between(booking.getCheckInDate(), booking.getCheckOutDate());
+        List<BookingItem> bookingItems =
+                bookingItemRepository.findByDeleteFlagFalseAndBookingId(
+                        booking.getId()
+                );
+
+        long numberOfNights = ChronoUnit.DAYS.between(
+                booking.getCheckInDate(),
+                booking.getCheckOutDate()
+        );
 
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (BookingItem bookingItem : bookingItems) {
-            BigDecimal itemAmount =
-                    bookingItem.getPrice().multiply(
-                                    BigDecimal.valueOf(numberOfNights))
-                            .multiply(BigDecimal.valueOf(bookingItem.getQuantity()));
+            BigDecimal itemAmount = bookingItem.getPrice()
+                    .multiply(BigDecimal.valueOf(numberOfNights))
+                    .multiply(BigDecimal.valueOf(bookingItem.getQuantity()));
 
             totalAmount = totalAmount.add(itemAmount);
         }
@@ -1278,15 +1343,33 @@ public class DataSeeder implements ApplicationRunner {
 
     private void setPaymentAudit(
             Payment payment,
-            Instant now
+            LocalDateTime auditDateTime
     ) {
+
         payment.setDeleteFlag(false);
 
-        payment.setCreatedBy("admin");
-        payment.setCreatedAt(now);
+        Instant auditInstant = toInstant(auditDateTime);
 
+        payment.setCreatedBy("admin");
+        payment.setCreatedAt(auditInstant);
         payment.setUpdatedBy("admin");
-        payment.setUpdatedAt(now);
+        payment.setUpdatedAt(auditInstant);
     }
 
+    private Instant toInstant(LocalDateTime localDateTime) {
+        return localDateTime
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
+    }
+
+    private LocalDateTime toLocalDateTime(Instant instant) {
+        if (instant == null) {
+            return LocalDateTime.now();
+        }
+
+        return LocalDateTime.ofInstant(
+                instant,
+                ZoneId.systemDefault()
+        );
+    }
 }
