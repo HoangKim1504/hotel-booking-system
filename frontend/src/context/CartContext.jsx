@@ -13,6 +13,7 @@ import {
     addCartItem,
     updateCartItem,
     deleteCartItem,
+    clearCartItems,
 } from "../services/cartService";
 
 const CartContext = createContext(null);
@@ -25,6 +26,10 @@ export function CartProvider({ children }) {
 
     const [cart, setCart] = useState(null);
     const [loading, setLoading] = useState(false);
+
+    const cartItems = cart?.items ?? [];
+    const cartTotal = cart?.totalAmount ?? 0;
+    const cartWarnings = cart?.warnings ?? [];
 
     const loadCart = async () => {
         if (!isAuthenticated || !token) {
@@ -104,19 +109,28 @@ export function CartProvider({ children }) {
         );
     }, [cart]);
 
+    const clearCart = async () => {
+        const updatedCart =
+            await clearCartItems(token);
+
+        setCart(updatedCart);
+
+        return updatedCart;
+    };
+
     return (
         <CartContext.Provider
             value={{
                 cart,
-                cartItems: cart?.items ?? [],
-                cartTotal: cart?.totalAmount ?? 0,
-                cartWarnings: cart?.warnings ?? [],
+                cartItems,
+                cartTotal,
+                cartWarnings,
                 cartCount,
-                loading,
                 loadCart,
                 addToCart,
                 changeQuantity,
                 removeFromCart,
+                clearCart,
             }}
         >
             {children}

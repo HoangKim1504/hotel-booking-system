@@ -118,3 +118,26 @@ export async function deleteCartItem({
 
     return data;
 }
+
+/**
+ * Clear all items in cart
+ */
+export async function clearCartItems(token) {
+    const response = await fetch(
+        `${API_BASE_URL}/api/cart/items`,
+        {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}

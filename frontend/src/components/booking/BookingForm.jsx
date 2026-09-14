@@ -39,6 +39,7 @@ function BookingForm() {
         cartTotal,
         cartWarnings,
         loadCart,
+        clearCart,
     } = useCart();
 
     const [showConfirm, setShowConfirm] = useState(false);
@@ -80,15 +81,13 @@ function BookingForm() {
         setBookingLoading(true);
 
         try {
-            const items = cartItems.map((item) => ({
-                roomTypeId: item.roomTypeId,
-                quantity: item.quantity,
-                price: item.price,
-            }));
-
             // 1. Create booking
             const booking = await createBooking({
-                items,
+                items: cartItems.map((item) => ({
+                    roomTypeId: item.roomTypeId,
+                    quantity: item.quantity,
+                    price: item.price,
+                })),
                 checkInDate: formData.checkIn,
                 checkOutDate: formData.checkOut,
                 token,
@@ -97,24 +96,38 @@ function BookingForm() {
             // 2. Create payment
             await createPayment({
                 bookingId: booking.id,
-                paymentMethod: formData.paymentMethod,
+                paymentMethod:
+                    formData.paymentMethod,
                 token,
             });
 
-            // 3. Save created booking id
-            setCreatedBookingId(booking.id);
+            // 3. Clear cart AFTER booking and payment success
+            await clearCart();
 
+            // 4. Save booking ID for detail page
+            setCreatedBookingId(
+                booking.id
+            );
+
+            // 5. Close confirmation popup
             setShowConfirm(false);
+
+            // 6. Show booking success popup
             setShowSuccessPopup(true);
 
         } catch (error) {
+            const errorMessages = getErrorMessages(error);
+
+            // Close confirm popup
+            setShowConfirm(false);
+
+            // Save booking errors
             setBookingErrors(
-                getErrorMessages(error)
+                errorMessages
             );
 
-            setShowConfirm(false);
+            // Show error popup
             setShowErrorPopup(true);
-
         } finally {
             setBookingLoading(false);
         }
