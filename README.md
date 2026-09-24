@@ -1,40 +1,40 @@
 # Hotel Room Booking Website
 
-Website đặt phòng khách sạn trực tuyến được xây dựng nhằm hỗ trợ người dùng tìm kiếm phòng, xem thông tin chi tiết, đặt nhiều loại phòng trong cùng một lần đặt và quản lý lịch sử đặt phòng.
+An online hotel room booking website designed to help users search for rooms, view room details, book multiple room types within a single booking, and manage their booking history.
 
-Hệ thống đồng thời cung cấp trang quản trị dành cho Admin để quản lý người dùng, loại phòng, phòng, đơn đặt phòng và theo dõi các số liệu thống kê của hệ thống.
+The system also provides an Admin dashboard for managing users, room types, rooms, bookings, and monitoring system statistics.
 
-## 1. Công nghệ sử dụng
+## 1. Technologies Used
 
 ### Backend
 
-- Java
-- Spring Boot 4
-- Spring REST / Spring MVC
-- Spring Data MongoDB
-- Spring Security
-- Maven
+* Java
+* Spring Boot 4
+* Spring REST / Spring MVC
+* Spring Data MongoDB
+* Spring Security
+* Maven
 
 ### Frontend
 
-- ReactJS
-- JavaScript
-- HTML / JSX
-- CSS
-- Bootstrap
+* ReactJS
+* JavaScript
+* HTML / JSX
+* CSS
+* Bootstrap
 
 ### Database
 
-- MongoDB
+* MongoDB
 
 ### Deployment
 
-- Docker
-- Docker Compose
+* Docker
+* Docker Compose
 
-## 2. Kiến trúc hệ thống
+## 2. System Architecture
 
-Hệ thống được xây dựng theo kiến trúc **Monolithic**, bao gồm:
+The system is built using a **Monolithic Architecture**, consisting of:
 
 ```text
 Frontend (ReactJS)
@@ -47,56 +47,56 @@ Backend (Spring Boot)
 MongoDB
 ```
 
-Frontend giao tiếp với Backend thông qua REST API.
+The Frontend communicates with the Backend through REST APIs.
 
-Backend chịu trách nhiệm xử lý nghiệp vụ, xác thực, phân quyền và truy xuất dữ liệu từ MongoDB.
+The Backend is responsible for handling business logic, authentication, authorization, and data access from MongoDB.
 
-## 3. Chức năng chính
+## 3. Main Features
 
 ### User
 
-- Đăng ký tài khoản
-- Đăng nhập / đăng xuất
-- Tìm kiếm loại phòng theo ngày Check-in / Check-out
-- Tìm kiếm theo số lượng khách
-- Lọc, sắp xếp và phân trang kết quả
-- Xem thông tin chi tiết loại phòng
-- Thêm phòng vào giỏ đặt phòng
-- Đặt nhiều loại phòng trong cùng một booking
-- Xem lịch sử đặt phòng
-- Xem chi tiết booking
-- Cập nhật thông tin cá nhân
-- Hủy booking theo điều kiện của hệ thống
+* Register an account
+* Log in / Log out
+* Search for room types by Check-in / Check-out dates
+* Search based on the number of guests
+* Filter, sort, and paginate search results
+* View room type details
+* Add rooms to the booking cart
+* Book multiple room types within a single booking
+* View booking history
+* View booking details
+* Update personal information
+* Cancel bookings based on system conditions
 
 ### Admin
 
-- Quản lý loại phòng
-- Quản lý phòng
-- Quản lý người dùng
-- Quản lý booking
-- Tìm kiếm, sắp xếp và phân trang dữ liệu
-- Thay đổi trạng thái booking
-- Theo dõi trạng thái thanh toán
-- Xem thống kê hệ thống
-- Xem biểu đồ doanh thu và dữ liệu booking
+* Manage room types
+* Manage rooms
+* Manage users
+* Manage bookings
+* Search, sort, and paginate data
+* Update booking status
+* Monitor payment status
+* View system statistics
+* View revenue and booking charts
 
-## 4. Phân quyền
+## 4. Authorization
 
-Hệ thống sử dụng Spring Security để kiểm soát quyền truy cập.
+The system uses Spring Security to control access permissions.
 
 ### USER
 
-Được phép sử dụng các chức năng đặt phòng và quản lý booking cá nhân.
+Users are allowed to use room booking features and manage their own bookings.
 
 ### ADMIN
 
-Được phép truy cập trang quản trị và thực hiện các chức năng quản lý hệ thống.
+Admins are allowed to access the administration dashboard and perform system management operations.
 
-Người dùng thông thường không được phép truy cập các URL thuộc khu vực `/admin`.
+Regular users are not allowed to access URLs under the `/admin` path.
 
-Tài khoản bị khóa sẽ không thể đăng nhập vào hệ thống.
+Locked accounts are not allowed to log in to the system.
 
-## 5. Cấu trúc project
+## 5. Project Structure
 
 ```text
 project/
@@ -117,46 +117,46 @@ project/
 └── README.md
 ```
 
-## 6. Cách chạy project
+## 6. How to Run the Project
 
-### Yêu cầu
+### Requirements
 
-Cài đặt:
+Install the following tools:
 
-- Docker Desktop
-- Node.js
-- npm
-- Git
+* Docker Desktop
+* Node.js
+* npm
+* Git
 
-### Chạy Backend và Database
+### Run Backend and Database
 
-Di chuyển vào thư mục backend:
+Navigate to the backend directory:
 
 ```bash
 cd backend/hotel-booking-system
 ```
 
-Build và chạy Docker:
+Build and start Docker containers:
 
 ```bash
 docker compose up --build
 ```
 
-Nếu muốn chạy ở chế độ nền:
+To run the containers in detached mode:
 
 ```bash
 docker compose up --build -d
 ```
 
-### Chạy Frontend
+### Run Frontend
 
-Di chuyển vào thư mục frontend:
+Navigate to the frontend directory:
 
 ```bash
 cd frontend
 ```
 
-Cài dependency:
+Install dependencies:
 
 ```bash
 npm install
@@ -166,31 +166,31 @@ npm install
 npm install recharts
 ```
 
-Chạy React:
+Start the React application:
 
 ```bash
 npm run dev
 ```
 
-Sau khi khởi động thành công, truy cập website bằng URL được hiển thị trên terminal của frontend.
+After the application starts successfully, open the website using the URL displayed in the frontend terminal.
 
-## 7. Dừng hệ thống
+## 7. Stop the System
 
-Dừng Backend và Database:
+Stop the Backend and Database:
 
 ```bash
 docker compose down
 ```
 
-Nếu muốn xóa container, network và volume:
+To remove containers, networks, and volumes:
 
 ```bash
 docker compose down -v
 ```
 
-## 8. Build lại hệ thống
+## 8. Rebuild the System
 
-Khi thay đổi code Backend và muốn build lại Docker:
+When Backend code is changed and Docker needs to be rebuilt:
 
 ```bash
 docker compose down
@@ -198,7 +198,7 @@ docker compose build --no-cache
 docker compose up
 ```
 
-Hoặc:
+Alternatively:
 
 ```bash
 docker compose up --build
@@ -206,24 +206,24 @@ docker compose up --build
 
 ## 9. API
 
-Backend cung cấp REST API cho Frontend với các nhóm API chính:
+The Backend provides REST APIs for the Frontend, including the following main API groups:
 
-- Authentication API
-- User API
-- Room Type API
-- Room API
-- Booking API
-- Cart / Booking Item API
-- Admin API
-- Statistics API
+* Authentication API
+* User API
+* Room Type API
+* Room API
+* Booking API
+* Cart / Booking Item API
+* Admin API
+* Statistics API
 
-Dữ liệu giữa Frontend và Backend được trao đổi chủ yếu dưới định dạng JSON.
+Data between the Frontend and Backend is mainly exchanged in JSON format.
 
 ## 10. Database
 
-Hệ thống sử dụng MongoDB để lưu trữ dữ liệu.
+The system uses MongoDB for data storage.
 
-Một số collection chính:
+Some of the main collections include:
 
 ```text
 users
@@ -233,19 +233,19 @@ bookings
 bookingItems
 ```
 
-MongoDB được chạy thông qua Docker Compose cùng với Backend.
+MongoDB runs through Docker Compose together with the Backend.
 
-## 11. Mục tiêu đồ án
+## 11. Project Objectives
 
-- Xây dựng website đặt phòng khách sạn hoàn chỉnh.
-- Áp dụng Java Spring Boot để phát triển REST API.
-- Áp dụng ReactJS để xây dựng giao diện người dùng.
-- Áp dụng Spring Security cho Authentication và Authorization.
-- Sử dụng MongoDB để quản lý dữ liệu.
-- Áp dụng kiến trúc Monolithic.
-- Triển khai môi trường ứng dụng bằng Docker và Docker Compose.
-- Thực hành kết nối Frontend – Backend – Database trong một hệ thống hoàn chỉnh.
+* Build a complete hotel room booking website.
+* Apply Java Spring Boot to develop REST APIs.
+* Use ReactJS to build the user interface.
+* Apply Spring Security for authentication and authorization.
+* Use MongoDB for data management.
+* Apply a Monolithic Architecture.
+* Deploy the application environment using Docker and Docker Compose.
+* Practice integrating Frontend, Backend, and Database components into a complete system.
 
-## 12. Tác giả
+## 12. Author
 
 [Kim Tran Hoang](https://github.com/HoangKim1504)
